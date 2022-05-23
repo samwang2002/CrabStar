@@ -1,14 +1,11 @@
-all: crabstar.exe
-
-debug: crabstarDebug.exe
-
-crabstar.exe: crabstar.o
+.PHONY: all
+all: crabstar.o
 	g++ -oFast crabstar.cpp -o crabstar
-	x86_64-w64-mingw32-gcc -oFast crabstar.cpp -o crabstar.exe
+	x86_64-w64-mingw32-g++ -oFast crabstar.cpp -o crabstar.exe
 
-crabstarDebug.exe: crabstar.o
-	g++ crabstar.cpp -o crabstarDebug
-	x86_64-w64-mingw32-gcc crabstar.cpp -o crabstarDebug.exe
+debug: crabstar.o
+	g++ crabstar.cpp -o crabstar
+	x86_64-w64-mingw32-g++ crabstar.cpp -o crabstar.exe
 
 crabstar.o: bitboard.h
 
