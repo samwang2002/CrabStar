@@ -5,6 +5,9 @@
 //define bitboard data type
 #define U64 unsigned long long
 
+// pawn attacks table [side][square]
+U64 pawn_attacks[2][64];
+
 // set/get/pop macros
 #define set_bit(bitboard, square) (bitboard |= (1ULL << square))
 #define get_bit(bitboard, square) (bitboard & (1ULL << square))
