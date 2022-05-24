@@ -28,16 +28,3 @@ U64 mask_pawn_attacks(int side, int square)
     }
     return attacks;
 }
-
-// init leaper pieces attacks
-void init_leapers_attacks()
-{
-    // loop over 64 board squres
-    for (int square = 0; square < 64; square++)
-    {
-        // inititialize pawn attacks
-        pawn_attacks[white][square] = mask_pawn_attacks(white, square);
-        pawn_attacks[black][square] = mask_pawn_attacks(black, square);
-    }
-
-}
