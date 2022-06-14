@@ -2,7 +2,7 @@
 
 U64 mask_knight_attacks(int square)
 {
-    // result attakcs bitboard
+    // result attacks bitboard
     U64 attacks = 0ULL;
 
     // piece bitboard
