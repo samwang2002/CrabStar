@@ -28,7 +28,7 @@ void print_bitboard(U64 bitboard)
                 std::cout << "  " << (8 - rank) << " ";
 
             // print bit state (either 1 or 0)
-            std::cout << " " << (get_bit(bitboard, square) ? 1 : 0 );
+            std::cout << " " << (get_bit(bitboard, square) ? '1' : '.' );
 
         }
 
