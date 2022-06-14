@@ -4,6 +4,7 @@
 #include "knight.hpp"
 #include "king.hpp"
 #include "bishop.hpp"
+#include "rook.hpp"
 
 // init leaper pieces attacks
 void init_leapers_attacks()
@@ -29,7 +30,9 @@ int main()
     init_leapers_attacks();
 
     for (int square = 0; square < 64; square++)
-        print_bitboard(mask_bishop_attacks(square));
+        print_bitboard(mask_rook_attacks(square));
+
+    print_bitboard(mask_rook_attacks(d4));
 
     return 0;
 }
