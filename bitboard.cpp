@@ -1,6 +1,6 @@
 // headers
 #include <iostream>
-#include "bitboard.h"
+#include "bitboard.hpp"
 
 
 /**********************************\

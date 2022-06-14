@@ -1,4 +1,4 @@
-#include "pawn.h"
+#include "pawn.hpp"
 
 // generate pawn attacks
 U64 mask_pawn_attacks(int side, int square)

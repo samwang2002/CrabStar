@@ -1,4 +1,4 @@
-#include "bishop.h"
+#include "bishop.hpp"
 
 U64 mask_bishop_attacks(int square)
 {

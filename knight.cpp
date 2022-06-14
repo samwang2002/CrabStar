@@ -1,4 +1,4 @@
-#include "knight.h"
+#include "knight.hpp"
 
 U64 mask_knight_attacks(int square)
 {

@@ -1,4 +1,4 @@
-#include "king.h"
+#include "king.hpp"
 
 U64 mask_king_attacks(int square)
 {
