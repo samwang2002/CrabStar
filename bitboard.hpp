@@ -97,17 +97,14 @@ static const char* square_to_coordinates[] = {
      a b c d e f g h
 **********************/
 
-// not A file constant
+// file constants
 const U64 not_a_file = 18374403900871474942ULL;
-
-// not H file constant
 const U64 not_h_file = 9187201950435737471ULL;
-
-// not HG file constant
 const U64 not_hg_file = 4557430888798830399ULL;
-
-// not AB file constant
 const U64 not_ab_file = 18229723555195321596ULL;
+
+// bitboard functions
 void print_bitboard(U64 bitboard);
+U64 set_occupancy(int index, int masked_bits, U64 attack_mask);
 
 #endif

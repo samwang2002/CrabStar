@@ -43,3 +43,21 @@ void print_bitboard(U64 bitboard)
     std::cout << "     Bitboard: " << bitboard << "d\n" << std::endl;
 
 }
+
+// index: integer where the ith bit is set iff the ith LSB within the attack mask is occupied
+// attack mask: bitboard of attack mask
+// returns bitboard with the indexed squares occupied
+U64 set_occupancy(int index, U64 attack_mask)
+{
+    U64 occupancy = 0ULL;
+    int masked_bits = count_bits(attack_mask);
+
+    for (int count = 0; count < masked_bits; ++count) {
+        int square = get_ls1b_index(attack_mask);
+        attack_mask &= attack_mask-1;
+        if (index & (1 << count))       // make sure occupancy is on board
+            occupancy |= (1ULL << square);
+    }
+
+    return occupancy;
+}
