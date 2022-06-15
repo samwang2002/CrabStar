@@ -11,13 +11,12 @@
 #define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (1ULL << square) : 0)
 #define count_bits(bitboard) __builtin_popcountll(bitboard)
 
-// count set bits
-// static inline int count_bits(U64 bitboard)
-// {
-//     int count = 0;
-//     while ((bitboard &= (bitboard-1))) ++count;
-//     return count;
-// }
+// get index of least significant bit
+static inline int get_ls1b_index(U64 bitboard)
+{
+    if (bitboard) return count_bits((bitboard & -bitboard)-1);
+    return -1;
+}
 
 // sides to move (colors)
 enum {white, black};
