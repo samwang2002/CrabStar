@@ -29,10 +29,11 @@ int main()
 {
     init_leapers_attacks();
 
-    for (int square = 0; square < 64; square++)
-        print_bitboard(mask_rook_attacks(square));
-
-    print_bitboard(mask_rook_attacks(d4));
+    std::cout<< get_random_number() << "\n";
+    std::cout<< get_random_number() << "\n";
+    std::cout<< get_random_number() << "\n";
+    std::cout<< get_random_number() << "\n";
+    std::cout<< get_random_number() << "\n";
 
     return 0;
 }

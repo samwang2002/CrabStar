@@ -61,3 +61,20 @@ U64 set_occupancy(int index, U64 attack_mask)
 
     return occupancy;
 }
+
+unsigned int get_random_number()
+{
+    // get current state
+    unsigned int number = state;
+
+    // XOR shift algorithm
+    number ^= number << 13;
+    number ^= number >> 17;
+    number ^= number << 5;
+
+    // update random number state
+    state = number;
+
+    // return random number
+    return number;
+}

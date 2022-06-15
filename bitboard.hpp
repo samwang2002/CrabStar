@@ -103,8 +103,15 @@ const U64 not_h_file = 9187201950435737471ULL;
 const U64 not_hg_file = 4557430888798830399ULL;
 const U64 not_ab_file = 18229723555195321596ULL;
 
+
 // bitboard functions
 void print_bitboard(U64 bitboard);
 U64 set_occupancy(int index, int masked_bits, U64 attack_mask);
+
+// pseudo random number state
+static inline unsigned int state = 1804289383;
+
+// generate 32-bit pseudo legal numbers
+unsigned int get_random_number();
 
 #endif
