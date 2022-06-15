@@ -29,11 +29,10 @@ int main()
 {
     init_leapers_attacks();
 
-    std::cout<< get_random_number() << "\n";
-    std::cout<< get_random_number() << "\n";
-    std::cout<< get_random_number() << "\n";
-    std::cout<< get_random_number() << "\n";
-    std::cout<< get_random_number() << "\n";
+    print_bitboard((U64)get_random_U32_number());
+    print_bitboard((U64)get_random_U32_number() & 0xFFFF);
+    print_bitboard(get_random_U64_number());
+    print_bitboard(get_random_U64_number() & get_random_U64_number() & get_random_U64_number());
 
     return 0;
 }

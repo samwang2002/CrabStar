@@ -62,7 +62,7 @@ U64 set_occupancy(int index, U64 attack_mask)
     return occupancy;
 }
 
-unsigned int get_random_number()
+unsigned int get_random_U32_number()
 {
     // get current state
     unsigned int number = state;
@@ -77,4 +77,24 @@ unsigned int get_random_number()
 
     // return random number
     return number;
+}
+
+U64 get_random_U64_number()
+{
+    // define 4 random numbers
+    U64  n1, n2, n3, n4;
+
+    // init random numbers slicing 16 bits from MS1B side
+    n1 = (U64)(get_random_U32_number() & 0xFFFF);
+    n2 = (U64)(get_random_U32_number() & 0xFFFF);
+    n3 = (U64)(get_random_U32_number() & 0xFFFF);
+    n4 = (U64)(get_random_U32_number() & 0xFFFF);
+
+    //return random number
+    return n1 | (n2 << 16) | (n3 << 32) | (n4 << 48);
+}
+
+U64 generate_magic_number()
+{
+  return (get_random_U64_number() & get_random_U64_number() & get_random_U64_number());
 }
