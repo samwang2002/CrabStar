@@ -1,11 +1,8 @@
 #include <iostream>
 #include "bitboard.hpp"
-#include "pawn.hpp"
-#include "knight.hpp"
-#include "king.hpp"
-#include "bishop.hpp"
-#include "rook.hpp"
-//#include "magicbitboard.hpp"
+#include "sliders.hpp"
+#include "leapers.hpp"
+
 
 // init leaper pieces attacks
 void init_leapers_attacks()
