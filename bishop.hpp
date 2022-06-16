@@ -94,6 +94,8 @@ static U64 bishop_magic_numbers[64] = {
     0x4010011029020020ULL
 };
 
+void init_bishop_attacks();
+
 U64 get_bishop_attacks(int square, U64 occupancy);
 
 #endif
