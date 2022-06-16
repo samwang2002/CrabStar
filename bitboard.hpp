@@ -21,6 +21,9 @@ static inline int get_ls1b_index(U64 bitboard)
 // sides to move (colors)
 enum {white, black};
 
+// bishop and rook
+enum { rook, bishop};
+
 // board squares
 enum {
     a8, b8, c8, d8, e8, f8, g8, h8,
@@ -108,9 +111,6 @@ const U64 not_ab_file = 18229723555195321596ULL;
 void print_bitboard(U64 bitboard);
 
 U64 set_occupancy(int index, int masked_bits, U64 attack_mask);
-
-// initialize all
-void init_all();
 
 
 #endif
