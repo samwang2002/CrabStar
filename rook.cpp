@@ -30,28 +30,45 @@ U64 generate_rook_attacks(int square, U64 block)
     int tf = square % 8;
 
     // mask relevant rook occupancy bits
-    for (int r = tr + 0; r <= 7; r++)
+    for (int r = tr + 1; r <= 7; r++)        // down
     {
          attacks |= (1ULL << (r * 8 + tf));
          if((1ULL << (r * 8 + tf)) & block) break;
     }
-    for (int r = tr - 0; r >= 0; r--)
+    for (int r = tr - 1; r >= 0; r--)        // up
     {
          attacks |= (1ULL << (r * 8 + tf));
          if((1ULL << (r * 8 + tf)) & block) break;
     }
-    for (int f = tf + 0; f <= 7; f++)
+    for (int f = tf + 1; f <= 7; f++)        // right
     {
          attacks |= (1ULL << (tr * 8 + f));
          if((1ULL << (tr * 8 + f)) & block) break;
     }
-    for (int f = tf - 0; f >= 7; f--)
+    for (int f = tf - 1; f >= 0; f--)        // left
     {
          attacks |= (1ULL << (tr * 8 + f));
          if((1ULL << (tr * 8 + f)) & block) break;
     }
 
     return attacks;
+}
+
+// fill table of rook attacks
+void init_rook_attacks()
+{
+    for (int square = 0; square < 64; ++square) {
+        U64 attack_mask = mask_rook_attacks(square);
+        int bits_count = count_bits(attack_mask);
+        int occupancy_idxs = (1 << bits_count);
+        rook_masks[square] = attack_mask;
+
+        for (int index = 0; index < occupancy_idxs; ++index) {
+            U64 occupancy = set_occupancy(index, bits_count, attack_mask);
+            int magic_idx = (occupancy * rook_magic_numbers[square]) >> (64 - rook_relevant_bits[square]);
+            rook_attacks[square][magic_idx] = generate_rook_attacks(square, occupancy);
+        }
+    }
 }
 
 U64 get_rook_attacks(int square, U64 occupancy)

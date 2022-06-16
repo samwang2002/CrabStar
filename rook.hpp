@@ -93,6 +93,8 @@ static U64 rook_magic_numbers[64] = {
     0x1004081002402ULL
 };
 
+void init_rook_attacks();
+
 U64 get_rook_attacks(int square, U64 occupancy);
 
 #endif
