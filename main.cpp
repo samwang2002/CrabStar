@@ -83,8 +83,11 @@ void init_all()
     init_leapers_attacks();
 
     //init slider pieces attacks
-    init_sliders_attacks(bishop);
-    init_sliders_attacks(rook);
+    // init_sliders_attacks(bishop);
+    // init_sliders_attacks(rook);
+    init_bishop_attacks();
+    init_rook_attacks();
+
 }
 
 int main()
