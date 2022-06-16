@@ -18,17 +18,35 @@ U64 mask_bishop_attacks(int square)
     return attacks;
 }
 
-// U64 bishop_attacks(int square, int block)
-// {
-//     U64 attacks = 0ULL;
+U64 generate_bishop_attacks(int square, U64 block)
+{
+     U64 attacks = 0ULL;
 
-//     // target rank and files
-//     int tr = square / 8;
-//     int tf = square % 8;
+    // target rank and files
+     int tr = square / 8;
+     int tf = square % 8;
 
-//     // mask relevant bishop occupancy bits
-//     for (int r = tr+1, f=tf+1; r <= 7 && f <= 7; r++, f++) attacks |= (1ULL << (r*8 + f));
-//     for (int r = tr-1, f=tf+1; r >= 0 && f <= 7; r--, f++) attacks |= (1ULL << (r*8 + f));
-//     for (int r = tr+1, f=tf-1; r <= 7 && f >= 0; r++, f--) attacks |= (1ULL << (r*8 + f));
-//     for (int r = tr-1, f=tf-1; r >= 0 && f >= 0; r--, f--) attacks |= (1ULL << (r*8 + f));
-// }
+     // mask relevant bishop occupancy bits
+     for (int r = tr+1, f=tf+1; r <= 7 && f <= 7; r++, f++)
+     {
+        attacks |= (1ULL << (r*8 + f));
+        if((1ULL << (r*8 + f) & block)) break;
+     }
+     for (int r = tr-1, f=tf+1; r >= 0 && f <= 7; r--, f++)
+     {
+         attacks |= (1ULL << (r*8 + f));
+         if((1ULL << (r*8 + f) & block)) break;
+     }
+     for (int r = tr+1, f=tf-1; r <= 7 && f >= 0; r++, f--)
+     {
+         attacks |= (1ULL << (r*8 + f));
+         if((1ULL << (r*8 + f)) & block) break;
+     }
+     for (int r = tr-1, f=tf-1; r >= 0 && f >= 0; r--, f--)
+     {
+         attacks |= (1ULL << (r*8 + f));
+         if((1ULL << (r*8 + f)) & block) break;
+     }
+     
+     return attacks;
+}

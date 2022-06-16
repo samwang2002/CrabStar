@@ -5,7 +5,9 @@
 
 U64 mask_bishop_attacks(int square);
 
-// U64 bishop_attacks(int square, U64 block);
+
+// generate bishop attacks on the fly
+U64 generate_bishop_attacks(int square, U64 block);
 
 // relevancy occupancy bit count for every square on board
 const int bishop_relevant_bits[64] = {

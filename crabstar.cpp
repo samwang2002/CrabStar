@@ -5,6 +5,7 @@
 #include "king.hpp"
 #include "bishop.hpp"
 #include "rook.hpp"
+#include "magicbitboard.hpp"
 
 // init leaper pieces attacks
 void init_leapers_attacks()
@@ -25,14 +26,17 @@ void init_leapers_attacks()
 
 }
 
+void init_all()
+{
+    // initiliaze leaper pieces attacks
+    init_leapers_attacks();
+}
+
 int main()
 {
     init_leapers_attacks();
 
-    print_bitboard((U64)get_random_U32_number());
-    print_bitboard((U64)get_random_U32_number() & 0xFFFF);
-    print_bitboard(get_random_U64_number());
-    print_bitboard(get_random_U64_number() & get_random_U64_number() & get_random_U64_number());
-
+    init_magic_numbers();
+    
     return 0;
 }

@@ -106,21 +106,11 @@ const U64 not_ab_file = 18229723555195321596ULL;
 
 // bitboard functions
 void print_bitboard(U64 bitboard);
+
 U64 set_occupancy(int index, int masked_bits, U64 attack_mask);
 
-// random numbers
-
-// pseudo random number state
-static inline unsigned int state = 1804289383;
-
-// generate 32-bit pseudo legal numbers
-unsigned int get_random_U32_number();
-
-// generate 64-bit psuedo legal numbers
-U64 get_random_U64_number();
-
-// generate magic number candidate
-U64 generate_magic_number();
+// initialize all
+void init_all();
 
 
 #endif
