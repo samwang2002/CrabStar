@@ -57,7 +57,6 @@ U64 mask_knight_attacks(int square)
 /* ------------------------------- pawn ------------------------------- */
 U64 mask_pawn_attacks(int side, int square)
 {
-
     // result attacks bitboard
     U64 attacks = 0ULL;
 

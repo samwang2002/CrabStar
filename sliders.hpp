@@ -16,6 +16,12 @@ static U64 bishop_attacks[64][512];
 // generate bishop attacks on the fly
 U64 generate_bishop_attacks(int square, U64 block);
 
+// initialize bishop attack table
+void init_bishop_attacks();
+
+// return bishop attacks using magic bitboard
+U64 get_bishop_attacks(int square, U64 occupancy);
+
 
 // relevancy occupancy bit count for every square on board
 const int bishop_relevant_bits[64] = {
@@ -96,11 +102,6 @@ static U64 bishop_magic_numbers[64] = {
     0x4010011029020020ULL
 };
 
-void init_bishop_attacks();
-
-U64 get_bishop_attacks(int square, U64 occupancy);
-
-
 
 /* ------------------------------- rook ------------------------------- */
 
@@ -114,6 +115,12 @@ static U64 rook_attacks[64][4096];
 
 // generate rook attacks on the fly
 U64 generate_rook_attacks(int square, U64 block);
+
+// initialize rook attack table
+void init_rook_attacks();
+
+// get rook attacks using magic bitboard
+U64 get_rook_attacks(int square, U64 occupancy);
 
 // rook relevant occupancy bit count for every square on board
 const int rook_relevant_bits[64] = {
@@ -193,10 +200,6 @@ static U64 rook_magic_numbers[64] = {
     0x2006104900a0804ULL,
     0x1004081002402ULL
 };
-
-void init_rook_attacks();
-
-U64 get_rook_attacks(int square, U64 occupancy);
 
 
 #endif
