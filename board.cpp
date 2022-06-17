@@ -9,7 +9,7 @@ U64 bitboards[12];
 U64 occupancies[3];
 int side = white;
 int enpassant = no_sq;
-int castle;
+int castle = 0;
 
 // print current state of board
 void print_board()
@@ -66,7 +66,6 @@ void init_leapers_attacks()
         // init king attacks
         king_attacks[square] = mask_king_attacks(square);
     }
-
 }
 
 // initialize all attacks
@@ -75,4 +74,62 @@ void init_all()
     init_leapers_attacks();
     init_bishop_attacks();
     init_rook_attacks();
+}
+
+// parse fen from string
+void parse_fen(const char *fen)
+{
+    // reset board position and state variables
+    memset(bitboards, 0, sizeof(bitboards));
+    memset(occupancies, 0, sizeof(occupancies));
+    side = 0;
+    enpassant = no_sq;
+    castle = 0;
+
+    // load position
+    for (int rank = 0; rank < 8; ++rank) {
+        for (int file = 0; file < 8; ++file) {
+            int square = rank*8 + file;
+            if (isalpha(*fen)) {            // piece
+                int piece = char_pieces.at(*fen);
+                set_bit(bitboards[piece], square);
+            } else if (isdigit(*fen)) {     // empty squares
+                int offset = *fen - '0';
+                file += offset-1;       // subtract one because file automatically increments
+            }
+            ++fen;
+        }
+        ++fen;
+    }
+
+    // get game state variables
+    // side
+    (*fen == 'w') ? (side=white) : (side=black);
+    fen += 2;
+
+    // castling
+    while (*fen != ' ') {
+        switch (*fen) {
+            case 'K': castle |= wk; break;
+            case 'Q': castle |= wq; break;
+            case 'k': castle |= bk; break;
+            case 'q': castle |= bq; break;
+        }
+        ++fen;
+    }
+    ++fen;
+
+    // en passant square
+    if (*fen != '-') {
+        int file = fen[0] - 'a';
+        int rank = 8 - (fen[1] - '0');
+        enpassant = rank*8 + file;
+    } else enpassant = no_sq;
+
+    // initialize occupancies
+    for (int piece = P; piece <= K; ++piece)        // white pieces
+        occupancies[white] |= bitboards[piece];
+    for (int piece = p; piece <= k; ++piece)        // black pieces
+        occupancies[black] |= bitboards[piece];
+    occupancies[both] |= occupancies[white] | occupancies[black];
 }
