@@ -70,7 +70,7 @@ void init_bishop_attacks()
     }
 }
 
-// return bishop attacks using magic bitboard
+// get bishop attacks using magic bitboard
 U64 get_bishop_attacks(int square, U64 occupancy)
 {
     // get bishop attacks assuming current board occupancy
@@ -154,7 +154,7 @@ void init_rook_attacks()
     }
 }
 
-// return rook attacks using magic bitboard
+// get rook attacks using magic bitboard
 U64 get_rook_attacks(int square, U64 occupancy)
 {
     // get bishop attacks assuming current board occupancy
@@ -164,4 +164,11 @@ U64 get_rook_attacks(int square, U64 occupancy)
 
     // return rook attacks
     return rook_attacks[square][occupancy];
+}
+
+/* ------------------------------- queen ------------------------------- */
+// get queen attacks
+U64 get_queen_attacks(int square, U64 occupancy)
+{
+    return get_bishop_attacks(square, occupancy) | get_rook_attacks(square, occupancy);
 }

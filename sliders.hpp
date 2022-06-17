@@ -4,7 +4,7 @@
 #include "bitboard.hpp"
 
 /* ------------------------------- bishop ------------------------------- */
-// returns squares that could be obstacles in bishop's path
+// get squares that could be obstacles in bishop's path
 U64 mask_bishop_attacks(int square);
 
 // generate bishop attacks on the fly
@@ -13,7 +13,7 @@ U64 generate_bishop_attacks(int square, U64 block);
 // initialize bishop attack table
 void init_bishop_attacks();
 
-// return bishop attacks using magic bitboard
+// get bishop attacks using magic bitboard
 U64 get_bishop_attacks(int square, U64 occupancy);
 
 // bishop attack masks
@@ -201,5 +201,7 @@ static U64 rook_magic_numbers[64] = {
     0x1004081002402ULL
 };
 
+/* ------------------------------- queen ------------------------------- */
+U64 get_queen_attacks(int square, U64 occupancy);
 
 #endif
