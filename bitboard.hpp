@@ -22,7 +22,7 @@ static inline int get_ls1b_index(U64 bitboard)
 enum {white, black, both};
 
 // bishop and rook
-enum { rook, bishop};
+enum {rook, bishop};
 
 // encode pieces
 enum { P, N, B, R, Q, K, p, n, b, r, q, k };
@@ -32,7 +32,7 @@ const char ascii_pieces[13] = "PNBRQKpnbrqk";
 
 // convert ASCII character pieces to encoded constants
 // note: the array is in the exact order as C++ does not support designated initializers
-const int char_pieces[] = {P, N, B, R, Q, K, P, n, b, r, q, k};
+const int char_pieces[] = {P, N, B, R, Q, K, p, n, b, r, q, k};
 
 // board squares
 enum {

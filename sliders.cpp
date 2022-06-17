@@ -1,6 +1,6 @@
 #include "sliders.hpp"
 
-// bishop
+/* ------------------------------- bishop ------------------------------- */
 
 U64 mask_bishop_attacks(int square)
 {
@@ -81,7 +81,7 @@ U64 get_bishop_attacks(int square, U64 occupancy)
     return bishop_attacks[square][occupancy];
 }
 
-// rook
+/* ------------------------------- rook ------------------------------- */
 
 // mask rook attacks
 U64 mask_rook_attacks(int square)

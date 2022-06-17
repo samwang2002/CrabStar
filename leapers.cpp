@@ -1,8 +1,7 @@
 #include "leapers.hpp"
 
 
-//mask king attacks
-
+/* ------------------------------- king ------------------------------- */
 U64 mask_king_attacks(int square)
 {
     // result attacks bitboard
@@ -28,8 +27,7 @@ U64 mask_king_attacks(int square)
     return attacks;
 }
 
-// mask knight attacks
-
+/* ------------------------------- knight ------------------------------- */
 U64 mask_knight_attacks(int square)
 {
     // result attacks bitboard
@@ -56,9 +54,7 @@ U64 mask_knight_attacks(int square)
     return attacks;
 }
 
-// mask pawn attacks
-
-// generate pawn attacks
+/* ------------------------------- pawn ------------------------------- */
 U64 mask_pawn_attacks(int side, int square)
 {
 

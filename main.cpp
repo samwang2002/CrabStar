@@ -95,7 +95,7 @@ int main()
     print_bitboard(bitboards[P]);
 
     std::cout << "piece: " << ascii_pieces[P] << "\n";
-    std::cout << ascii_pieces[char_pieces[K]];
+    std::cout << ascii_pieces[char_pieces[K]] << std::endl;
     
 
     return 0;
