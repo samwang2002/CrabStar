@@ -7,7 +7,7 @@
 void init_leapers_attacks()
 {
     // loop over 64 board squres
-    for (int square = 0; square < 64; square++)
+    for (int square = 0; square < 64; ++square)
     {
         // inititialize pawn attacks
         pawn_attacks[white][square] = mask_pawn_attacks(white, square);
@@ -26,7 +26,7 @@ void init_leapers_attacks()
 void init_sliders_attacks(int bishop)
 {
     //loop over 64 board squares
-    for (int square = 0; square < 64; square++)
+    for (int square = 0; square < 64; ++square)
     {
         //initialize bishop and rook masks
         bishop_masks[square] = mask_bishop_attacks(square);

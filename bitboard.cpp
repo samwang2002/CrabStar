@@ -13,10 +13,10 @@ static inline int get_ls1b_index(U64 bitboard)
 void print_bitboard(U64 bitboard)
 {
     // loop over board ranks
-    for (int rank = 0; rank < 8; rank++)
+    for (int rank = 0; rank < 8; ++rank)
     {
         // loop over board files
-        for (int file = 0; file < 8; file++)
+        for (int file = 0; file < 8; ++file)
         {
             // convert file & rank into square index
             int square = rank * 8 + file;

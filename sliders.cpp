@@ -11,10 +11,10 @@ U64 mask_bishop_attacks(int square)
     int tf = square % 8;
 
     // mask relevant bishop occupancy bits
-    for (int r = tr+1, f=tf+1; r <= 6 && f <= 6; r++, f++) attacks |= (1ULL << (r*8 + f));
-    for (int r = tr-1, f=tf+1; r >= 1 && f <= 6; r--, f++) attacks |= (1ULL << (r*8 + f));
-    for (int r = tr+1, f=tf-1; r <= 6 && f >= 1; r++, f--) attacks |= (1ULL << (r*8 + f));
-    for (int r = tr-1, f=tf-1; r >= 1 && f >= 1; r--, f--) attacks |= (1ULL << (r*8 + f));
+    for (int r = tr+1, f=tf+1; r <= 6 && f <= 6; ++r, ++f) attacks |= (1ULL << (r*8 + f));
+    for (int r = tr-1, f=tf+1; r >= 1 && f <= 6; --r, ++f) attacks |= (1ULL << (r*8 + f));
+    for (int r = tr+1, f=tf-1; r <= 6 && f >= 1; ++r, --f) attacks |= (1ULL << (r*8 + f));
+    for (int r = tr-1, f=tf-1; r >= 1 && f >= 1; --r, --f) attacks |= (1ULL << (r*8 + f));
 
     return attacks;
 }
@@ -29,22 +29,22 @@ U64 generate_bishop_attacks(int square, U64 block)
      int tf = square % 8;
 
      // mask relevant bishop occupancy bits
-     for (int r = tr+1, f=tf+1; r <= 7 && f <= 7; r++, f++)     // bottom right
+     for (int r = tr+1, f=tf+1; r <= 7 && f <= 7; ++r, ++f)     // bottom right
      {
         attacks |= (1ULL << (r*8 + f));
         if((1ULL << (r*8 + f) & block)) break;
      }
-     for (int r = tr-1, f=tf+1; r >= 0 && f <= 7; r--, f++)     // top right
+     for (int r = tr-1, f=tf+1; r >= 0 && f <= 7; --r, ++f)     // top right
      {
          attacks |= (1ULL << (r*8 + f));
          if((1ULL << (r*8 + f) & block)) break;
      }
-     for (int r = tr+1, f=tf-1; r <= 7 && f >= 0; r++, f--)     // bottom left
+     for (int r = tr+1, f=tf-1; r <= 7 && f >= 0; ++r, --f)     // bottom left
      {
          attacks |= (1ULL << (r*8 + f));
          if((1ULL << (r*8 + f)) & block) break;
      }
-     for (int r = tr-1, f=tf-1; r >= 0 && f >= 0; r--, f--)     // top left
+     for (int r = tr-1, f=tf-1; r >= 0 && f >= 0; --r --f)     // top left
      {
          attacks |= (1ULL << (r*8 + f));
          if((1ULL << (r*8 + f)) & block) break;
@@ -94,10 +94,10 @@ U64 mask_rook_attacks(int square)
     int tf = square % 8;
 
     // mask relevant rook occupancy bits
-    for (int r = tr + 1; r <= 6; r++) attacks |= (1ULL << (r * 8 + tf));
-    for (int r = tr - 1; r >= 1; r--) attacks |= (1ULL << (r * 8 + tf));
-    for (int f = tf + 1; f <= 6; f++) attacks |= (1ULL << (tr * 8 + f));
-    for (int f = tf - 1; f >= 1; f--) attacks |= (1ULL << (tr * 8 + f));
+    for (int r = tr + 1; r <= 6; ++r) attacks |= (1ULL << (r * 8 + tf));
+    for (int r = tr - 1; r >= 1; --r) attacks |= (1ULL << (r * 8 + tf));
+    for (int f = tf + 1; f <= 6; ++f) attacks |= (1ULL << (tr * 8 + f));
+    for (int f = tf - 1; f >= 1; --f) attacks |= (1ULL << (tr * 8 + f));
 
     return attacks;
 }
@@ -113,22 +113,22 @@ U64 generate_rook_attacks(int square, U64 block)
     int tf = square % 8;
 
     // mask relevant rook occupancy bits
-    for (int r = tr + 1; r <= 7; r++)        // down
+    for (int r = tr + 1; r <= 7; ++r)        // down
     {
          attacks |= (1ULL << (r * 8 + tf));
          if((1ULL << (r * 8 + tf)) & block) break;
     }
-    for (int r = tr - 1; r >= 0; r--)        // up
+    for (int r = tr - 1; r >= 0; --r)        // up
     {
          attacks |= (1ULL << (r * 8 + tf));
          if((1ULL << (r * 8 + tf)) & block) break;
     }
-    for (int f = tf + 1; f <= 7; f++)        // right
+    for (int f = tf + 1; f <= 7; ++f)        // right
     {
          attacks |= (1ULL << (tr * 8 + f));
          if((1ULL << (tr * 8 + f)) & block) break;
     }
-    for (int f = tf - 1; f >= 0; f--)        // left
+    for (int f = tf - 1; f >= 0; --f)        // left
     {
          attacks |= (1ULL << (tr * 8 + f));
          if((1ULL << (tr * 8 + f)) & block) break;
