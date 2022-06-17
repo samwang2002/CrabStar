@@ -9,8 +9,7 @@ int main()
 {
     init_all();
     
-    // set_bit(bitboards[P], e2);
-
+    set_bit(bitboards[P], e2);
     print_bitboard(bitboards[P]);
 
     // std::cout << "piece: " << ascii_pieces[P] << "\n";

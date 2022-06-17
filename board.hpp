@@ -48,18 +48,18 @@ enum { wk = 1, wq = 2, bk = 4, bq = 8 };
 
 /* ------------------------------- variables ------------------------------- */
 // bitboards
-static U64 bitboards[12];
+extern U64 bitboards[12];
 
 // occupancy bitboards
-static U64 occupancies[3];
+extern U64 occupancies[3];
 
 // side to move
-static int side = -1;
+extern int side;
 
 // enpassant square
-static int enpassant = no_sq;
+extern int enpassant;
 
 // castling rights
-static int castle;
+extern int castle;
 
 #endif

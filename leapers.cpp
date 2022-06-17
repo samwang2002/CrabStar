@@ -1,5 +1,10 @@
 #include "leapers.hpp"
 
+// defining global variables
+U64 king_attacks[64];
+U64 knight_attacks[64];
+U64 pawn_attacks[2][64];
+
 
 /* ------------------------------- king ------------------------------- */
 // generate king attacks

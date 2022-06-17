@@ -4,6 +4,13 @@
 #include "leapers.hpp"
 #include "sliders.hpp"
 
+// declaring global variables
+U64 bitboards[12];
+U64 occupancies[3];
+int side = -1;
+int enpassant = no_sq;
+int castle;
+
 // print current state of board
 void print_board()
 {
@@ -14,11 +21,13 @@ void print_board()
 
             int square = rank*8 + file;
             int piece = -1;
-            // loop over piece bitboards
+
+            // loop over piece bitboards to see if any piece is present
             for (int i = 0; i < 12; ++i)
-                if (get_bit(bitboards[i], square)) piece = i;
+                if (get_bit(bitboards[i], square))
+                    piece = i;
             
-            std::cout << " " << (piece == -1) ? '.' : ascii_pieces[piece];
+            std::cout << " " << ((piece == -1) ? '.' : ascii_pieces[piece]);
         }
         std::cout << std::endl;
     }
