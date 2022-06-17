@@ -2,6 +2,7 @@
 
 
 /* ------------------------------- king ------------------------------- */
+// generate king attacks
 U64 mask_king_attacks(int square)
 {
     // result attacks bitboard
@@ -28,6 +29,7 @@ U64 mask_king_attacks(int square)
 }
 
 /* ------------------------------- knight ------------------------------- */
+// generate knight attacks
 U64 mask_knight_attacks(int square)
 {
     // result attacks bitboard
@@ -55,6 +57,7 @@ U64 mask_knight_attacks(int square)
 }
 
 /* ------------------------------- pawn ------------------------------- */
+// generate pawn attacks
 U64 mask_pawn_attacks(int side, int square)
 {
     // result attacks bitboard

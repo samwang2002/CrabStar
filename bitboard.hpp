@@ -2,22 +2,33 @@
 #define BITBOARD_H
 
 
-//define bitboard data type
+// define bitboard data type
 #define U64 unsigned long long
 
-// set/get/pop macros
+/* ------------------------------- macros ------------------------------- */
+// returns bitboard with square-th bit set as 1
 #define set_bit(bitboard, square) ((bitboard) |= (1ULL << (square)))
+
+// returns value of square-th bit of bitboard
 #define get_bit(bitboard, square) ((bitboard) & (1ULL << (square)))
+
+// returns bitboard with square-th bit set as 0
 #define pop_bit(bitboard, square) ((bitboard) &= ~(1ULL << (square)))
+
+// returns number of set bits in bitboard
 #define count_bits(bitboard) __builtin_popcountll(bitboard)
 
+/* ------------------------------- function declarations ------------------------------- */
 // get index of least significant bit
-static inline int get_ls1b_index(U64 bitboard)
-{
-    if (bitboard) return count_bits((bitboard & -bitboard)-1);
-    return -1;
-}
+static inline int get_ls1b_index(U64 bitboard);
 
+// print bitboard as grid of 0s and 1s
+void print_bitboard(U64 bitboard);
+
+// initializes bitboard using index to describe which bits in attack mask are set
+U64 set_occupancy(int index, int masked_bits, U64 attack_mask);
+
+/* ------------------------------- constants ------------------------------- */
 // sides to move (colors)
 enum {white, black, both};
 
@@ -25,7 +36,7 @@ enum {white, black, both};
 enum {rook, bishop};
 
 // encode pieces
-enum { P, N, B, R, Q, K, p, n, b, r, q, k };
+enum {P, N, B, R, Q, K, p, n, b, r, q, k};
 
 //ASCII pieces
 const char ascii_pieces[13] = "PNBRQKpnbrqk";
@@ -57,6 +68,8 @@ static const char* square_to_coordinates[] = {
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
 };
 
+//castling rights binary encoding
+enum { wk = 1, wq = 2, bk = 4, bq = 8 };
 /*
     bin  dec
     
@@ -69,13 +82,15 @@ static const char* square_to_coordinates[] = {
    1001       black king => queen side
               white king => king side
 */
-//castling rights binary encoding
-enum { wk = 1, wq = 2, bk = 4, bq = 8 };
 
-
+// file constants
+const U64 not_a_file = 18374403900871474942ULL;
+const U64 not_h_file = 9187201950435737471ULL;
+const U64 not_hg_file = 4557430888798830399ULL;
+const U64 not_ab_file = 18229723555195321596ULL;
 
 /**********************\
-    not A file
+  ex: not A file
  
   8  0 1 1 1 1 1 1 1
   7  0 1 1 1 1 1 1 1
@@ -87,57 +102,9 @@ enum { wk = 1, wq = 2, bk = 4, bq = 8 };
   1  0 1 1 1 1 1 1 1
 
      a b c d e f g h
-
-
-    not H file
-  8  1 1 1 1 1 1 1 0
-  7  1 1 1 1 1 1 1 0
-  6  1 1 1 1 1 1 1 0
-  5  1 1 1 1 1 1 1 0 
-  4  1 1 1 1 1 1 1 0 
-  3  1 1 1 1 1 1 1 0
-  2  1 1 1 1 1 1 1 0
-  1  1 1 1 1 1 1 1 0
-
-     a b c d e f g h
-
-    not HG file
-  8  1 1 1 1 1 1 0 0
-  7  1 1 1 1 1 1 0 0
-  6  1 1 1 1 1 1 0 0
-  5  1 1 1 1 1 1 0 0 
-  4  1 1 1 1 1 1 0 0 
-  3  1 1 1 1 1 1 0 0
-  2  1 1 1 1 1 1 0 0
-  1  1 1 1 1 1 1 0 0
-
-     a b c d e f g h
-
-    not AB file
-  8  0 0 1 1 1 1 1 1
-  7  0 0 1 1 1 1 1 1 
-  6  0 0 1 1 1 1 1 1
-  5  0 0 1 1 1 1 1 1 
-  4  0 0 1 1 1 1 1 1 
-  3  0 0 1 1 1 1 1 1
-  2  0 0 1 1 1 1 1 1
-  1  0 0 1 1 1 1 1 1
-
-     a b c d e f g h
 **********************/
 
-// file constants
-const U64 not_a_file = 18374403900871474942ULL;
-const U64 not_h_file = 9187201950435737471ULL;
-const U64 not_hg_file = 4557430888798830399ULL;
-const U64 not_ab_file = 18229723555195321596ULL;
-
-
-// bitboard functions
-void print_bitboard(U64 bitboard);
-
-U64 set_occupancy(int index, int masked_bits, U64 attack_mask);
-
+/* ------------------------------- variables ------------------------------- */
 // bitboards
 static U64 bitboards[12];
 

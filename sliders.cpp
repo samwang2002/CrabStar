@@ -1,10 +1,9 @@
 #include "sliders.hpp"
 
 /* ------------------------------- bishop ------------------------------- */
-
+// returns squares that could be obstacles in bishop's path, so edge squares are not considered
 U64 mask_bishop_attacks(int square)
 {
-    // returns squares that could be obstacles in bishop's path, so edge squares are not considered
     U64 attacks = 0ULL;
 
     // target rank and files
@@ -20,6 +19,7 @@ U64 mask_bishop_attacks(int square)
     return attacks;
 }
 
+// generate bishop attacks given square and occupancies, used to fill attack table
 U64 generate_bishop_attacks(int square, U64 block)
 {
      U64 attacks = 0ULL;
@@ -70,6 +70,7 @@ void init_bishop_attacks()
     }
 }
 
+// return bishop attacks using magic bitboard
 U64 get_bishop_attacks(int square, U64 occupancy)
 {
     // get bishop attacks assuming current board occupancy
@@ -82,8 +83,7 @@ U64 get_bishop_attacks(int square, U64 occupancy)
 }
 
 /* ------------------------------- rook ------------------------------- */
-
-// mask rook attacks
+// returns squares that could be obstacles in rook's path, so edge squares are not considered
 U64 mask_rook_attacks(int square)
 {
     // result attacks bitboard for rook
@@ -102,6 +102,7 @@ U64 mask_rook_attacks(int square)
     return attacks;
 }
 
+// generate rook attacks given square and occupancies, used to fill attack table
 U64 generate_rook_attacks(int square, U64 block)
 {
     // result attacks bitboard for rook
@@ -153,6 +154,7 @@ void init_rook_attacks()
     }
 }
 
+// return rook attacks using magic bitboard
 U64 get_rook_attacks(int square, U64 occupancy)
 {
     // get bishop attacks assuming current board occupancy

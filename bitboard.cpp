@@ -2,14 +2,12 @@
 #include <iostream>
 #include "bitboard.hpp"
 
-
-/**********************************\
-====================================
-
-        Bit manipulations
-
-====================================
-\**********************************/
+// get index of least significant bit
+static inline int get_ls1b_index(U64 bitboard)
+{
+    if (bitboard) return count_bits((bitboard & -bitboard)-1);
+    return -1;
+}
 
 // print bitboard
 void print_bitboard(U64 bitboard)

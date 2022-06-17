@@ -4,14 +4,8 @@
 #include "bitboard.hpp"
 
 /* ------------------------------- bishop ------------------------------- */
-
+// returns squares that could be obstacles in bishop's path
 U64 mask_bishop_attacks(int square);
-
-// bishop attack masks
-static U64 bishop_masks[64];
-
-// bishop attacks table [square][occupancies]
-static U64 bishop_attacks[64][512];
 
 // generate bishop attacks on the fly
 U64 generate_bishop_attacks(int square, U64 block);
@@ -21,6 +15,12 @@ void init_bishop_attacks();
 
 // return bishop attacks using magic bitboard
 U64 get_bishop_attacks(int square, U64 occupancy);
+
+// bishop attack masks
+static U64 bishop_masks[64];
+
+// bishop attacks table [square][occupancies]
+static U64 bishop_attacks[64][512];
 
 
 // relevancy occupancy bit count for every square on board
@@ -104,14 +104,8 @@ static U64 bishop_magic_numbers[64] = {
 
 
 /* ------------------------------- rook ------------------------------- */
-
+// returns squares that could be obstacles in rook's path
 U64 mask_rook_attacks(int square);
-
-// rook attack masks
-static U64 rook_masks[64];
-
-// rook attacks table [square][occupancies]
-static U64 rook_attacks[64][4096];
 
 // generate rook attacks on the fly
 U64 generate_rook_attacks(int square, U64 block);
@@ -121,6 +115,12 @@ void init_rook_attacks();
 
 // get rook attacks using magic bitboard
 U64 get_rook_attacks(int square, U64 occupancy);
+
+// rook attack masks
+static U64 rook_masks[64];
+
+// rook attacks table [square][occupancies]
+static U64 rook_attacks[64][4096];
 
 // rook relevant occupancy bit count for every square on board
 const int rook_relevant_bits[64] = {

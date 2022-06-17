@@ -4,6 +4,10 @@
 #include "bitboard.hpp"
 
 /* ------------------------------- king ------------------------------- */
+// king attacks table [square]
+static U64 king_attacks[64];
+
+// generate king attacks
 U64 mask_king_attacks(int square);
 
 /* ------------------------------- knight ------------------------------- */
@@ -12,12 +16,6 @@ static U64 knight_attacks[64];
 
 // generate knight attacks
 U64 mask_knight_attacks(int square);
-
-//knight attacks table [square]
-static U64 king_attacks[64];
-
-// generate knight attacks
-U64 mask_king_attacks(int square);
 
 /* ------------------------------- pawn ------------------------------- */
 // pawn attacks table [side][square]
