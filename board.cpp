@@ -7,7 +7,7 @@
 // declaring global variables
 U64 bitboards[12];
 U64 occupancies[3];
-int side = -1;
+int side = white;
 int enpassant = no_sq;
 int castle;
 
@@ -37,6 +37,17 @@ void print_board()
         std::cout << std::endl;
     }
     std::cout << "\n     a b c d e f g h\n\n";
+
+    // print out game state variables
+    std::cout << "     Side:     " << (side ? "black" : "white") << std::endl;
+    std::cout << "     Enpass:      " << ((enpassant != no_sq) ? square_to_coordinates[enpassant] : "no")
+              << std::endl;
+    std::cout << "     Castling:  "
+              << ((castle & wk) ? 'K' : '-')
+              << ((castle & wq) ? 'Q' : '-')
+              << ((castle & bk) ? 'k' : '-')
+              << ((castle & bq) ? 'q' : '-')
+              << std::endl << std::endl;
 }
 
 // initialize attack tables for leapers
