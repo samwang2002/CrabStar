@@ -19,10 +19,19 @@ static inline int get_ls1b_index(U64 bitboard)
 }
 
 // sides to move (colors)
-enum {white, black};
+enum {white, black, both};
 
 // bishop and rook
 enum { rook, bishop};
+
+// encode pieces
+enum { P, N, B, R, Q, K, p, n, b, r, q, k };
+
+//ASCII pieces
+const char ascii_pieces[13] = "PNBRQKpnbrqk";
+
+// convert ASCII character pieces to encoded constants
+const int char_pieces[] = {P, N, B, R, Q, K, P, n, b, r, q, k};
 
 // board squares
 enum {
@@ -33,7 +42,7 @@ enum {
     a4, b4, c4, d4, e4, f4, g4, h4,
     a3, b3, c3, d3, e3, f3, g3, h3,
     a2, b2, c2, d2, e2, f2, g2, h2,
-    a1, b1, c1, d1, e1, f1, g1, h1
+    a1, b1, c1, d1, e1, f1, g1, h1, no_sq
 };
 
 static const char* square_to_coordinates[] = {
@@ -46,6 +55,22 @@ static const char* square_to_coordinates[] = {
     "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
 };
+
+/*
+    bin  dec
+    
+   0001    1  white king can castle to the king side
+   0010    2  white king can castle to the queen side
+   0100    4  black king can castle to the king side
+   1000    8  black king can castle to the queen side
+   examples
+   1111       both sides an castle both directions
+   1001       black king => queen side
+              white king => king side
+*/
+//castling rights binary encoding
+enum { wk = 1, wq = 2, bk = 4, bq = 8 };
+
 
 
 /**********************\
@@ -112,5 +137,19 @@ void print_bitboard(U64 bitboard);
 
 U64 set_occupancy(int index, int masked_bits, U64 attack_mask);
 
+// bitboards
+static U64 bitboards[12];
+
+// occupancy bitboards
+static U64 occupancies[3];
+
+// side to move
+static int side = -1;
+
+// enpassant square
+static int enpassant = no_sq;
+
+// castling rights
+static int castle;
 
 #endif
