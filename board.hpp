@@ -23,8 +23,11 @@ enum {rook, bishop};
 // encode pieces
 enum {P, N, B, R, Q, K, p, n, b, r, q, k};
 
-//ASCII pieces
-const char ascii_pieces[13] = "PNBRQKpnbrqk";
+// ASCII pieces
+static const char ascii_pieces[13] = "PNBRQKpnbrqk";
+
+// unicode pieces
+static const char *unicode_pieces[12] = {"♙", "♘", "♗", "♖", "♕", "♔", "♟", "♞", "♝", "♜", "♛", "♚"};
 
 // convert ASCII character pieces to encoded constants
 // note: the array is in the exact order as C++ does not support designated initializers

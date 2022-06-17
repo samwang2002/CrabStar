@@ -27,7 +27,12 @@ void print_board()
                 if (get_bit(bitboards[i], square))
                     piece = i;
             
-            std::cout << " " << ((piece == -1) ? '.' : ascii_pieces[piece]);
+            std::cout << " ";
+            #ifdef WIN64
+                std::cout << ((piece == -1) ? '.' : ascii_pieces[piece]);
+            #else
+                std::cout << ((piece == -1) ? "." : unicode_pieces[piece]);
+            #endif
         }
         std::cout << std::endl;
     }

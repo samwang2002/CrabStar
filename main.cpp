@@ -9,11 +9,17 @@ int main()
 {
     init_all();
     
+    set_bit(bitboards[P], a2);
+    set_bit(bitboards[P], b2);
+    set_bit(bitboards[P], c2);
+    set_bit(bitboards[P], d2);
     set_bit(bitboards[P], e2);
-    print_bitboard(bitboards[P]);
+    set_bit(bitboards[P], f2);
+    set_bit(bitboards[P], g2);
+    set_bit(bitboards[P], h2);
 
-    // std::cout << "piece: " << ascii_pieces[P] << "\n";
-    // std::cout << ascii_pieces[char_pieces[K]] << std::endl;
+    set_bit(bitboards[N], b1);
+    set_bit(bitboards[N], g1);
     
     print_board();
 
