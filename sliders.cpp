@@ -44,7 +44,7 @@ U64 generate_bishop_attacks(int square, U64 block)
          attacks |= (1ULL << (r*8 + f));
          if((1ULL << (r*8 + f)) & block) break;
      }
-     for (int r = tr-1, f=tf-1; r >= 0 && f >= 0; --r --f)     // top left
+     for (int r = tr-1, f=tf-1; r >= 0 && f >= 0; --r, --f)     // top left
      {
          attacks |= (1ULL << (r*8 + f));
          if((1ULL << (r*8 + f)) & block) break;
