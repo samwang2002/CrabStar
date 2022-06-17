@@ -29,22 +29,6 @@ void print_bitboard(U64 bitboard);
 U64 set_occupancy(int index, int masked_bits, U64 attack_mask);
 
 /* ------------------------------- constants ------------------------------- */
-// sides to move (colors)
-enum {white, black, both};
-
-// bishop and rook
-enum {rook, bishop};
-
-// encode pieces
-enum {P, N, B, R, Q, K, p, n, b, r, q, k};
-
-//ASCII pieces
-const char ascii_pieces[13] = "PNBRQKpnbrqk";
-
-// convert ASCII character pieces to encoded constants
-// note: the array is in the exact order as C++ does not support designated initializers
-const int char_pieces[] = {P, N, B, R, Q, K, p, n, b, r, q, k};
-
 // board squares
 enum {
     a8, b8, c8, d8, e8, f8, g8, h8,
@@ -68,21 +52,6 @@ static const char* square_to_coordinates[] = {
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
 };
 
-//castling rights binary encoding
-enum { wk = 1, wq = 2, bk = 4, bq = 8 };
-/*
-    bin  dec
-    
-   0001    1  white king can castle to the king side
-   0010    2  white king can castle to the queen side
-   0100    4  black king can castle to the king side
-   1000    8  black king can castle to the queen side
-   examples
-   1111       both sides an castle both directions
-   1001       black king => queen side
-              white king => king side
-*/
-
 // file constants
 const U64 not_a_file = 18374403900871474942ULL;
 const U64 not_h_file = 9187201950435737471ULL;
@@ -103,21 +72,5 @@ const U64 not_ab_file = 18229723555195321596ULL;
 
      a b c d e f g h
 **********************/
-
-/* ------------------------------- variables ------------------------------- */
-// bitboards
-static U64 bitboards[12];
-
-// occupancy bitboards
-static U64 occupancies[3];
-
-// side to move
-static int side = -1;
-
-// enpassant square
-static int enpassant = no_sq;
-
-// castling rights
-static int castle;
 
 #endif
