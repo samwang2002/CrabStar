@@ -127,9 +127,7 @@ void parse_fen(const char *fen)
     } else enpassant = no_sq;
 
     // initialize occupancies
-    for (int piece = P; piece <= K; ++piece)        // white pieces
-        occupancies[white] |= bitboards[piece];
-    for (int piece = p; piece <= k; ++piece)        // black pieces
-        occupancies[black] |= bitboards[piece];
+    for (int piece = P; piece <= K; ++piece) occupancies[white] |= bitboards[piece];
+    for (int piece = p; piece <= k; ++piece) occupancies[black] |= bitboards[piece];
     occupancies[both] |= occupancies[white] | occupancies[black];
 }
