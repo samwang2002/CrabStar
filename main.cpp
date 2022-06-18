@@ -8,7 +8,7 @@
 int main()
 {
     init_all();
-    U64 occupancy = 0ULL;
-    set_bit(occupancy, f6);
-    print_bitboard(get_queen_attacks(d4, occupancy));
+    parse_fen(tricky_position);
+    print_board();
+    std::cout << square_attacked(h2, black) << std::endl;
 }

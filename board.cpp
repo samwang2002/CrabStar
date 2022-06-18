@@ -131,3 +131,25 @@ void parse_fen(const char *fen)
     for (int piece = p; piece <= k; ++piece) occupancies[black] |= bitboards[piece];
     occupancies[both] |= occupancies[white] | occupancies[black];
 }
+
+// get whether square is currently attacked by given side
+int square_attacked(int square, int side)
+{
+    if (side == white) {
+        U64 attacks = (pawn_attacks[black][square] & bitboards[P])              // not a typo
+                    | (knight_attacks[square] & bitboards[N])
+                    | (get_bishop_attacks(square, occupancies[both]) & bitboards[B])
+                    | (get_rook_attacks(square, occupancies[both]) & bitboards[R])
+                    | (get_queen_attacks(square, occupancies[both]) & bitboards[Q])
+                    | (king_attacks[square] & bitboards[K]);
+        return attacks ? 1 : 0;
+    } else {
+        U64 attacks = (pawn_attacks[white][square] & bitboards[p])
+                    | (knight_attacks[square] & bitboards[n])
+                    | (get_bishop_attacks(square, occupancies[both]) & bitboards[b])
+                    | (get_rook_attacks(square, occupancies[both]) & bitboards[r])
+                    | (get_queen_attacks(square, occupancies[both]) & bitboards[q])
+                    | (king_attacks[square] & bitboards[k]);
+        return attacks ? 1 : 0;
+    }
+}
