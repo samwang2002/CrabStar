@@ -258,6 +258,26 @@ void generate_pawn_moves(move_list *moves, int side)
     }
 }
 
+// generate castling moves
+void generate_castling_moves(move_list *moves, int side)
+{
+    if (side == white) {
+        if ((castle & wk) && !get_bit(occupancies[both], f1) && !get_bit(occupancies[both], g1)
+            && !square_attacked(e1, black) && !square_attacked(f1, black) && !square_attacked(g1, black))
+            add_move(moves, encode_move(e1, g1, K, 0, 0, 0, 0, 1));
+        if ((castle & wq) && !get_bit(occupancies[both], d1) && !get_bit(occupancies[both], c1)
+            && !square_attacked(e1, black) && !square_attacked(d1, black) && !square_attacked(c1, black))
+            add_move(moves, encode_move(e1, c1, K, 0, 0, 0, 0, 1));
+    } else {
+        if ((castle & bk) && !get_bit(occupancies[both], f8) && !get_bit(occupancies[both], g8)
+            && !square_attacked(e8, white) && !square_attacked(f8, white) && !square_attacked(g8, white))
+            add_move(moves, encode_move(e8, g8, k, 0, 0, 0, 0, 1));
+        if ((castle & bq) && !get_bit(occupancies[both], d8) && !get_bit(occupancies[both], c8)
+            && !square_attacked(e8, white) && !square_attacked(d8, white) && !square_attacked(c8, white))
+            add_move(moves, encode_move(e8, c8, k, 0, 0, 0, 0, 1));
+    }
+}
+
 
 // void generate_moves()
 // {
