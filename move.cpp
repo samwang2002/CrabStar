@@ -14,6 +14,9 @@ void add_move(move_list *moves, int move)
 // print description of move
 void print_move(int move)
 {
+    #ifndef _WIN32
+        std::cout << unicode_pieces[get_move_piece(move)] << ' ';
+    #endif
     std::cout << square_to_coordinates[get_move_source(move)];
     if (get_move_capture(move)) std::cout << 'x';
     std::cout << square_to_coordinates[get_move_target(move)];

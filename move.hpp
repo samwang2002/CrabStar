@@ -10,6 +10,12 @@ typedef struct {
 // promoted pieces
 static const char promoted_pieces[12] = {'p', 'n', 'b', 'r', 'q', 'k', 'p', 'n', 'b', 'r', 'q', 'k'};
 
+// ASCII pieces
+static const char ascii_pieces[13] = "PNBRQKpnbrqk";
+
+// unicode pieces
+static const char *unicode_pieces[12] = {"♙", "♘", "♗", "♖", "♕", "♔", "♟", "♞", "♝", "♜", "♛", "♚"};
+
 /* ------------------------------- macros ------------------------------- */
 // encodes all data about a move in an integer
 // castling (1b), enpassant (1b), double push (1b), capture (1b), promoted piece (4b),

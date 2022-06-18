@@ -219,14 +219,14 @@ void generate_pawn_moves(move_list *moves, int side)
             int target = source + 8;
             if (!get_bit(occupancies[both], target)) {
                 if (source >= a2) {
-                    add_move(moves, encode_move(source, target, P, Q, 0, 0, 0, 0));
-                    add_move(moves, encode_move(source, target, P, R, 0, 0, 0, 0));
-                    add_move(moves, encode_move(source, target, P, B, 0, 0, 0, 0));
-                    add_move(moves, encode_move(source, target, P, N, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, q, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, r, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, b, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, n, 0, 0, 0, 0));
                 } else {
-                    add_move(moves, encode_move(source, target, P, 0, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, 0, 0, 0, 0, 0));
                     if (source <= h7 && !get_bit(occupancies[both], source+16))
-                        add_move(moves, encode_move(source, source+16, P, 0, 0, 1, 0, 0));
+                        add_move(moves, encode_move(source, source+16, p, 0, 0, 1, 0, 0));
                 }
             }
 
@@ -235,12 +235,12 @@ void generate_pawn_moves(move_list *moves, int side)
             while (attacks) {
                 target = get_ls1b_index(attacks);
                 if (source >= a2) {     // promotions
-                    add_move(moves, encode_move(source, target, P, Q, 1, 0, 0, 0));
-                    add_move(moves, encode_move(source, target, P, R, 1, 0, 0, 0));
-                    add_move(moves, encode_move(source, target, P, B, 1, 0, 0, 0));
-                    add_move(moves, encode_move(source, target, P, N, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, q, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, r, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, b, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, n, 1, 0, 0, 0));
                 } else {
-                    add_move(moves, encode_move(source, target, P, 0, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, p, 0, 1, 0, 0, 0));
                 }
                 pop_bit(attacks, target);
             }
@@ -249,7 +249,7 @@ void generate_pawn_moves(move_list *moves, int side)
             if (enpassant != no_sq) {
                 if (U64 enpas_attacks = pawn_attacks[black][source] & (1ULL << enpassant)) {
                     target = get_ls1b_index(enpas_attacks);
-                    add_move(moves, encode_move(source, target, P, 0, 1, 0, 1, 0));
+                    add_move(moves, encode_move(source, target, p, 0, 1, 0, 1, 0));
                 }
             }
 
