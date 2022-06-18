@@ -41,6 +41,9 @@ enum {white, black, both};
 // bishop and rook
 enum {rook, bishop};
 
+// encode pieces
+enum {P, N, B, R, Q, K, p, n, b, r, q, k};
+
 // ASCII pieces
 static const char ascii_pieces[13] = "PNBRQKpnbrqk";
 

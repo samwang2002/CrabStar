@@ -7,19 +7,8 @@ typedef struct {
     int count;
 } move_list;
 
-// encode pieces
-enum {P, N, B, R, Q, K, p, n, b, r, q, k};
-
 // promoted pieces
-// char promoted_pieces[12];
-// promoted_pieces[Q] = 'q';
-// promoted_pieces[R] = 'r';
-// promoted_pieces[B] = 'b';
-// promoted_pieces[N] = 'n';
-// promoted_pieces[q] = 'q';
-// promoted_pieces[r] = 'r';
-// promoted_pieces[b] = 'b';
-// promoted_pieces[n] = 'n';
+static const char promoted_pieces[12] = {'p', 'n', 'b', 'r', 'q', 'k', 'p', 'n', 'b', 'r', 'q', 'k'};
 
 /* ------------------------------- macros ------------------------------- */
 // encodes all data about a move in an integer

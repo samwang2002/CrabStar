@@ -166,27 +166,94 @@ void generate_moves(move_list *moves, int side)
 void generate_pawn_moves(move_list *moves, int side)
 {
     if (side == white) {
-        // quiet moves
         U64 bitboard = bitboards[P];
-        int count = 0;
         while (bitboard) {
-            std::cout << "count: " << count << std::endl;
             int source = get_ls1b_index(bitboard);
+
+            // quiet moves
             int target = source - 8;
             if (!get_bit(occupancies[both], target)) {      // target square is not occupied
-                if (source <= a7) {      // promotions
+                if (source <= h7) {      // promotions
+                    add_move(moves, encode_move(source, target, P, Q, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, R, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, B, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, N, 0, 0, 0, 0));
+                } else {
+                    add_move(moves, encode_move(source, target, P, 0, 0, 0, 0, 0));     // single push
+                    if (source >= a2 && !get_bit(occupancies[both], source-16))         // double push
+                        add_move(moves, encode_move(source, source-16, P, 0, 0, 1, 0, 0));
+                }
+            }
+
+            // regular captures
+            U64 attacks = pawn_attacks[white][source] & occupancies[black];
+            while (attacks) {
+                target = get_ls1b_index(attacks);
+                if (source <= h7) {     // promotions
+                    add_move(moves, encode_move(source, target, P, Q, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, R, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, B, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, N, 1, 0, 0, 0));
+                } else {
+                    add_move(moves, encode_move(source, target, P, 0, 1, 0, 0, 0));
+                }
+                pop_bit(attacks, target);
+            }
+
+            // en passant captures
+            if (enpassant != no_sq) {
+                if (U64 enpas_attacks = pawn_attacks[white][source] & (1ULL << enpassant)) {
+                    target = get_ls1b_index(enpas_attacks);
+                    add_move(moves, encode_move(source, target, P, 0, 1, 0, 1, 0));
+                }
+            }
+
+            pop_bit(bitboard, source);
+        }
+    } else {
+        U64 bitboard = bitboards[p];
+        while (bitboard) {
+            int source = get_ls1b_index(bitboard);
+
+            // quiet moves
+            int target = source + 8;
+            if (!get_bit(occupancies[both], target)) {
+                if (source >= a2) {
                     add_move(moves, encode_move(source, target, P, Q, 0, 0, 0, 0));
                     add_move(moves, encode_move(source, target, P, R, 0, 0, 0, 0));
                     add_move(moves, encode_move(source, target, P, B, 0, 0, 0, 0));
                     add_move(moves, encode_move(source, target, P, N, 0, 0, 0, 0));
                 } else {
                     add_move(moves, encode_move(source, target, P, 0, 0, 0, 0, 0));
-                    if (source <= h2 && !get_bit(occupancies[both], source-16))
-                        add_move(moves, encode_move(source, source-16, P, 0, 0, 1, 0, 0));
+                    if (source <= h7 && !get_bit(occupancies[both], source+16))
+                        add_move(moves, encode_move(source, source+16, P, 0, 0, 1, 0, 0));
                 }
             }
+
+            // regular captures
+            U64 attacks = pawn_attacks[black][source] & occupancies[white];
+            while (attacks) {
+                target = get_ls1b_index(attacks);
+                if (source >= a2) {     // promotions
+                    add_move(moves, encode_move(source, target, P, Q, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, R, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, B, 1, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, N, 1, 0, 0, 0));
+                } else {
+                    add_move(moves, encode_move(source, target, P, 0, 1, 0, 0, 0));
+                }
+                pop_bit(attacks, target);
+            }
+
+            // en passant captures
+            if (enpassant != no_sq) {
+                if (U64 enpas_attacks = pawn_attacks[black][source] & (1ULL << enpassant)) {
+                    target = get_ls1b_index(enpas_attacks);
+                    add_move(moves, encode_move(source, target, P, 0, 1, 0, 1, 0));
+                }
+            }
+
             pop_bit(bitboard, source);
-            ++count;
         }
     }
 }
