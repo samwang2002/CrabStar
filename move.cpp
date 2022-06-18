@@ -17,9 +17,15 @@ void print_move(int move)
     #ifndef _WIN32
         std::cout << unicode_pieces[get_move_piece(move)] << ' ';
     #endif
-    std::cout << square_to_coordinates[get_move_source(move)];
-    if (get_move_capture(move)) std::cout << 'x';
+    std::cout << square_to_coordinates[get_move_source(move)] << ' ';
+    if (get_move_capture(move)) std::cout << "x ";
     std::cout << square_to_coordinates[get_move_target(move)];
     if (get_move_promoted(move))
-        std::cout << promoted_pieces[get_move_promoted(move)];
+        #ifdef _WIN32
+            std::cout << "->" << promoted_pieces[get_move_promoted(move)];
+        # else
+            std::cout << "->" << unicode_pieces[get_move_promoted(move)];
+        #endif
+    if (get_move_castling(move))
+        std::cout << '*';
 }
