@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string.h>
 #include "board.hpp"
 #include "bitboard.hpp"
 #include "leapers.hpp"
@@ -151,5 +152,43 @@ int square_attacked(int square, int side)
                     | (get_queen_attacks(square, occupancies[both]) & bitboards[q])
                     | (king_attacks[square] & bitboards[k]);
         return attacks ? 1 : 0;
+    }
+}
+
+// generate all moves
+void generate_moves()
+{
+    // define source and target squares
+    int source_square, target_square;
+
+    // define current piece's bitboard copy
+    U64 bitboard, attacks;
+
+    // loop over all the bitboards
+    for (int piece = P; piece <= k; piece++)
+    {
+        // initialize piece bitboard copy
+        bitboard = bitboards[piece];
+
+        // generate white pawns and white king castling moves
+        if (side == white)
+        {
+
+        }
+
+        // generate black pawns and black king castling moves
+        else
+        {
+
+        }
+        // generate knight moves
+        
+        // generate bishop moves
+
+        // generate rook moves
+
+        // generate queen moves
+
+        // generate king moves
     }
 }

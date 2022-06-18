@@ -27,6 +27,9 @@ void parse_fen(const char *fen);
 // get whether square is currently attacked by given side
 int square_attacked(int square, int side);
 
+// generate all moves
+void generate_moves();
+
 /* ------------------------------- constants ------------------------------- */
 // sides to move (colors)
 enum {white, black, both};
