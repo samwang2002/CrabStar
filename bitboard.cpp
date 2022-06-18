@@ -3,7 +3,7 @@
 #include "bitboard.hpp"
 
 // get index of least significant bit
-inline int get_ls1b_index(U64 bitboard)
+int get_ls1b_index(U64 bitboard)
 {
     if (bitboard) return count_bits((bitboard & -bitboard)-1);
     return -1;

@@ -2,6 +2,7 @@
 #define BOARD_H
 
 #include "bitboard.hpp"
+#include "move.hpp"
 #include <map>
 
 // FEN debug positions
@@ -28,7 +29,10 @@ void parse_fen(const char *fen);
 int square_attacked(int square, int side);
 
 // generate all moves
-void generate_moves();
+void generate_moves(move_list *moves, int side);
+
+// generate pawn moves
+void generate_pawn_moves(move_list *moves, int side);
 
 /* ------------------------------- constants ------------------------------- */
 // sides to move (colors)
@@ -37,9 +41,6 @@ enum {white, black, both};
 // bishop and rook
 enum {rook, bishop};
 
-// encode pieces
-enum {P, N, B, R, Q, K, p, n, b, r, q, k};
-
 // ASCII pieces
 static const char ascii_pieces[13] = "PNBRQKpnbrqk";
 
@@ -47,7 +48,6 @@ static const char ascii_pieces[13] = "PNBRQKpnbrqk";
 static const char *unicode_pieces[12] = {"♙", "♘", "♗", "♖", "♕", "♔", "♟", "♞", "♝", "♜", "♛", "♚"};
 
 // convert ASCII character pieces to encoded constants
-// const int char_pieces[] = {P, N, B, R, Q, K, p, n, b, r, q, k};
 const std::map<char, int> char_pieces = {
     {'P', P}, {'N', N}, {'B', B}, {'R', R}, {'Q', Q}, {'K', K},
     {'p', p}, {'n', n}, {'b', b}, {'r', r}, {'q', q}, {'k', k}

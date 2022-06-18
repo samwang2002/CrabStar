@@ -20,7 +20,7 @@
 
 /* ------------------------------- function declarations ------------------------------- */
 // get index of least significant bit
-inline int get_ls1b_index(U64 bitboard);
+int get_ls1b_index(U64 bitboard);
 
 // print bitboard as grid of 0s and 1s
 void print_bitboard(U64 bitboard);

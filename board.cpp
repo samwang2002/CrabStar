@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
 #include "board.hpp"
+#include "move.hpp"
 #include "bitboard.hpp"
 #include "leapers.hpp"
 #include "sliders.hpp"
@@ -156,39 +157,74 @@ int square_attacked(int square, int side)
 }
 
 // generate all moves
-void generate_moves()
+void generate_moves(move_list *moves, int side)
 {
-    // define source and target squares
-    int source_square, target_square;
+    
+}
 
-    // define current piece's bitboard copy
-    U64 bitboard, attacks;
-
-    // loop over all the bitboards
-    for (int piece = P; piece <= k; piece++)
-    {
-        // initialize piece bitboard copy
-        bitboard = bitboards[piece];
-
-        // generate white pawns and white king castling moves
-        if (side == white)
-        {
-
+// generate pawn moves
+void generate_pawn_moves(move_list *moves, int side)
+{
+    if (side == white) {
+        // quiet moves
+        U64 bitboard = bitboards[P];
+        int count = 0;
+        while (bitboard) {
+            std::cout << "count: " << count << std::endl;
+            int source = get_ls1b_index(bitboard);
+            int target = source - 8;
+            if (!get_bit(occupancies[both], target)) {      // target square is not occupied
+                if (source <= a7) {      // promotions
+                    add_move(moves, encode_move(source, target, P, Q, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, R, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, B, 0, 0, 0, 0));
+                    add_move(moves, encode_move(source, target, P, N, 0, 0, 0, 0));
+                } else {
+                    add_move(moves, encode_move(source, target, P, 0, 0, 0, 0, 0));
+                    if (source <= h2 && !get_bit(occupancies[both], source-16))
+                        add_move(moves, encode_move(source, source-16, P, 0, 0, 1, 0, 0));
+                }
+            }
+            pop_bit(bitboard, source);
+            ++count;
         }
-
-        // generate black pawns and black king castling moves
-        else
-        {
-
-        }
-        // generate knight moves
-        
-        // generate bishop moves
-
-        // generate rook moves
-
-        // generate queen moves
-
-        // generate king moves
     }
 }
+
+
+// void generate_moves()
+// {
+//     int source_square, target_square;
+//     U64 bitboard, attacks;
+
+//     // loop over all the bitboards
+//     for (int piece = P; piece <= k; piece++)
+//     {
+//         bitboard = bitboards[piece];
+
+//         // generate white pawns and white king castling moves
+//         if (side == white)
+//         {
+//             if (piece == P) {
+//                 U64 moves = (bitboard << 8) & !occupancies[both];
+//             } else if (piece == p) {
+//                 U64 moves = (bitboard >> 8) & !occupancies[both];
+//             }
+//         }
+
+//         // generate black pawns and black king castling moves
+//         else
+//         {
+
+//         }
+//         // generate knight moves
+        
+//         // generate bishop moves
+
+//         // generate rook moves
+
+//         // generate queen moves
+
+//         // generate king moves
+//     }
+// }
