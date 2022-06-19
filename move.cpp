@@ -50,7 +50,7 @@ void print_move_list(move_list *moves)
 
         #ifdef WIN64
             //print move
-            std::cout << "      " << square_to_coordinates[get_move_source(move)];
+            std::cout << "     " << square_to_coordinates[get_move_source(move)];
             std::cout << square_to_coordinates[get_move_target(move)];
             std::cout << (get_move_promoted(move) ? promoted_pieces[get_move_promoted(move)] : ' ') << "   ";
             std::cout << (ascii_pieces[get_move_piece(move)]) << "         ";
@@ -61,7 +61,7 @@ void print_move_list(move_list *moves)
 
         #else
             //print move
-            std::cout << "      " << square_to_coordinates[get_move_source(move)];
+            std::cout << "     " << square_to_coordinates[get_move_source(move)];
             std::cout << square_to_coordinates[get_move_target(move)];
             std::cout << (get_move_promoted(move) ? promoted_pieces[get_move_promoted(move)] : ' ') << "   ";
             std::cout << unicode_pieces[get_move_piece(move)] << "         ";

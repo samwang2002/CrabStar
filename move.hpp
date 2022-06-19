@@ -47,6 +47,7 @@ void add_move(move_list *moves, int move);
 // print description of move
 void print_move(int move);
 
+// print list of moves
 void print_move_list(move_list *moves);
 
 #endif
