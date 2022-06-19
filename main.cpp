@@ -29,7 +29,7 @@ int main()
 
     move_list moves;
     moves.count = 0;
-    generate_rook_moves(&moves, black);
+    generate_queen_moves(&moves, black);
     print_move_list(&moves);
 
     return 0;
