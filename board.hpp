@@ -60,6 +60,9 @@ void generate_knight_moves(move_list *moves, int side);
 // generate bishop moves
 void generate_bishop_moves(move_list *moves, int side);
 
+// generate rook moves
+void generate_rook_moves(move_list *moves, int side);
+
 /* ------------------------------- constants ------------------------------- */
 // sides to move (colors)
 enum {white, black, both};

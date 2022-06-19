@@ -278,7 +278,7 @@ void generate_castling_moves(move_list *moves, int side)
     }
 }
 
-//generate knight moves
+// generate knight moves
 void generate_knight_moves(move_list *moves, int side)
 {
     if (side == white)
@@ -434,6 +434,42 @@ void generate_bishop_moves(move_list *moves, int side)
             pop_bit(bitboard, source_square);
         }
 
+    }
+}
+
+// generate rook moves
+void generate_rook_moves(move_list *moves, int side)
+{
+    if (side == white) {
+        U64 bitboard = bitboards[R];
+        while (bitboard) {
+            int source = get_ls1b_index(bitboard);
+            U64 attacks = get_rook_attacks(source, occupancies[both]) & ~occupancies[white];
+            while (attacks) {
+                int target = get_ls1b_index(attacks);
+                if (!get_bit(occupancies[black], target))       // quiet move
+                    add_move(moves, encode_move(source, target, R, 0, 0, 0, 0, 0));
+                else                                            // capture move
+                    add_move(moves, encode_move(source, target, R, 0, 1, 0, 0, 0));
+                pop_bit(attacks, target);
+            }
+            pop_bit(bitboard, source);
+        }
+    } else {
+        U64 bitboard = bitboards[r];
+        while (bitboard) {
+            int source = get_ls1b_index(bitboard);
+            U64 attacks = get_rook_attacks(source, occupancies[both]) & ~occupancies[black];
+            while (attacks) {
+                int target = get_ls1b_index(attacks);
+                if (!get_bit(occupancies[white], target))
+                    add_move(moves, encode_move(source, target, r, 0, 0, 0, 0, 0));
+                else
+                    add_move(moves, encode_move(source, target, r, 0, 1, 0, 0, 0));
+                pop_bit(attacks, target);
+            }
+            pop_bit(bitboard, source);
+        }
     }
 }
 
