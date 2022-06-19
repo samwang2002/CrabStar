@@ -71,8 +71,7 @@ void print_move_list(move_list *moves)
             std::cout << (get_move_castling(move) ? 1 : 0) << std::endl;
         
         #endif
-
-        //print total number of moves
-        std::cout << "\n\n     Total number of moves: " << moves->count << "\n" << std::endl;
     }
+    //print total number of moves
+    std::cout << "\n\n     Total number of moves: " << moves->count << "\n" << std::endl;
 }

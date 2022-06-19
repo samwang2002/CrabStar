@@ -26,4 +26,7 @@ int main()
         print_move(moves.moves[i]);
         std::cout << std::endl;
     }
+    print_move_list(&moves);
+
+    return 0;
 }
