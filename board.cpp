@@ -292,7 +292,7 @@ void generate_knight_moves(move_list *moves, int side)
         // init source square
         int source_square = get_ls1b_index(bitboard);
 
-        // copy white knight's attacks to get set of target squares
+        // init white knight's attacks to get set of target squares
         U64 attacks = knight_attacks[source_square] & (~occupancies[white]);
 
         // loop over target squares available from generated attacks
@@ -329,7 +329,7 @@ void generate_knight_moves(move_list *moves, int side)
         // init source square
         int source_square = get_ls1b_index(bitboard);
 
-        // copy white knight's attacks to get set of target squares
+        // init black knight's attacks to get set of target squares
         U64 attacks = knight_attacks[source_square] & (~occupancies[black]);
 
         // loop over target squares available from generated attacks
@@ -352,6 +352,88 @@ void generate_knight_moves(move_list *moves, int side)
 
         //pop ls1b of the current piece bitboard copy
         pop_bit(bitboard, source_square);
+    }
+}
+
+// generate bishop moves
+void generate_bishop_moves(move_list *moves, int side)
+{
+    if (side == white)
+    {
+    // define piece as white bishop
+        int piece = B;
+    
+        // define white bishop bitboard
+        U64 bitboard = bitboards[B];
+
+        // loop over source squares of piece bitboard
+        while(bitboard)
+        {
+            // init source square
+            int source_square = get_ls1b_index(bitboard);
+
+            // init white bishop's attacks to get set of target squares
+            U64 attacks = get_bishop_attacks(source_square, occupancies[both]) & (~occupancies[white]);
+
+            // loop over target squares available from generated attacks
+            while (attacks)
+            {
+                // init target square
+                int target_square = get_ls1b_index(attacks);
+
+                //quiet move
+                if (!get_bit(occupancies[black], target_square))
+                    add_move(moves, encode_move(source_square, target_square, piece, 0, 0, 0, 0, 0));
+                
+                // capture move
+                else
+                    add_move(moves, encode_move(source_square, target_square, piece, 0, 1, 0, 0, 0));
+                
+                //pop ls1b in current attacks set
+                pop_bit(attacks, target_square);
+
+            }
+
+            //pop ls1b of the current piece bitboard copy
+            pop_bit(bitboard, source_square);
+        }
+    }
+
+    else
+    {
+        // define piece as black bishop
+        int piece = b;
+    
+        // define black bishop bitboard
+        U64 bitboard = bitboards[b];
+
+        // loop over source squares of piece bitboard
+        while(bitboard)
+        {
+            // init source square
+            int source_square = get_ls1b_index(bitboard);
+            // init black bishop's attacks to get set of target squares
+            U64 attacks = get_bishop_attacks(source_square, occupancies[both]) & ~occupancies[black];
+            // loop over target squares available from generated attacks
+            while (attacks)
+            {
+                // init target square
+                int target_square = get_ls1b_index(attacks);
+                //quiet move
+                if (!get_bit(occupancies[white], target_square))
+                    add_move(moves, encode_move(source_square, target_square, piece, 0, 0, 0, 0, 0));
+                // capture move
+                else
+                    add_move(moves, encode_move(source_square, target_square, piece, 0, 1, 0, 0, 0));
+
+                //pop ls1b in current attacks set
+                pop_bit(attacks, target_square);
+
+            }
+            //pop ls1b of the current piece bitboard copy
+            pop_bit(bitboard, source_square);
+        }
+
     }
 }
 
