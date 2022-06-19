@@ -3,7 +3,7 @@
 
 #include "bitboard.hpp"
 #include "move.hpp"
-#include <map>
+#include <unordered_map>
 
 // FEN debug positions
 #define empty_board "8/8/8/8/8/8/8/8 w - - "
@@ -48,7 +48,7 @@ enum {rook, bishop};
 enum {P, N, B, R, Q, K, p, n, b, r, q, k};
 
 // convert ASCII character pieces to encoded constants
-const std::map<char, int> char_pieces = {
+const std::unordered_map<char, int> char_pieces = {
     {'P', P}, {'N', N}, {'B', B}, {'R', R}, {'Q', Q}, {'K', K},
     {'p', p}, {'n', n}, {'b', b}, {'r', r}, {'q', q}, {'k', k}
 };
