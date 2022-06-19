@@ -19,6 +19,7 @@ int main()
     // add_move(&moves, encode_move(a5, a6, P, 0, 0, 0, 0, 0));
     generate_pawn_moves(&moves, black);
     generate_castling_moves(&moves, black);
+    generate_knight_moves(&moves, black);
     std::cout << "move count: " << moves.count << std::endl;
     for (int i = 0; i < moves.count; ++i) {
         print_move(moves.moves[i]);

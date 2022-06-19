@@ -278,6 +278,82 @@ void generate_castling_moves(move_list *moves, int side)
     }
 }
 
+//generate knight moves
+void generate_knight_moves(move_list *moves, int side)
+{
+    if (side == white)
+    {
+        // define piece as white knight
+        int piece = N;
+    
+        // define white knight bitboard
+        U64 bitboard = bitboards[N];
+
+        // init source square
+        int source_square = get_ls1b_index(bitboard);
+
+        // copy white knight's attacks to get set of target squares
+        U64 attacks = knight_attacks[source_square] & (~occupancies[white]);
+
+        // loop over target squares available from generated attacks
+        while (attacks)
+        {
+            // init target square
+            int target_square = get_ls1b_index(attacks);
+
+            //quiet move
+            if(!get_bit(occupancies[black], target_square))
+                add_move(moves, encode_move(source_square, target_square, piece, 0, 0, 0, 0, 0));
+            
+            // capture move
+            else
+                add_move(moves, encode_move(source_square, target_square, piece, 0, 1, 0, 0, 0));
+            
+            // pop ls1b in current attacks set
+            pop_bit(attacks,target_square);
+        }
+
+        //pop ls1b of the current piece bitboard copy
+        pop_bit(bitboard, source_square);
+
+    }
+    
+    else
+    {
+        // define piece as black knight
+        int piece = n;
+    
+        // define black knight bitboard
+        U64 bitboard = bitboards[n];
+
+        // init source square
+        int source_square = get_ls1b_index(bitboard);
+
+        // copy white knight's attacks to get set of target squares
+        U64 attacks = knight_attacks[source_square] & (~occupancies[black]);
+
+        // loop over target squares available from generated attacks
+        while (attacks)
+        {
+            // init target square
+            int target_square = get_ls1b_index(attacks);
+
+            //quiet move
+            if(!get_bit(occupancies[white], target_square))
+                add_move(moves, encode_move(source_square, target_square, piece, 0, 0, 0, 0, 0));
+            
+            // capture move
+            else
+                add_move(moves, encode_move(source_square, target_square, piece, 0, 1, 0, 0, 0));
+            
+            // pop ls1b in current attacks set
+            pop_bit(attacks,target_square);
+        }
+
+        //pop ls1b of the current piece bitboard copy
+        pop_bit(bitboard, source_square);
+    }
+}
 
 // void generate_moves()
 // {

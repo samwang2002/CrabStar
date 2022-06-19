@@ -37,6 +37,9 @@ void generate_pawn_moves(move_list *moves, int side);
 // generate king moves
 void generate_castling_moves(move_list *moves, int side);
 
+// generate knight moves
+void generate_knight_moves(move_list *moves, int side);
+
 /* ------------------------------- constants ------------------------------- */
 // sides to move (colors)
 enum {white, black, both};
