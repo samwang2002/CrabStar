@@ -1,5 +1,5 @@
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef BOARD_HPP
+#define BOARD_HPP
 
 #include "bitboard.hpp"
 #include "move.hpp"
@@ -33,11 +33,8 @@
 // print state of board
 void print_board();
 
-// initialize attack tables for leapers
-void init_leapers_attacks();
-
-// initialize all attacks
-void init_all();
+// initialize all attack tables
+void init_attacks();
 
 // initialize position from FEN string
 void parse_fen(const char *fen);
@@ -48,55 +45,11 @@ int square_attacked(int square, int side);
 // generate all moves
 void generate_moves(move_list *moves, int side);
 
-// generate pawn moves
-void generate_pawn_moves(move_list *moves, int side);
-
-// generate king moves
-void generate_castling_moves(move_list *moves, int side);
-
-// generate knight moves
-void generate_knight_moves(move_list *moves, int side);
-
-// generate bishop moves
-void generate_bishop_moves(move_list *moves, int side);
-
 // generate rook moves
 void generate_rook_moves(move_list *moves, int side);
 
 // generate queen moves
 void generate_queen_moves(move_list *moves, int side);
-
-/* ------------------------------- constants ------------------------------- */
-// sides to move (colors)
-enum {white, black, both};
-
-// bishop and rook
-enum {rook, bishop};
-
-// encode pieces
-enum {P, N, B, R, Q, K, p, n, b, r, q, k};
-
-// convert ASCII character pieces to encoded constants
-const std::unordered_map<char, int> char_pieces = {
-    {'P', P}, {'N', N}, {'B', B}, {'R', R}, {'Q', Q}, {'K', K},
-    {'p', p}, {'n', n}, {'b', b}, {'r', r}, {'q', q}, {'k', k}
-};
-
-//castling rights binary encoding
-enum { wk = 1, wq = 2, bk = 4, bq = 8 };
-/*
-    bin  dec
-    
-   0001    1  white king can castle to the king side
-   0010    2  white king can castle to the queen side
-   0100    4  black king can castle to the king side
-   1000    8  black king can castle to the queen side
-   examples
-   1111       both sides an castle both directions
-   1001       black king => queen side
-              white king => king side
-*/
-
 
 /* ------------------------------- variables ------------------------------- */
 // bitboards

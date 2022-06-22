@@ -1,18 +1,29 @@
-#ifndef ROOK_H
-#define ROOK_H
+#ifndef ROOK_HPP
+#define ROOK_HPP
 
+#include "move.hpp"
 #include "bitboard.hpp"
 
+// returns squares that could be obstacles in rook's path
 U64 mask_rook_attacks(int square);
+
+// generate rook attacks on the fly
+U64 generate_rook_attacks(int square, U64 block);
+
+// initialize rook attack table
+void init_rook_attacks();
+
+// get rook attacks using magic bitboard
+U64 get_rook_attacks(int square, U64 occupancy);
+
+// generate rook moves
+void generate_rook_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies);
 
 // rook attack masks
 static U64 rook_masks[64];
 
 // rook attacks table [square][occupancies]
 static U64 rook_attacks[64][4096];
-
-// generate rook attacks on the fly
-U64 generate_rook_attacks(int square, U64 block);
 
 // rook relevant occupancy bit count for every square on board
 const int rook_relevant_bits[64] = {
@@ -26,7 +37,7 @@ const int rook_relevant_bits[64] = {
     12, 11, 11, 11, 11, 11, 11, 12
 };
 
-static U64 rook_magic_numbers[64] = {
+const U64 rook_magic_numbers[64] = {
     0x8a80104000800020ULL,
     0x140002000100040ULL,
     0x2801880a0017001ULL,
@@ -92,9 +103,5 @@ static U64 rook_magic_numbers[64] = {
     0x2006104900a0804ULL,
     0x1004081002402ULL
 };
-
-void init_rook_attacks();
-
-U64 get_rook_attacks(int square, U64 occupancy);
 
 #endif

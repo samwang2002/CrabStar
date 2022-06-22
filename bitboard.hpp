@@ -1,5 +1,5 @@
-#ifndef BITBOARD_H
-#define BITBOARD_H
+#ifndef BITBOARD_HPP
+#define BITBOARD_HPP
 
 
 // define bitboard data type
@@ -41,7 +41,7 @@ enum {
     a1, b1, c1, d1, e1, f1, g1, h1, no_sq
 };
 
-static const char* square_to_coordinates[] = {
+static const char *square_to_coordinates[] = {
     "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
     "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
     "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
@@ -53,10 +53,10 @@ static const char* square_to_coordinates[] = {
 };
 
 // file constants
-const U64 not_a_file = 18374403900871474942ULL;
-const U64 not_h_file = 9187201950435737471ULL;
-const U64 not_hg_file = 4557430888798830399ULL;
-const U64 not_ab_file = 18229723555195321596ULL;
+static const U64 not_a_file = 18374403900871474942ULL;
+static const U64 not_h_file = 9187201950435737471ULL;
+static const U64 not_hg_file = 4557430888798830399ULL;
+static const U64 not_ab_file = 18229723555195321596ULL;
 
 /**********************\
   ex: not A file

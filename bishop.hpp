@@ -1,9 +1,8 @@
-#ifndef BISHOP_H
-#define BISHOP_H
+#ifndef BISHOP_HPP
+#define BISHOP_HPP
 
+#include "move.hpp"
 #include "bitboard.hpp"
-
-U64 mask_bishop_attacks(int square);
 
 // bishop attack masks
 static U64 bishop_masks[64];
@@ -11,10 +10,23 @@ static U64 bishop_masks[64];
 // bishop attacks table [square][occupancies]
 static U64 bishop_attacks[64][512];
 
+/* ------------------------------- functions ------------------------------- */
+// get squares that could be obstacles in bishop's path
+U64 mask_bishop_attacks(int square);
+
 // generate bishop attacks on the fly
 U64 generate_bishop_attacks(int square, U64 block);
 
+// initialize bishop attack table
+void init_bishop_attacks();
 
+// get bishop attacks using magic bitboard
+U64 get_bishop_attacks(int square, U64 occupancy);
+
+// generate bishop moves
+void generate_bishop_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies);
+
+/* ------------------------------- constants ------------------------------- */
 // relevancy occupancy bit count for every square on board
 const int bishop_relevant_bits[64] = {
  6, 5, 5, 5, 5, 5, 5, 6,
@@ -27,7 +39,7 @@ const int bishop_relevant_bits[64] = {
  6, 5, 5, 5, 5, 5, 5, 6
 }; 
 
-static U64 bishop_magic_numbers[64] = {
+const U64 bishop_magic_numbers[64] = {
     0x40040844404084ULL,
     0x2004208a004208ULL,
     0x10190041080202ULL,
@@ -93,9 +105,5 @@ static U64 bishop_magic_numbers[64] = {
     0x8918844842082200ULL,
     0x4010011029020020ULL
 };
-
-void init_bishop_attacks();
-
-U64 get_bishop_attacks(int square, U64 occupancy);
 
 #endif
