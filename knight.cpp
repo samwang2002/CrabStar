@@ -1,7 +1,7 @@
 #include "knight.hpp"
 #include "constants.hpp"
 
-// U64 knight_attacks[64];
+U64 knight_attacks[64];
 
 // generate knight attacks
 U64 mask_knight_attacks(int square)
