@@ -152,3 +152,66 @@ void generate_moves(move_list *moves, int side)
     generate_rook_moves(moves, side, bitboards, occupancies);
     generate_queen_moves(moves, side, bitboards, occupancies);
 }
+
+// make move on chess board
+// move_flag is either all_moves or captures_only
+// if move_flag == captures_only, make_move will only update the board if the given move is a capture
+int make_move(int move, int move_flag)
+{
+    if (move_flag == all_moves) {           // make move
+        // preserve board state
+        copy_board();
+
+        // parse move
+        int source = get_move_source(move);
+        int target = get_move_target(move);
+        int piece = get_move_piece(move);
+        int promoted_piece = get_move_promoted(move);
+        // int capture = get_move_capture(move);
+        // int double_step = get_move_double(move);
+        int enpass = get_move_enpassant(move);
+        // int castling = get_move_castling(move);
+
+        // clear source square
+        pop_bit(bitboards[piece], source);
+        pop_bit(occupancies[side], target);
+
+        // clear target square
+        if (side == white) {
+            for (int i = p; i <= k; ++i)
+                pop_bit(bitboards[i], target);
+            pop_bit(occupancies[black], target);
+        } else {
+            for (int i = P; i <= K; ++i)
+                pop_bit(bitboards[i], target);
+            pop_bit(occupancies[white], target);
+        }
+
+        // place piece on target square
+        if (promoted_piece)
+            set_bit(bitboards[promoted_piece], target);
+        else
+            set_bit(bitboards[piece], target);
+        set_bit(occupancies[side], target);
+        set_bit(occupancies[both], target);
+
+        // handle enpassant captures
+        if (enpass) {
+            if (side == white) {
+                pop_bit(bitboards[p], target+8);
+                pop_bit(occupancies[black], target+8);
+                pop_bit(occupancies[both], target+8);
+            } else {
+                pop_bit(bitboards[P], target-8);
+                pop_bit(occupancies[white], target-8);
+                pop_bit(occupancies[both], target-8);
+            }
+        }
+        enpassant = no_sq;
+
+        return 1;
+    } else {                                // only make capture moves
+        if (get_move_capture(move)) make_move(move, all_moves);
+        else return 0;
+    }
+}

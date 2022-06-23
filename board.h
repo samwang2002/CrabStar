@@ -44,6 +44,9 @@ int square_attacked(int square, int side);
 // generate all moves
 void generate_moves(move_list *moves, int side);
 
+// make move on chess board
+int make_move(int move, int move_flag);
+
 /* ------------------------------- variables ------------------------------- */
 // bitboards
 extern U64 bitboards[12];

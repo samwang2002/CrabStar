@@ -16,17 +16,20 @@ static const char ascii_pieces[13] = "PNBRQKpnbrqk";
 // unicode pieces
 static const char *unicode_pieces[12] = {"♙", "♘", "♗", "♖", "♕", "♔", "♟", "♞", "♝", "♜", "♛", "♚"};
 
+// move types
+enum {all_moves, captures_only};
+
 /* ------------------------------- macros ------------------------------- */
 // encodes all data about a move in an integer
 // castling (1b), enpassant (1b), double push (1b), capture (1b), promoted piece (4b),
 // piece (4b), target square (6b), source (6b), 24b total
-#define encode_move(source, target, piece, promoted, capture, double_step, enpassant, castling) \
+#define encode_move(source, target, piece, promoted, capture, double_push, enpassant, castling) \
     ((source) |             \
     ((target) << 6) |       \
     ((piece) << 12) |       \
     ((promoted) << 16) |    \
     ((capture) << 20) |     \
-    ((double_step) << 21) | \
+    ((double_push) << 21) | \
     ((enpassant) << 22) |   \
     ((castling) << 23))     \
 
