@@ -159,6 +159,7 @@ void generate_moves(move_list *moves, int side)
 int make_move(int move, int move_flag)
 {
     if (move_flag == all_moves || get_move_capture(move)) {
+
         // preserve board state
         copy_board();
 
@@ -172,6 +173,7 @@ int make_move(int move, int move_flag)
         int enpass = get_move_enpassant(move);
         int castling = get_move_castling(move);
 
+        // -- update board position --
         // clear source square
         pop_bit(bitboards[piece], source);
         pop_bit(occupancies[side], source);
@@ -213,6 +215,13 @@ int make_move(int move, int move_flag)
         }
         enpassant = no_sq;
 
+        // check if move is legal
+        if (square_attacked((side == white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1)) {
+            take_back();
+            return 0;
+        }
+
+        // -- update state variables --
         // handle double pawn pushes
         if (double_push)
             enpassant = target + ((side==white) ? 8 : -8);
@@ -262,7 +271,6 @@ int make_move(int move, int move_flag)
         side ^= 1;
 
         return 1;
-    } else {        // quiet move, ignore because flag asks only for captures
+    } else          // quiet move, ignore because flag asks only for captures
         return 0;
-    }
 }
