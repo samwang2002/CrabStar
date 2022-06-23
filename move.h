@@ -1,5 +1,5 @@
-#ifndef MOVE_HPP
-#define MOVE_HPP
+#ifndef MOVE_H
+#define MOVE_H
 
 // move list structure
 typedef struct {

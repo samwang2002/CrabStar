@@ -1,16 +1,17 @@
-#include <iostream>
+#include <stdio.h>
 #include <string.h>
-#include "board.hpp"
-#include "move.hpp"
-#include "bitboard.hpp"
-#include "constants.hpp"
+#include <ctype.h>
+#include "board.h"
+#include "move.h"
+#include "bitboard.h"
+#include "constants.h"
 
-#include "pawn.hpp"
-#include "knight.hpp"
-#include "king.hpp"
-#include "bishop.hpp"
-#include "rook.hpp"
-#include "queen.hpp"
+#include "pawn.h"
+#include "knight.h"
+#include "king.h"
+#include "bishop.h"
+#include "rook.h"
+#include "queen.h"
 
 // declaring global variables
 U64 bitboards[12];
@@ -22,10 +23,10 @@ int castle = 0;
 // print current state of board
 void print_board()
 {
-    std::cout << std::endl;
+    printf("\n");
     for (int rank = 0; rank < 8; ++rank) {
         for (int file = 0; file < 8; ++file) {
-            if (!file) std::cout << "  " << 8-rank << " ";      // print ranks
+            if (!file) printf("  %d ", 8-rank);             // print ranks
 
             int square = rank*8 + file;
             int piece = -1;
@@ -35,27 +36,21 @@ void print_board()
                 if (get_bit(bitboards[i], square))
                     piece = i;
             
-            std::cout << " ";
             #ifdef WIN64
-                std::cout << ((piece == -1) ? '.' : ascii_pieces[piece]);
+                printf(" %c", (piece == -1) ? '.' : ascii_pieces[piece]);
             #else
-                std::cout << ((piece == -1) ? "." : unicode_pieces[piece]);
+                printf(" %s", (piece == -1) ? "." : unicode_pieces[piece]);
             #endif
         }
-        std::cout << std::endl;
+        printf("\n");
     }
-    std::cout << "\n     a b c d e f g h\n\n";
+    printf("\n     a b c d e f g h\n\n");
 
     // print out game state variables
-    std::cout << "     Side:     " << (side ? "black" : "white") << std::endl;
-    std::cout << "     Enpass:      " << ((enpassant != no_sq) ? square_to_coordinates[enpassant] : "no")
-              << std::endl;
-    std::cout << "     Castling:  "
-              << ((castle & wk) ? 'K' : '-')
-              << ((castle & wq) ? 'Q' : '-')
-              << ((castle & bk) ? 'k' : '-')
-              << ((castle & bq) ? 'q' : '-')
-              << std::endl << std::endl;
+    printf("     Side:     %s\n", side ? "black" : "white");
+    printf("     Enpass:      %s\n", (enpassant != no_sq) ? square_to_coordinates[enpassant] : "no");
+    printf("     Castling:  %c%c%c%c\n", (castle & wk) ? 'K' : '-', (castle & wq) ? 'Q' : '-',
+           (castle & bk) ? 'k' : '-', (castle & bq) ? 'q' : '-');
 }
 
 // initialize all attacks
@@ -83,7 +78,7 @@ void parse_fen(const char *fen)
         for (int file = 0; file < 8; ++file) {
             int square = rank*8 + file;
             if (isalpha(*fen)) {            // piece
-                int piece = char_pieces.at(*fen);
+                int piece = char_pieces[(int)*fen];
                 set_bit(bitboards[piece], square);
             } else if (isdigit(*fen)) {     // empty squares
                 int offset = *fen - '0';

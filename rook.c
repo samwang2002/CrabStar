@@ -1,5 +1,5 @@
-#include "rook.hpp"
-#include "constants.hpp"
+#include "rook.h"
+#include "constants.h"
 
 // returns squares that could be obstacles in rook's path, so edge squares are not considered
 U64 mask_rook_attacks(int square)

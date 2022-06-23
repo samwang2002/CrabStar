@@ -1,5 +1,5 @@
-#include "bishop.hpp"
-#include "constants.hpp"
+#include "bishop.h"
+#include "constants.h"
 
 // returns squares that could be obstacles in bishop's path, so edge squares are not considered
 U64 mask_bishop_attacks(int square)

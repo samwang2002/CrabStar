@@ -1,8 +1,8 @@
-#ifndef KNIGHT_HPP
-#define KNIGHT_HPP
+#ifndef KNIGHT_H
+#define KNIGHT_H
 
-#include "move.hpp"
-#include "bitboard.hpp"
+#include "move.h"
+#include "bitboard.h"
 
 // knight attacks table [square]
 extern U64 knight_attacks[64];

@@ -1,10 +1,9 @@
-#ifndef BOARD_HPP
-#define BOARD_HPP
+#ifndef BOARD_H
+#define BOARD_H
 
-#include "bitboard.hpp"
-#include "move.hpp"
+#include "bitboard.h"
+#include "move.h"
 #include <string.h>
-#include <unordered_map>
 
 // FEN debug positions
 #define empty_board "8/8/8/8/8/8/8/8 w - - "
@@ -44,12 +43,6 @@ int square_attacked(int square, int side);
 
 // generate all moves
 void generate_moves(move_list *moves, int side);
-
-// generate rook moves
-void generate_rook_moves(move_list *moves, int side);
-
-// generate queen moves
-void generate_queen_moves(move_list *moves, int side);
 
 /* ------------------------------- variables ------------------------------- */
 // bitboards

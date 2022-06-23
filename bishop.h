@@ -1,8 +1,8 @@
-#ifndef BISHOP_HPP
-#define BISHOP_HPP
+#ifndef BISHOP_H
+#define BISHOP_H
 
-#include "move.hpp"
-#include "bitboard.hpp"
+#include "move.h"
+#include "bitboard.h"
 
 // bishop attack masks
 static U64 bishop_masks[64];
@@ -28,7 +28,7 @@ void generate_bishop_moves(move_list *moves, int side, U64 *bitboards, U64 *occu
 
 /* ------------------------------- constants ------------------------------- */
 // relevancy occupancy bit count for every square on board
-const int bishop_relevant_bits[64] = {
+static const int bishop_relevant_bits[64] = {
  6, 5, 5, 5, 5, 5, 5, 6,
  5, 5, 5, 5, 5, 5, 5, 5,
  5, 5, 7, 7, 7, 7, 5, 5,
@@ -39,7 +39,7 @@ const int bishop_relevant_bits[64] = {
  6, 5, 5, 5, 5, 5, 5, 6
 }; 
 
-const U64 bishop_magic_numbers[64] = {
+static const U64 bishop_magic_numbers[64] = {
     0x40040844404084ULL,
     0x2004208a004208ULL,
     0x10190041080202ULL,

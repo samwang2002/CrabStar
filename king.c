@@ -1,5 +1,5 @@
-#include "king.hpp"
-#include "constants.hpp"
+#include "king.h"
+#include "constants.h"
 
 U64 king_attacks[64];
 

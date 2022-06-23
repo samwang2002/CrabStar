@@ -1,7 +1,7 @@
-#include "queen.hpp"
-#include "constants.hpp"
-#include "bishop.hpp"
-#include "rook.hpp"
+#include "queen.h"
+#include "constants.h"
+#include "bishop.h"
+#include "rook.h"
 
 // get queen attacks
 U64 get_queen_attacks(int square, U64 occupancy)

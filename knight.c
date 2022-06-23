@@ -1,5 +1,5 @@
-#include "knight.hpp"
-#include "constants.hpp"
+#include "knight.h"
+#include "constants.h"
 
 U64 knight_attacks[64];
 

@@ -1,8 +1,8 @@
-#ifndef QUEEN_HPP
-#define QUEEN_HPP
+#ifndef QUEEN_H
+#define QUEEN_H
 
-#include "move.hpp"
-#include "bitboard.hpp"
+#include "move.h"
+#include "bitboard.h"
 
 // get queen attacks given square and occupancy
 U64 get_queen_attacks(int square, U64 occupancy);

@@ -1,16 +1,16 @@
-#include <iostream>
+#include <stdio.h>
 #include <string.h>
-#include "board.hpp"
-#include "bitboard.hpp"
-#include "move.hpp"
-#include "constants.hpp"
+#include "board.h"
+#include "bitboard.h"
+#include "move.h"
+#include "constants.h"
 
-#include "pawn.hpp"
-#include "knight.hpp"
-#include "king.hpp"
-#include "bishop.hpp"
-#include "rook.hpp"
-#include "queen.hpp"
+#include "pawn.h"
+#include "knight.h"
+#include "king.h"
+#include "bishop.h"
+#include "rook.h"
+#include "queen.h"
 
 
 int main()

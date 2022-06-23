@@ -1,8 +1,8 @@
-#ifndef PAWN_HPP
-#define PAWN_HPP
+#ifndef PAWN_H
+#define PAWN_H
 
-#include "move.hpp"
-#include "bitboard.hpp"
+#include "move.h"
+#include "bitboard.h"
 
 // pawn attacks table [side][square]
 extern U64 pawn_attacks[2][64];

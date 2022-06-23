@@ -1,8 +1,8 @@
-#ifndef ROOK_HPP
-#define ROOK_HPP
+#ifndef ROOK_H
+#define ROOK_H
 
-#include "move.hpp"
-#include "bitboard.hpp"
+#include "move.h"
+#include "bitboard.h"
 
 // returns squares that could be obstacles in rook's path
 U64 mask_rook_attacks(int square);
@@ -26,7 +26,7 @@ static U64 rook_masks[64];
 static U64 rook_attacks[64][4096];
 
 // rook relevant occupancy bit count for every square on board
-const int rook_relevant_bits[64] = {
+static const int rook_relevant_bits[64] = {
     12, 11, 11, 11, 11, 11, 11, 12,
     11, 10, 10, 10, 10, 10, 10, 11,
     11, 10, 10, 10, 10, 10, 10, 11,
@@ -37,7 +37,7 @@ const int rook_relevant_bits[64] = {
     12, 11, 11, 11, 11, 11, 11, 12
 };
 
-const U64 rook_magic_numbers[64] = {
+static const U64 rook_magic_numbers[64] = {
     0x8a80104000800020ULL,
     0x140002000100040ULL,
     0x2801880a0017001ULL,

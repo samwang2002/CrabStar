@@ -1,5 +1,5 @@
-#ifndef BITBOARD_HPP
-#define BITBOARD_HPP
+#ifndef BITBOARD_H
+#define BITBOARD_H
 
 
 // define bitboard data type

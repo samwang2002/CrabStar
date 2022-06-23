@@ -1,8 +1,8 @@
-#ifndef KING_HPP
-#define KING_HPP
+#ifndef KING_H
+#define KING_H
 
-#include "move.hpp"
-#include "bitboard.hpp"
+#include "move.h"
+#include "bitboard.h"
 
 // king attacks table [square]
 extern U64 king_attacks[64];
