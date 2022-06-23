@@ -97,7 +97,7 @@ void generate_bishop_moves(move_list *moves, int side, U64 *bitboards, U64 *occu
         while(bitboard)
         {
             // init source square
-            int source_square = get_ls1b_index(bitboard);
+            int source_square = ls1b(bitboard);
 
             // init white bishop's attacks to get set of target squares
             U64 attacks = get_bishop_attacks(source_square, occupancies[both]) & (~occupancies[white]);
@@ -106,7 +106,7 @@ void generate_bishop_moves(move_list *moves, int side, U64 *bitboards, U64 *occu
             while (attacks)
             {
                 // init target square
-                int target_square = get_ls1b_index(attacks);
+                int target_square = ls1b(attacks);
 
                 //quiet move
                 if (!get_bit(occupancies[black], target_square))
@@ -138,14 +138,14 @@ void generate_bishop_moves(move_list *moves, int side, U64 *bitboards, U64 *occu
         while(bitboard)
         {
             // init source square
-            int source_square = get_ls1b_index(bitboard);
+            int source_square = ls1b(bitboard);
             // init black bishop's attacks to get set of target squares
             U64 attacks = get_bishop_attacks(source_square, occupancies[both]) & ~occupancies[black];
             // loop over target squares available from generated attacks
             while (attacks)
             {
                 // init target square
-                int target_square = get_ls1b_index(attacks);
+                int target_square = ls1b(attacks);
                 //quiet move
                 if (!get_bit(occupancies[white], target_square))
                     add_move(moves, encode_move(source_square, target_square, piece, 0, 0, 0, 0, 0));

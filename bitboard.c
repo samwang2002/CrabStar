@@ -3,7 +3,7 @@
 #include "bitboard.h"
 
 // get index of least significant bit
-int get_ls1b_index(U64 bitboard)
+int ls1b(U64 bitboard)
 {
     if (bitboard) return count_bits((bitboard & -bitboard)-1);
     return -1;
@@ -50,7 +50,7 @@ U64 set_occupancy(int index, int masked_bits, U64 attack_mask)
     U64 occupancy = 0ULL;
 
     for (int count = 0; count < masked_bits; ++count) {
-        int square = get_ls1b_index(attack_mask);
+        int square = ls1b(attack_mask);
         attack_mask &= attack_mask-1;
         if (index & (1 << count))       // make sure occupancy is on board
             occupancy |= (1ULL << square);

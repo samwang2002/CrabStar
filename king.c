@@ -62,10 +62,10 @@ void generate_king_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
     if (side == white) {
         U64 bitboard = bitboards[K];
         while (bitboard) {
-            int source = get_ls1b_index(bitboard);
+            int source = ls1b(bitboard);
             U64 attacks = king_attacks[source] & ~occupancies[white];
             while (attacks) {
-                int target = get_ls1b_index(attacks);
+                int target = ls1b(attacks);
                 if (!get_bit(occupancies[black], target))       // quiet move
                     add_move(moves, encode_move(source, target, K, 0, 0, 0, 0, 0));
                 else                                            // capture
@@ -77,10 +77,10 @@ void generate_king_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
     } else {
         U64 bitboard = bitboards[k];
         while (bitboard) {
-            int source = get_ls1b_index(bitboard);
+            int source = ls1b(bitboard);
             U64 attacks = king_attacks[source] & ~occupancies[black];
             while (attacks) {
-                int target = get_ls1b_index(attacks);
+                int target = ls1b(attacks);
                 if (!get_bit(occupancies[white], target))       // quiet move
                     add_move(moves, encode_move(source, target, k, 0, 0, 0, 0, 0));
                 else                                            // capture

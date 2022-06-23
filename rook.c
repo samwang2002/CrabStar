@@ -90,10 +90,10 @@ void generate_rook_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
     if (side == white) {
         U64 bitboard = bitboards[R];
         while (bitboard) {
-            int source = get_ls1b_index(bitboard);
+            int source = ls1b(bitboard);
             U64 attacks = get_rook_attacks(source, occupancies[both]) & ~occupancies[white];
             while (attacks) {
-                int target = get_ls1b_index(attacks);
+                int target = ls1b(attacks);
                 if (!get_bit(occupancies[black], target))       // quiet move
                     add_move(moves, encode_move(source, target, R, 0, 0, 0, 0, 0));
                 else                                            // capture move
@@ -105,10 +105,10 @@ void generate_rook_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
     } else {
         U64 bitboard = bitboards[r];
         while (bitboard) {
-            int source = get_ls1b_index(bitboard);
+            int source = ls1b(bitboard);
             U64 attacks = get_rook_attacks(source, occupancies[both]) & ~occupancies[black];
             while (attacks) {
-                int target = get_ls1b_index(attacks);
+                int target = ls1b(attacks);
                 if (!get_bit(occupancies[white], target))
                     add_move(moves, encode_move(source, target, r, 0, 0, 0, 0, 0));
                 else

@@ -46,7 +46,7 @@ void generate_pawn_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
     if (side == white) {
         U64 bitboard = bitboards[P];
         while (bitboard) {
-            int source = get_ls1b_index(bitboard);
+            int source = ls1b(bitboard);
 
             // quiet moves
             int target = source - 8;
@@ -66,7 +66,7 @@ void generate_pawn_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
             // regular captures
             U64 attacks = pawn_attacks[white][source] & occupancies[black];
             while (attacks) {
-                target = get_ls1b_index(attacks);
+                target = ls1b(attacks);
                 if (source <= h7) {     // promotions
                     add_move(moves, encode_move(source, target, P, Q, 1, 0, 0, 0));
                     add_move(moves, encode_move(source, target, P, R, 1, 0, 0, 0));
@@ -82,7 +82,7 @@ void generate_pawn_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
             if (enpassant != no_sq) {
                 U64 enpas_attacks = pawn_attacks[white][source];
                 if (enpas_attacks & (1ULL << enpassant)) {
-                    target = get_ls1b_index(enpas_attacks);
+                    target = ls1b(enpas_attacks);
                     add_move(moves, encode_move(source, target, P, 0, 1, 0, 1, 0));
                 }
             }
@@ -92,7 +92,7 @@ void generate_pawn_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
     } else {
         U64 bitboard = bitboards[p];
         while (bitboard) {
-            int source = get_ls1b_index(bitboard);
+            int source = ls1b(bitboard);
 
             // quiet moves
             int target = source + 8;
@@ -112,7 +112,7 @@ void generate_pawn_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
             // regular captures
             U64 attacks = pawn_attacks[black][source] & occupancies[white];
             while (attacks) {
-                target = get_ls1b_index(attacks);
+                target = ls1b(attacks);
                 if (source >= a2) {     // promotions
                     add_move(moves, encode_move(source, target, p, q, 1, 0, 0, 0));
                     add_move(moves, encode_move(source, target, p, r, 1, 0, 0, 0));
@@ -128,7 +128,7 @@ void generate_pawn_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
             if (enpassant != no_sq) {
                 U64 enpas_attacks = pawn_attacks[black][source];
                 if (enpas_attacks & (1ULL << enpassant)) {
-                    target = get_ls1b_index(enpas_attacks);
+                    target = ls1b(enpas_attacks);
                     add_move(moves, encode_move(source, target, p, 0, 1, 0, 1, 0));
                 }
             }
