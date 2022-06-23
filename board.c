@@ -158,7 +158,7 @@ void generate_moves(move_list *moves, int side)
 // if move_flag == captures_only, make_move will only update the board if the given move is a capture
 int make_move(int move, int move_flag)
 {
-    if (move_flag == all_moves) {           // make move
+    if (move_flag == all_moves || get_move_capture(move)) {
         // preserve board state
         copy_board();
 
@@ -167,24 +167,28 @@ int make_move(int move, int move_flag)
         int target = get_move_target(move);
         int piece = get_move_piece(move);
         int promoted_piece = get_move_promoted(move);
-        // int capture = get_move_capture(move);
-        // int double_step = get_move_double(move);
+        int capture = get_move_capture(move);
+        int double_push = get_move_double(move);
         int enpass = get_move_enpassant(move);
-        // int castling = get_move_castling(move);
+        int castling = get_move_castling(move);
 
         // clear source square
         pop_bit(bitboards[piece], source);
-        pop_bit(occupancies[side], target);
+        pop_bit(occupancies[side], source);
+        pop_bit(occupancies[both], source);
 
         // clear target square
-        if (side == white) {
-            for (int i = p; i <= k; ++i)
-                pop_bit(bitboards[i], target);
-            pop_bit(occupancies[black], target);
-        } else {
-            for (int i = P; i <= K; ++i)
-                pop_bit(bitboards[i], target);
-            pop_bit(occupancies[white], target);
+        if (capture) {
+            if (side == white) {
+                for (int i = p; i <= k; ++i)
+                    pop_bit(bitboards[i], target);
+                pop_bit(occupancies[black], target);
+            } else {
+                for (int i = P; i <= K; ++i)
+                    pop_bit(bitboards[i], target);
+                pop_bit(occupancies[white], target);
+            }
+            // don't need to clear occupancy for both colors on target square
         }
 
         // place piece on target square
@@ -209,9 +213,56 @@ int make_move(int move, int move_flag)
         }
         enpassant = no_sq;
 
+        // handle double pawn pushes
+        if (double_push)
+            enpassant = target + ((side==white) ? 8 : -8);
+        
+        // handle castling
+        if (castling) {
+            switch (target) {
+                case g1:
+                    pop_bit(bitboards[R], h1);
+                    pop_bit(occupancies[white], h1);
+                    pop_bit(occupancies[both], h1);
+                    set_bit(bitboards[R], f1);
+                    set_bit(occupancies[white], f1);
+                    set_bit(occupancies[both], f1);
+                    break;
+                case c1:
+                    pop_bit(bitboards[R], a1);
+                    pop_bit(occupancies[white], a1);
+                    pop_bit(occupancies[both], a1);
+                    set_bit(bitboards[R], d1);
+                    set_bit(occupancies[white], d1);
+                    set_bit(occupancies[both], d1);
+                    break;
+                case g8:
+                    pop_bit(bitboards[r], h8);
+                    pop_bit(occupancies[black], h8);
+                    pop_bit(occupancies[both], h8);
+                    set_bit(bitboards[r], f8);
+                    set_bit(occupancies[black], f8);
+                    set_bit(occupancies[both], f8);
+                    break;
+                case c8:
+                    pop_bit(bitboards[r], a8);
+                    pop_bit(occupancies[black], a8);
+                    pop_bit(occupancies[both], a8);
+                    set_bit(bitboards[r], d8);
+                    set_bit(occupancies[black], d8);
+                    set_bit(occupancies[both], d8);
+                    break;
+            }
+        }
+
+        // update castling rights
+        castle &= castling_rights[source] & castling_rights[target];
+
+        // flip side
+        side ^= 1;
+
         return 1;
-    } else {                                // only make capture moves
-        if (get_move_capture(move)) make_move(move, all_moves);
-        else return 0;
+    } else {        // quiet move, ignore because flag asks only for captures
+        return 0;
     }
 }

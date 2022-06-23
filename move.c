@@ -26,6 +26,7 @@ void print_move(int move)
         #endif
     if (get_move_castling(move))
         printf("*");
+    printf("\n");
 }
 
 //print move list
