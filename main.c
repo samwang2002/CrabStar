@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <string.h>
-// #include <time.h>
+#ifdef WIN64
+    #include <windows.h>
+#else
+    #include <sys/time.h>
+#endif
+
 #include "board.h"
 #include "bitboard.h"
 #include "move.h"
@@ -13,6 +18,16 @@
 #include "rook.h"
 #include "queen.h"
 
+int get_time_ms()
+{
+    #ifdef WIN64
+        return GetTickCount();
+    #else
+        struct timeval time_value;
+        gettimeofday(&time_value, NULL);
+        return time_value.tv_sec * 1000 + time_value.tv_usec / 1000;
+    #endif
+}
 
 int main()
 {
@@ -24,7 +39,8 @@ int main()
     move_list moves;
     moves.count = 0;
     generate_moves(&moves, side);
-    print_move_list(&moves);
+
+    int start = get_time_ms();
 
     for (int i = 0; i < moves.count; ++i) {
         int move = moves.moves[i];
@@ -35,6 +51,8 @@ int main()
         getchar();
         take_back();
     }
+
+    printf("time taken to execute: %d\n", get_time_ms() - start);
 
     return 0;
 }
