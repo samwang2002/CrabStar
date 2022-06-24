@@ -40,7 +40,7 @@ void perft_driver(int depth)
     // generate moves
     generate_moves(moves, side);
     
-        // loop over generated moves
+    // loop over generated moves
     for (int move_count = 0; move_count < moves->count; move_count++)
     {   
         // preserve board state
@@ -104,7 +104,7 @@ void perft_test(int depth)
     }
     
     // print results
-    printf("\n    Depth: %d\n", depth);
-    printf("    Nodes: %ld\n", nodes);
+    printf("\n     Depth: %d\n", depth);
+    printf("     Nodes: %ld\n", nodes);
     printf("     Time: %ld\n\n", get_time_ms() - start);
 }
