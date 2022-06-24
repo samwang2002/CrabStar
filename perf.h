@@ -3,7 +3,7 @@
 
 int get_time_ms();
 
-void perft_driver(int depth);
+void perft_driver(int depth, int last_move);
 
 void perft_test(int depth);
 

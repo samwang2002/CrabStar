@@ -8,6 +8,7 @@
 #include "perf.h"
 #include "move.h"
 #include "board.h"
+#include "constants.h"
 
 int get_time_ms()
 {
@@ -22,15 +23,33 @@ int get_time_ms()
 
 // leaf nodes (number of positions reached during the test of the move generator at a given depth)
 long nodes = 0;
+long captures = 0;
+long castles = 0;
+long promotions = 0;
+long enpassants = 0;
+long checks = 0;
+long checkmates = 0;
 
 // perft driver
-void perft_driver(int depth)
+void perft_driver(int depth, int last_move)
 {
-    // reccursion escape condition
-    if (depth == 0)
-    {
-        // increment nodes count (count reached positions)
-        nodes++;
+    if (depth == 0) {
+        ++nodes;
+        if (get_move_capture(last_move)) ++captures;
+        if (get_move_castling(last_move)) ++castles;
+        if (get_move_promoted(last_move)) ++promotions;
+        if (get_move_enpassant(last_move)) ++enpassants;
+        // checks and checkmates
+        if (!make_move(last_move, all_moves)) {
+            if (square_attacked(ls1b(bitboards[(side == white) ? K : k]), side^1)) {
+                ++checks;
+                move_list moves;
+                moves.count = 0;
+                generate_moves(&moves, side);
+                printf("move count: %d\n", moves.count);
+                if (moves.count == 0) ++checkmates;
+            }
+        }
         return;
     }
     
@@ -47,12 +66,13 @@ void perft_driver(int depth)
         copy_board();
         
         // make move
-        if (!make_move(moves->moves[move_count], all_moves))
+        int current_move = moves->moves[move_count];
+        if (!make_move(current_move, all_moves))
             // skip to the next move
             continue;
         
         // call perft driver recursively
-        perft_driver(depth - 1);
+        perft_driver(depth - 1, current_move);
         
         // take back
         take_back();
@@ -67,11 +87,17 @@ void perft_test(int depth)
     // create move list instance
     move_list moves[1];
 
-    // generate moves
-    generate_moves(moves, side);
-
     // init start time
     long start = get_time_ms();
+
+    // special case for depth=0
+    if (depth <= 0) {
+        nodes = 1;
+        goto PRINT_RESULTS;
+    }
+
+    // generate moves
+    generate_moves(moves, side);
 
     // loop over generated moves
     for (int move_count = 0; move_count < moves->count; move_count++)
@@ -80,7 +106,8 @@ void perft_test(int depth)
         copy_board();
         
         // make move
-        if (!make_move(moves->moves[move_count], all_moves))
+        int current_move = moves->moves[move_count];
+        if (!make_move(current_move, all_moves))
             // skip to the next move
             continue;
         
@@ -88,7 +115,7 @@ void perft_test(int depth)
         long cummulative_nodes = nodes;
         
         // call perft driver recursively
-        perft_driver(depth - 1);
+        perft_driver(depth - 1, current_move);
         
         // old nodes
         long old_nodes = nodes - cummulative_nodes;
@@ -97,14 +124,21 @@ void perft_test(int depth)
         take_back();
         
         // print move
-        printf("     move: %s%s%c  nodes: %ld\n", square_to_coordinates[get_move_source(moves->moves[move_count])],
-                                                 square_to_coordinates[get_move_target(moves->moves[move_count])],
-                                                 get_move_promoted(moves->moves[move_count]) ? promoted_pieces[get_move_promoted(moves->moves[move_count])] : ' ',
-                                                 old_nodes);
+        printf("     move: %s%s%c  nodes: %'ld\n", square_to_coordinates[get_move_source(current_move)],
+                square_to_coordinates[get_move_target(current_move)],
+                get_move_promoted(current_move) ? promoted_pieces[get_move_promoted(current_move)] : ' ',
+                old_nodes);
     }
     
     // print results
-    printf("\n     Depth: %d\n", depth);
-    printf("     Nodes: %ld\n", nodes);
-    printf("     Time: %ld\n\n", get_time_ms() - start);
+    PRINT_RESULTS:
+    printf("\n     Depth:        %d\n", depth);
+    printf("     Nodes:        %'ld\n", nodes);
+    printf("     Captures:     %'ld\n", captures);
+    printf("     Castles:      %'ld\n", castles);
+    printf("     Promotions:   %'ld\n", promotions);
+    printf("     Enpassants:   %'ld\n", enpassants);
+    printf("     Checks:       %'ld\n", checks);
+    printf("     Checkmates:   %'ld\n", checkmates);
+    printf("     Time:         %ldms\n\n", get_time_ms() - start);
 }
