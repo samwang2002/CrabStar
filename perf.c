@@ -46,7 +46,7 @@ void perft_driver(int depth, int last_move)
                 move_list moves;
                 moves.count = 0;
                 generate_moves(&moves, side);
-                printf("move count: %d\n", moves.count);
+                // printf("move count: %d\n", moves.count);
                 if (moves.count == 0) ++checkmates;
             }
         }
