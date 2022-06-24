@@ -40,76 +40,35 @@ void init_knight_attacks()
 // generate knight moves
 void generate_knight_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies)
 {
-    if (side == white)
-    {
-        // define piece as white knight
-        int piece = N;
-    
-        // define white knight bitboard
+    if (side == white) {
         U64 bitboard = bitboards[N];
-
-        // init source square
-        int source_square = ls1b(bitboard);
-
-        // init white knight's attacks to get set of target squares
-        U64 attacks = knight_attacks[source_square] & (~occupancies[white]);
-
-        // loop over target squares available from generated attacks
-        while (attacks)
-        {
-            // init target square
-            int target_square = ls1b(attacks);
-
-            //quiet move
-            if(!get_bit(occupancies[black], target_square))
-                add_move(moves, encode_move(source_square, target_square, piece, 0, 0, 0, 0, 0));
-            
-            // capture move
-            else
-                add_move(moves, encode_move(source_square, target_square, piece, 0, 1, 0, 0, 0));
-            
-            // pop ls1b in current attacks set
-            pop_bit(attacks,target_square);
+        while (bitboard) {
+            int source = ls1b(bitboard);
+            U64 attacks = knight_attacks[source] & ~occupancies[white];
+            while (attacks) {
+                int target = ls1b(attacks);
+                if (!get_bit(occupancies[black], target))       // quiet move
+                    add_move(moves, encode_move(source, target, N, 0, 0, 0, 0, 0));
+                else
+                    add_move(moves, encode_move(source, target, N, 0, 1, 0, 0, 0));
+                pop_bit(attacks, target);
+            }
+            pop_bit(bitboard, source);
         }
-
-        //pop ls1b of the current piece bitboard copy
-        pop_bit(bitboard, source_square);
-
-    }
-    
-    else
-    {
-        // define piece as black knight
-        int piece = n;
-    
-        // define black knight bitboard
+    } else {
         U64 bitboard = bitboards[n];
-
-        // init source square
-        int source_square = ls1b(bitboard);
-
-        // init black knight's attacks to get set of target squares
-        U64 attacks = knight_attacks[source_square] & (~occupancies[black]);
-
-        // loop over target squares available from generated attacks
-        while (attacks)
-        {
-            // init target square
-            int target_square = ls1b(attacks);
-
-            //quiet move
-            if(!get_bit(occupancies[white], target_square))
-                add_move(moves, encode_move(source_square, target_square, piece, 0, 0, 0, 0, 0));
-            
-            // capture move
-            else
-                add_move(moves, encode_move(source_square, target_square, piece, 0, 1, 0, 0, 0));
-            
-            // pop ls1b in current attacks set
-            pop_bit(attacks,target_square);
+        while (bitboard) {
+            int source = ls1b(bitboard);
+            U64 attacks = knight_attacks[source] & ~occupancies[black];
+            while (attacks) {
+                int target = ls1b(attacks);
+                if (!get_bit(occupancies[white], target))       // quiet move
+                    add_move(moves, encode_move(source, target, n, 0, 0, 0, 0, 0));
+                else
+                    add_move(moves, encode_move(source, target, n, 0, 1, 0, 0, 0));
+                pop_bit(attacks, target);
+            }
+            pop_bit(bitboard, source);
         }
-
-        //pop ls1b of the current piece bitboard copy
-        pop_bit(bitboard, source_square);
     }
 }
