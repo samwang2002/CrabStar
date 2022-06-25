@@ -44,14 +44,14 @@ void generate_castling_moves(move_list *moves, int side, U64 *bitboards, U64 *oc
             && !attacked(e1, black) && !attacked(f1, black) && !attacked(g1, black))
             add_move(moves, encode_move(e1, g1, K, 0, 0, 0, 0, 1));
         if ((castle & wq) && !get_bit(occupancies[both], d1) && !get_bit(occupancies[both], c1)
-            && !attacked(e1, black) && !attacked(d1, black) && !attacked(c1, black))
+            && !get_bit(occupancies[both], b1) && !attacked(e1, black) && !attacked(d1, black) && !attacked(c1, black))
             add_move(moves, encode_move(e1, c1, K, 0, 0, 0, 0, 1));
     } else {
         if ((castle & bk) && !get_bit(occupancies[both], f8) && !get_bit(occupancies[both], g8)
             && !attacked(e8, white) && !attacked(f8, white) && !attacked(g8, white))
             add_move(moves, encode_move(e8, g8, k, 0, 0, 0, 0, 1));
         if ((castle & bq) && !get_bit(occupancies[both], d8) && !get_bit(occupancies[both], c8)
-            && !attacked(e8, white) && !attacked(d8, white) && !attacked(c8, white))
+            && !get_bit(occupancies[both], b8) && !attacked(e8, white) && !attacked(d8, white) && !attacked(c8, white))
             add_move(moves, encode_move(e8, c8, k, 0, 0, 0, 0, 1));
     }
 }

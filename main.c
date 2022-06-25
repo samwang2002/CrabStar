@@ -21,8 +21,8 @@ int main()
     // parse_fen(tricky_position);     // r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1
     // parse_fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N21qp/PPPBBPpP/R3K2R w KQkq - 0 1");
     // parse_fen(start_position);
-    // parse_fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    parse_fen("8/8/8/8/8/k7/7q/K7 w - -");
+    parse_fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    //parse_fen("8/8/8/8/8/k7/7q/K7 w - -");
     print_board();
 
 
@@ -32,7 +32,7 @@ int main()
     setlocale(LC_ALL, "");
     printf("%d has legal moves: %d\n", side, has_legal_moves(side));
     // side = white;
-    // perft_test(6);
+    perft_test(3);
     print_board();
     // print_bitboard(bitboards[N]);
     // getchar();
