@@ -42,7 +42,7 @@ void parse_fen(const char *fen);
 int square_attacked(int square, int side);
 
 // get whether side has legal moves
-int has_legal_moves(int side);
+int has_legal_moves();
 
 // generate all moves
 void generate_moves(move_list *moves, int side);

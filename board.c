@@ -142,17 +142,14 @@ int square_attacked(int square, int side)
 }
 
 // get whether side has legal moves
-int has_legal_moves(int side)
+int has_legal_moves()
 {
     copy_board();
     move_list moves;
     generate_moves(&moves, side);
-    // printf("side copy: %d\n", side_copy);
     for (int i = 0; i < moves.count; ++i) {
         if (make_move(moves.moves[i], all_moves)) {
-            // print_board();
             take_back();
-            // printf("side copy: %d\n", side);
             return 1;
         }
     }
