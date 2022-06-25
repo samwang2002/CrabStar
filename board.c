@@ -141,9 +141,25 @@ int square_attacked(int square, int side)
     }
 }
 
+// get whether side has legal moves
+int has_legal_moves(int side)
+{
+    move_list moves;
+    generate_moves(&moves, side);
+    for (int i = 0; i < moves.count; ++i) {
+        copy_board();
+        if (make_move(moves.moves[i], all_moves)) {
+            take_back();
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // generate all moves
 void generate_moves(move_list *moves, int side)
 {
+    moves->count = 0;
     generate_pawn_moves(moves, side, bitboards, occupancies, enpassant);
     generate_knight_moves(moves, side, bitboards, occupancies);
     generate_castling_moves(moves, side, bitboards, occupancies, castle, &square_attacked);
