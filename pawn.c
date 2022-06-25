@@ -80,8 +80,8 @@ void generate_pawn_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
 
             // en passant captures
             if (enpassant != no_sq) {
-                U64 enpas_attacks = pawn_attacks[white][source];
-                if (enpas_attacks & (1ULL << enpassant)) {
+                U64 enpas_attacks = pawn_attacks[white][source] & (1ULL << enpassant);
+                if (enpas_attacks) {
                     target = ls1b(enpas_attacks);
                     add_move(moves, encode_move(source, target, P, 0, 1, 0, 1, 0));
                 }
@@ -126,8 +126,8 @@ void generate_pawn_moves(move_list *moves, int side, U64 *bitboards, U64 *occupa
 
             // en passant captures
             if (enpassant != no_sq) {
-                U64 enpas_attacks = pawn_attacks[black][source];
-                if (enpas_attacks & (1ULL << enpassant)) {
+                U64 enpas_attacks = pawn_attacks[black][source] & (1ULL << enpassant);
+                if (enpas_attacks) {
                     target = ls1b(enpas_attacks);
                     add_move(moves, encode_move(source, target, p, 0, 1, 0, 1, 0));
                 }
