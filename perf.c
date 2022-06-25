@@ -39,12 +39,9 @@ void perft_driver(int depth, int last_move)
         if (get_move_castling(last_move)) ++castles;
         if (get_move_promoted(last_move)) ++promotions;
         if (get_move_enpassant(last_move)) ++enpassants;
-        if (!make_move(last_move, all_moves) &&
-            square_attacked(ls1b(bitboards[(side == white) ? K : k]), side^1)) {
+        if (square_attacked(ls1b(bitboards[(side == white) ? K : k]), side^1)) {
             ++checks;
-            // int side_copy2 = side;
             if (!has_legal_moves(side)) ++checkmates;
-            // side = side_copy2;
         }
         return;
     }
@@ -78,7 +75,7 @@ void perft_driver(int depth, int last_move)
 // perft test
 void perft_test(int depth)
 {
-    printf("\n     Performance test\n\n");
+    printf("\n     Performance test at depth=%d\n\n", depth);
     
     // create move list instance
     move_list moves[1];
