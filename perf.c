@@ -39,16 +39,10 @@ void perft_driver(int depth, int last_move)
         if (get_move_castling(last_move)) ++castles;
         if (get_move_promoted(last_move)) ++promotions;
         if (get_move_enpassant(last_move)) ++enpassants;
-        // checks and checkmates
-        if (!make_move(last_move, all_moves)) {
-            if (square_attacked(ls1b(bitboards[(side == white) ? K : k]), side^1)) {
-                ++checks;
-                move_list moves;
-                moves.count = 0;
-                generate_moves(&moves, side);
-                // printf("move count: %d\n", moves.count);
-                if (moves.count == 0) ++checkmates;
-            }
+        if (!make_move(last_move, all_moves) &&
+            square_attacked(ls1b(bitboards[(side == white) ? K : k]), side^1)) {
+            ++checks;
+            if (!has_legal_moves(side)) ++checkmates;
         }
         return;
     }
@@ -72,7 +66,8 @@ void perft_driver(int depth, int last_move)
             continue;
         
         // call perft driver recursively
-        perft_driver(depth - 1, current_move);
+        if (has_legal_moves(side))
+            perft_driver(depth - 1, current_move);
         
         // take back
         take_back();
