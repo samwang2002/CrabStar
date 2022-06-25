@@ -42,7 +42,9 @@ void perft_driver(int depth, int last_move)
         if (!make_move(last_move, all_moves) &&
             square_attacked(ls1b(bitboards[(side == white) ? K : k]), side^1)) {
             ++checks;
+            // int side_copy2 = side;
             if (!has_legal_moves(side)) ++checkmates;
+            // side = side_copy2;
         }
         return;
     }
@@ -66,8 +68,7 @@ void perft_driver(int depth, int last_move)
             continue;
         
         // call perft driver recursively
-        if (has_legal_moves(side))
-            perft_driver(depth - 1, current_move);
+        perft_driver(depth - 1, current_move);
         
         // take back
         take_back();
