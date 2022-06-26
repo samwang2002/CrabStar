@@ -290,3 +290,14 @@ int make_move(const int move, const int move_flag)
     } else          // quiet move, ignore because flag asks only for captures
         return 0;
 }
+
+// search for best move and print it
+void search_position(const int depth)
+{
+    // PLACEHOLDER: returns first move in move list
+    move_list moves;
+    generate_moves(&moves);
+    printf("bestmove ");
+    print_move(moves.moves[0]);
+    printf("\n");
+}
