@@ -19,6 +19,7 @@
 int main()
 {
     init_attacks();
+
     // parse_fen(tricky_position);     // r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1
     // parse_fen(start_position);  // 1
     // parse_fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");  // 2
@@ -28,16 +29,21 @@ int main()
     // parse_fen("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10 ");  // 6
 
     // parse_fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");  // good testposition
-    parse_fen("n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1");   // promotion
-    print_board();
+    // parse_fen("n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1");   // promotion
+    // print_board();
 
-    int move = parse_move("g2h1");
-    if (move) {
-        make_move(move, all_moves);
-        print_board();
-    } else {
-        printf("\nillegal move\n");
-    }
+    // // test parse move
+    // int move = parse_move("g2h1");
+    // if (move) {
+    //     make_move(move, all_moves);
+    //     print_board();
+    // } else {
+    //     printf("\nillegal move\n");
+    // }
+
+    // test parse position
+    parse_position("position fen r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 moves e2a6 e8g8");
+    print_board();
 
     return 0;
 }

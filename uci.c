@@ -2,6 +2,7 @@
 #include "move.h"
 #include "board.h"
 #include "constants.h"
+#include <string.h>
 
 // parse move string input
 int parse_move(const char *move_str)
@@ -30,4 +31,37 @@ int parse_move(const char *move_str)
 
     // no match, move is illegal
     return 0;
+}
+
+// parse position command
+void parse_position(const char *command)
+{
+    const char *curr = command;
+    curr += 9;                  // skip "position " at beginning of command
+
+    // parsen fen command
+    if (strncmp(command, "startpos", 8) == 0) parse_fen(start_position);
+    else {      // parse fen command
+        curr = strstr(command, "fen");
+        if (curr == NULL)       // "fen" not found
+            parse_fen(start_position);
+        else {                  // "fen" found
+            curr += 4;
+            parse_fen(curr);
+        }
+    }
+
+    // parse moves
+    curr = strstr(command, "moves");
+    if (curr == NULL) return;
+    curr += 6;
+    while (*curr) {
+        // make move
+        int move = parse_move(curr);
+        if (!move) break;
+        make_move(move, all_moves);
+
+        // skip to next move
+        while (*curr && *curr++ != ' ') ;
+    }
 }
