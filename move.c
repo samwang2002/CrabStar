@@ -12,21 +12,13 @@ void add_move(move_list *moves, int move)
 // print description of move
 void print_move(int move)
 {
-    #ifndef _WIN32
-        printf("%s ", unicode_pieces[get_move_piece(move)]);
-    #endif
-    printf("%s ", square_to_coordinates[get_move_source(move)]);
-    if (get_move_capture(move)) printf("x ");
-    printf("%s", square_to_coordinates[get_move_target(move)]);
     if (get_move_promoted(move))
-        #ifdef _WIN32
-            printf("->%c", promoted_pieces[get_move_promoted(move)]);
-        # else
-            printf("->%s", unicode_pieces[get_move_promoted(move)]);
-        #endif
-    if (get_move_castling(move))
-        printf("*");
-    printf("\n");
+        printf("%s%s%c", square_to_coordinates[get_move_source(move)],
+                         square_to_coordinates[get_move_target(move)],
+                        promoted_pieces[get_move_promoted(move)]);
+    else
+        printf("%s%s", square_to_coordinates[get_move_source(move)],
+                       square_to_coordinates[get_move_target(move)]);
 }
 
 //print move list
