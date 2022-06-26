@@ -27,26 +27,12 @@ int main()
     // parse_fen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");   // 4
     // parse_fen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8  ");    // 5
     // parse_fen("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10 ");  // 6
+    
+    parse_fen("1nbqkbnr/1ppppppp/8/8/8/8/11PPPPPP/RNBQKBNR w KQkq - 0 1");
+    print_board();
+    printf("score: %d\n", evaluate());
 
-    // parse_fen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");  // good testposition
-    // parse_fen("n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1");   // promotion
-    // print_board();
-
-    // // test parse move
-    // int move = parse_move("g2h1");
-    // if (move) {
-    //     make_move(move, all_moves);
-    //     print_board();
-    // } else {
-    //     printf("\nillegal move\n");
-    // }
-
-    // test parse position
-    // parse_position("position fen r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 moves e2a6 e8g8");
-    // parse_go("go wtim 20000 btime 10000 winc 1000 binc 1000 depth 1234");
-    // print_board()
-
-    uci_loop();
+    //uci_loop();
 
     return 0;
 }

@@ -52,4 +52,19 @@ static const int castling_rights[64] = {
  black queen's rook moved:     1111 & 0111  =  0111    7
 */
 
+static const int material_score[12] = {
+    100,        // white pawn score
+    300,        // white knight score
+    350,        // white bishop score
+    500,        // white rook score
+    1000,       // white queen score
+    10000,      // white king score
+    -100,       // black pawn score
+    -300,       // black knight score
+    -350,       // black bishop score
+    -500,       // black rook score
+    -1000,      // black queen score
+    -10000      // black king score
+};
+
 #endif

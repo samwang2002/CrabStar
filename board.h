@@ -53,6 +53,9 @@ int make_move(const int move, const int move_flag);
 // search position for best move and print it to UCI interface
 void search_position(const int depth);
 
+// position evaluation
+int evaluate();
+
 /* ------------------------------- variables ------------------------------- */
 // bitboards
 extern U64 bitboards[12];
