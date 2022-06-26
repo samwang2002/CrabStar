@@ -5,11 +5,12 @@
 #endif
 
 #include <stdio.h>
-#include "perf.h"
+#include "perft.h"
 #include "move.h"
 #include "board.h"
 #include "constants.h"
 
+// get current time in ms
 int get_time_ms()
 {
     #ifdef WIN64
