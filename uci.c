@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
 // parse move string input
 int parse_move(const char *move_str)
 {
@@ -55,8 +56,12 @@ void parse_position(const char *command)
 
     // parse moves
     curr = strstr(command, "moves");
-    if (curr == NULL) return;
+    if (curr == NULL) {
+        print_board();
+        return;
+    }
     curr += 6;
+
     while (*curr) {
         // make move
         int move = parse_move(curr);
@@ -64,8 +69,10 @@ void parse_position(const char *command)
         make_move(move, all_moves);
 
         // skip to next move
-        while (*curr && *curr++ != ' ') ;
+        while (*curr && *curr != ' ') ++curr;
+        ++curr;
     }
+    print_board();
 }
 
 // parse "go" command
@@ -77,6 +84,46 @@ void parse_go(const char *command)
         depth = atoi(curr_depth + 6);
     else
         depth = 6;          // defualt depth
-    
-    printf("depth: %d\n", depth);
+    search_position(depth);
+}
+
+// main UCI loop
+void uci_loop()
+{
+    // reset stdin and stdout buffers
+    setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+
+    char input[2000];
+
+    // print engine info
+    printf("id name Crab Star\n");
+    printf("id author Sam and Justin\n");
+    printf("uciok\n");
+
+    // main loop
+    while (1) {
+        memset(input, 0, sizeof(input));
+        fflush(stdout);
+
+        if (!fgets(input, 2000, stdin)) continue;           // get input
+        if (input[0] == '\n') continue;                     // input isn't available
+
+        if (strncmp(input, "isready", 7) == 0) {            // isready
+            printf("readyok\n");
+            continue;
+        } else if (strncmp(input, "position", 8) == 0)      // position
+            parse_position(input);
+        else if (strncmp(input, "ucinewgame", 10) == 0)     // ucinewgame
+            parse_position("position startpos");
+        else if (strncmp(input, "go", 2) == 0)              // go
+            parse_go(input);
+        else if (strncmp(input, "quit", 4) == 0)            // quit
+            break;
+        else if (strncmp(input, "uci", 3) == 0) {           // uci, print engine info
+            printf("id name Crab Star\n");
+            printf("id author Sam and Justin\n");
+            printf("uciok\n");
+        }
+    }
 }

@@ -30,4 +30,7 @@ void parse_go(const char *command);
     - binc: black increment per move (ms)
 */
 
+// main UCI loop to interact with protocol
+void uci_loop();
+
 #endif
