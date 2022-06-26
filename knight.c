@@ -4,7 +4,7 @@
 U64 knight_attacks[64];
 
 // generate knight attacks
-U64 mask_knight_attacks(int square)
+U64 mask_knight_attacks(const int square)
 {
     // result attacks bitboard
     U64 attacks = 0ULL;
@@ -38,7 +38,7 @@ void init_knight_attacks()
 }
 
 // generate knight moves
-void generate_knight_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies)
+void generate_knight_moves(move_list *moves, const int side, const U64 *bitboards, const U64 *occupancies)
 {
     if (side == white) {
         U64 bitboard = bitboards[N];

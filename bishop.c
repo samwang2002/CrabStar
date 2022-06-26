@@ -2,7 +2,7 @@
 #include "constants.h"
 
 // returns squares that could be obstacles in bishop's path, so edge squares are not considered
-U64 mask_bishop_attacks(int square)
+U64 mask_bishop_attacks(const int square)
 {
     U64 attacks = 0ULL;
 
@@ -20,7 +20,7 @@ U64 mask_bishop_attacks(int square)
 }
 
 // generate bishop attacks given square and occupancies, used to fill attack table
-U64 generate_bishop_attacks(int square, U64 block)
+U64 generate_bishop_attacks(const int square, const U64 block)
 {
      U64 attacks = 0ULL;
 
@@ -71,19 +71,14 @@ void init_bishop_attacks()
 }
 
 // get bishop attacks using magic bitboard
-U64 get_bishop_attacks(int square, U64 occupancy)
+U64 get_bishop_attacks(const int square, const U64 occupancy)
 {
-    // get bishop attacks assuming current board occupancy
-    occupancy &= bishop_masks[square];
-    occupancy *= bishop_magic_numbers[square];
-    occupancy >>= 64 - bishop_relevant_bits[square];
-
-    // return bishop attacks
-    return bishop_attacks[square][occupancy];
+    return bishop_attacks[square][((occupancy & bishop_masks[square]) * bishop_magic_numbers[square])
+                                  >> (64 - bishop_relevant_bits[square])];
 }
 
 // generate bishop moves
-void generate_bishop_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies)
+void generate_bishop_moves(move_list *moves, const int side, const U64 *bitboards, const U64 *occupancies)
 {
     if (side == white)
     {

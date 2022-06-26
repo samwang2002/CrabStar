@@ -45,12 +45,12 @@ enum {all_moves, captures_only};
 
 /* ------------------------------- functions ------------------------------- */
 // add move to move list
-void add_move(move_list *moves, int move);
+void add_move(move_list *moves, const int move);
 
 // print description of move
-void print_move(int move);
+void print_move(const int move);
 
 // print list of moves
-void print_move_list(move_list *moves);
+void print_move_list(const move_list *moves);
 
 #endif

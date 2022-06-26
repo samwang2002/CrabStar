@@ -3,14 +3,14 @@
 #include "bitboard.h"
 
 // get index of least significant bit
-int ls1b(U64 bitboard)
+int ls1b(const U64 bitboard)
 {
     if (bitboard) return count_bits((bitboard & -bitboard)-1);
     return -1;
 }
 
 // print bitboard
-void print_bitboard(U64 bitboard)
+void print_bitboard(const U64 bitboard)
 {
     // loop over board ranks
     for (int rank = 0; rank < 8; ++rank)
@@ -45,7 +45,7 @@ void print_bitboard(U64 bitboard)
 // index: integer where the ith bit is set iff the ith LSB within the attack mask is occupied
 // attack mask: bitboard of attack mask
 // returns bitboard with the indexed squares occupied
-U64 set_occupancy(int index, int masked_bits, U64 attack_mask)
+U64 set_occupancy(const int index, const int masked_bits, U64 attack_mask)
 {
     U64 occupancy = 0ULL;
 

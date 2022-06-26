@@ -39,16 +39,16 @@ void init_attacks();
 void parse_fen(const char *fen);
 
 // get whether square is currently attacked by given side
-int square_attacked(int square, int side);
+int square_attacked(const int square, const int side);
 
 // get whether side has legal moves
 int has_legal_moves();
 
 // generate all moves
-void generate_moves(move_list *moves, int side);
+void generate_moves(move_list *moves);
 
 // make move on chess board
-int make_move(int move, int move_flag);
+int make_move(const int move, const int move_flag);
 
 /* ------------------------------- variables ------------------------------- */
 // bitboards

@@ -120,7 +120,7 @@ void parse_fen(const char *fen)
 }
 
 // get whether square is currently attacked by given side
-int square_attacked(int square, int side)
+int square_attacked(const int square, const int side)
 {
     if (side == white) {
         U64 attacks = (pawn_attacks[black][square] & bitboards[P])              // not a typo
@@ -146,7 +146,7 @@ int has_legal_moves()
 {
     copy_board();
     move_list moves;
-    generate_moves(&moves, side);
+    generate_moves(&moves);
     for (int i = 0; i < moves.count; ++i) {
         if (make_move(moves.moves[i], all_moves)) {
             take_back();
@@ -157,7 +157,7 @@ int has_legal_moves()
 }
 
 // generate all moves
-void generate_moves(move_list *moves, int side)
+void generate_moves(move_list *moves)
 {
     moves->count = 0;
     generate_pawn_moves(moves, side, bitboards, occupancies, enpassant);
@@ -172,7 +172,7 @@ void generate_moves(move_list *moves, int side)
 // make move on chess board
 // move_flag is either all_moves or captures_only
 // if move_flag == captures_only, make_move will only update the board if the given move is a capture
-int make_move(int move, int move_flag)
+int make_move(const int move, const int move_flag)
 {
     if (move_flag == all_moves || get_move_capture(move)) {
 

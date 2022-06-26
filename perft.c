@@ -32,7 +32,7 @@ long checks = 0;
 long checkmates = 0;
 
 // perft driver
-void perft_driver(int depth, int last_move)
+void perft_driver(const int depth, const int last_move)
 {
     if (depth == 0) {
         ++nodes;
@@ -51,7 +51,7 @@ void perft_driver(int depth, int last_move)
     move_list moves[1];
     
     // generate moves
-    generate_moves(moves, side);
+    generate_moves(moves);
     
     // loop over generated moves
     for (int move_count = 0; move_count < moves->count; move_count++)
@@ -74,7 +74,7 @@ void perft_driver(int depth, int last_move)
 }
 
 // perft test
-void perft_test(int depth)
+void perft_test(const int depth)
 {
     printf("\n     Performance test at depth=%d\n\n", depth);
     
@@ -91,7 +91,7 @@ void perft_test(int depth)
     }
 
     // generate moves
-    generate_moves(moves, side);
+    generate_moves(moves);
 
     // loop over generated moves
     for (int move_count = 0; move_count < moves->count; move_count++)

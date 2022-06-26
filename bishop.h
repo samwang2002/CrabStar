@@ -12,19 +12,19 @@ static U64 bishop_attacks[64][512];
 
 /* ------------------------------- functions ------------------------------- */
 // get squares that could be obstacles in bishop's path
-U64 mask_bishop_attacks(int square);
+U64 mask_bishop_attacks(const int square);
 
 // generate bishop attacks on the fly
-U64 generate_bishop_attacks(int square, U64 block);
+U64 generate_bishop_attacks(const int square, const U64 block);
 
 // initialize bishop attack table
 void init_bishop_attacks();
 
 // get bishop attacks using magic bitboard
-U64 get_bishop_attacks(int square, U64 occupancy);
+U64 get_bishop_attacks(const int square, const U64 occupancy);
 
 // generate bishop moves
-void generate_bishop_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies);
+void generate_bishop_moves(move_list *moves, const int side, const U64 *bitboards, const U64 *occupancies);
 
 /* ------------------------------- constants ------------------------------- */
 // relevancy occupancy bit count for every square on board

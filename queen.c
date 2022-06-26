@@ -4,13 +4,13 @@
 #include "rook.h"
 
 // get queen attacks
-U64 get_queen_attacks(int square, U64 occupancy)
+U64 get_queen_attacks(const int square, const U64 occupancy)
 {
     return get_bishop_attacks(square, occupancy) | get_rook_attacks(square, occupancy);
 }
 
 // generate queen moves
-void generate_queen_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies)
+void generate_queen_moves(move_list *moves, const int side, const U64 *bitboards, const U64 *occupancies)
 {
     if (side == white) {
         U64 bitboard = bitboards[Q];

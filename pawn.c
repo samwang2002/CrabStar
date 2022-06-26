@@ -4,7 +4,7 @@
 U64 pawn_attacks[2][64];
 
 // generate pawn attacks
-U64 mask_pawn_attacks(int side, int square)
+U64 mask_pawn_attacks(const int side, const int square)
 {
     // result attacks bitboard
     U64 attacks = 0ULL;
@@ -41,7 +41,8 @@ void init_pawn_attacks()
 }
 
 // generate pawn moves
-void generate_pawn_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies, int enpassant)
+void generate_pawn_moves(move_list *moves, const int side, const U64 *bitboards, const U64 *occupancies,
+                         const int enpassant)
 {
     if (side == white) {
         U64 bitboard = bitboards[P];

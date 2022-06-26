@@ -20,13 +20,13 @@
 
 /* ------------------------------- function declarations ------------------------------- */
 // get index of least significant bit
-int ls1b(U64 bitboard);
+int ls1b(const U64 bitboard);
 
 // print bitboard as grid of 0s and 1s
-void print_bitboard(U64 bitboard);
+void print_bitboard(const U64 bitboard);
 
 // initializes bitboard using index to describe which bits in attack mask are set
-U64 set_occupancy(int index, int masked_bits, U64 attack_mask);
+U64 set_occupancy(const int index, const int masked_bits, U64 attack_mask);
 
 /* ------------------------------- constants ------------------------------- */
 // board squares

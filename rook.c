@@ -2,7 +2,7 @@
 #include "constants.h"
 
 // returns squares that could be obstacles in rook's path, so edge squares are not considered
-U64 mask_rook_attacks(int square)
+U64 mask_rook_attacks(const int square)
 {
     // result attacks bitboard for rook
     U64 attacks = 0ULL;
@@ -21,7 +21,7 @@ U64 mask_rook_attacks(int square)
 }
 
 // generate rook attacks given square and occupancies, used to fill attack table
-U64 generate_rook_attacks(int square, U64 block)
+U64 generate_rook_attacks(const int square, const U64 block)
 {
     // result attacks bitboard for rook
     U64 attacks = 0ULL;
@@ -73,19 +73,14 @@ void init_rook_attacks()
 }
 
 // get rook attacks using magic bitboard
-U64 get_rook_attacks(int square, U64 occupancy)
+U64 get_rook_attacks(const int square, const U64 occupancy)
 {
-    // get bishop attacks assuming current board occupancy
-    occupancy &= rook_masks[square];
-    occupancy *= rook_magic_numbers[square];
-    occupancy >>= 64 - rook_relevant_bits[square];
-
-    // return rook attacks
-    return rook_attacks[square][occupancy];
+    return rook_attacks[square][((occupancy & rook_masks[square]) * rook_magic_numbers[square])
+                                >> (64 - rook_relevant_bits[square])];
 }
 
 // generate rook moves
-void generate_rook_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies)
+void generate_rook_moves(move_list *moves, const int side, const U64 *bitboards, const U64 *occupancies)
 {
     if (side == white) {
         U64 bitboard = bitboards[R];

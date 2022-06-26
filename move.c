@@ -3,14 +3,14 @@
 #include "bitboard.h"
 
 // add move to move list
-void add_move(move_list *moves, int move)
+void add_move(move_list *moves, const int move)
 {
     moves->moves[moves->count] = move;
     moves->count++;
 }
 
 // print description of move
-void print_move(int move)
+void print_move(const int move)
 {
     if (get_move_promoted(move))
         printf("%s%s%c", square_to_coordinates[get_move_source(move)],
@@ -22,7 +22,7 @@ void print_move(int move)
 }
 
 //print move list
-void print_move_list(move_list *moves)
+void print_move_list(const move_list *moves)
 {
     //do nothing on empty move list
     if(!moves->count)

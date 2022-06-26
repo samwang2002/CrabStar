@@ -5,19 +5,19 @@
 #include "bitboard.h"
 
 // returns squares that could be obstacles in rook's path
-U64 mask_rook_attacks(int square);
+U64 mask_rook_attacks(const int square);
 
 // generate rook attacks on the fly
-U64 generate_rook_attacks(int square, U64 block);
+U64 generate_rook_attacks(const int square, const U64 block);
 
 // initialize rook attack table
 void init_rook_attacks();
 
 // get rook attacks using magic bitboard
-U64 get_rook_attacks(int square, U64 occupancy);
+U64 get_rook_attacks(const int square, const U64 occupancy);
 
 // generate rook moves
-void generate_rook_moves(move_list *moves, int side, U64 *bitboards, U64 *occupancies);
+void generate_rook_moves(move_list *moves, const int side, const U64 *bitboards, const U64 *occupancies);
 
 // rook attack masks
 static U64 rook_masks[64];
