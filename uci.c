@@ -3,6 +3,8 @@
 #include "board.h"
 #include "constants.h"
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 // parse move string input
 int parse_move(const char *move_str)
@@ -64,4 +66,17 @@ void parse_position(const char *command)
         // skip to next move
         while (*curr && *curr++ != ' ') ;
     }
+}
+
+// parse "go" command
+void parse_go(const char *command)
+{
+    int depth = -1;
+    const char *curr_depth = NULL;
+    if ((curr_depth = strstr(command, "depth")))
+        depth = atoi(curr_depth + 6);
+    else
+        depth = 6;          // defualt depth
+    
+    printf("depth: %d\n", depth);
 }

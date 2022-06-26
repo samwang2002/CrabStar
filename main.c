@@ -43,6 +43,7 @@ int main()
 
     // test parse position
     parse_position("position fen r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1 moves e2a6 e8g8");
+    parse_go("go wtim 20000 btime 10000 winc 1000 binc 1000 depth 1234");
     print_board();
 
     return 0;
