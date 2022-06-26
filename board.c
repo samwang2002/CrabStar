@@ -49,7 +49,7 @@ void print_board()
     // print out game state variables
     printf("     Side:     %s\n", side ? "black" : "white");
     printf("     Enpass:      %s\n", (enpassant != no_sq) ? square_to_coordinates[enpassant] : "no");
-    printf("     Castling:  %c%c%c%c\n", (castle & wk) ? 'K' : '-', (castle & wq) ? 'Q' : '-',
+    printf("     Castling:  %c%c%c%c\n\n", (castle & wk) ? 'K' : '-', (castle & wq) ? 'Q' : '-',
            (castle & bk) ? 'k' : '-', (castle & bq) ? 'q' : '-');
 }
 
