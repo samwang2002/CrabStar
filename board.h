@@ -56,6 +56,9 @@ void search_position(const int depth);
 // position evaluation
 int evaluate();
 
+//negamax alpha beta search
+int negamax(int alpha, int beta, int depth);
+
 /* ------------------------------- variables ------------------------------- */
 // bitboards
 extern U64 bitboards[12];
@@ -71,5 +74,14 @@ extern int enpassant;
 
 // castling rights
 extern int castle;
+
+// half move counter
+extern int ply;
+
+// best move
+extern int best_move;
+
+// negamax alpha beta nodes
+extern int neg_nodes;
 
 #endif

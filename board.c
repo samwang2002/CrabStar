@@ -19,6 +19,9 @@ U64 occupancies[3];
 int side = white;
 int enpassant = no_sq;
 int castle = 0;
+int ply = 0;
+int best_move = 0;
+int neg_nodes = 0;
 
 // print current state of board
 void print_board()
@@ -294,11 +297,12 @@ int make_move(const int move, const int move_flag)
 // search for best move and print it
 void search_position(const int depth)
 {
+    // find best move within a given position
+    int score = negamax(-50000, 50000, depth);
+
     // PLACEHOLDER: returns first move in move list
-    move_list moves;
-    generate_moves(&moves);
     printf("bestmove ");
-    print_move(moves.moves[0]);
+    print_move(best_move);
     printf("\n");
 }
 
@@ -360,4 +364,81 @@ int evaluate()
 
     // return final evaluation based on side
     return (side == white) ? score : -score;
+}
+
+int negamax(int alpha, int beta, int depth)
+{
+    // recursion escape condition
+    if (depth == 0)
+        return evaluate();
+    
+    // increment nodes count
+    neg_nodes++;
+
+    // best move so far
+    int best_sofar;
+    
+    // old value of alpha
+    int old_alpha = alpha;
+
+    //create move list instance
+    move_list moves[1];
+
+    //generate moves
+    generate_moves(moves);
+
+    // loop over moves within a movelist
+    for (int count = 0; count < moves->count; count++)
+    {
+        //preserve board state
+        copy_board();
+        
+        //increment ply
+        ply++;
+
+        // make sure to only make legal moves
+        if (!make_move(moves->moves[count], all_moves))
+        {
+            // decrement ply
+            ply --;
+
+            // skip to next move
+            continue;
+        }
+        
+        // score current move
+        int score = -negamax(-beta, -alpha, depth -1);
+        
+        // decrement ply
+        ply --;
+        
+        // take move back
+        take_back();
+
+        // fail-hard beta cutoff
+        if (score >= beta)
+        {
+            // node (move) fails high
+            return beta;
+        }
+
+        // found a better move
+        if (score > alpha)
+        {
+            // principle variation node (move)
+            alpha = score;
+
+            // if root move
+            if (ply == 0)
+                // associate bets move with the best score
+                best_sofar = moves->moves[count];
+        }
+    }
+
+    if (old_alpha != alpha)
+        best_move = best_sofar;
+
+    // node (move) fails low
+    return alpha;
+
 }

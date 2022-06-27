@@ -28,11 +28,11 @@ int main()
     // parse_fen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8  ");    // 5
     // parse_fen("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10 ");  // 6
     
-    parse_fen("rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1");
-    print_board();
-    printf("score: %d\n", evaluate());
+    //parse_fen(start_position);
+    //print_board();
+    //search_position(2);
 
-    //uci_loop();
+    uci_loop();
 
     return 0;
 }
