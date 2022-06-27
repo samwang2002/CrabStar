@@ -302,7 +302,7 @@ void search_position(const int depth)
     
     if (best_move)
     {
-        printf("info score cp %d depth %d nodes %ld\n", score, depth, neg_nodes);
+        printf("info score cp %d depth %d nodes %d\n", score, depth, neg_nodes);
         // PLACEHOLDER: returns first move in move list
         printf("bestmove ");
         print_move(best_move);
