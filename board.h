@@ -59,6 +59,9 @@ int evaluate();
 //negamax alpha beta search
 int negamax(int alpha, int beta, int depth);
 
+// quiescence search
+int quiescence(int alpha, int beta);
+
 /* ------------------------------- variables ------------------------------- */
 // bitboards
 extern U64 bitboards[12];
