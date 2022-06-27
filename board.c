@@ -299,11 +299,15 @@ void search_position(const int depth)
 {
     // find best move within a given position
     int score = negamax(-50000, 50000, depth);
-
-    // PLACEHOLDER: returns first move in move list
-    printf("bestmove ");
-    print_move(best_move);
-    printf("\n");
+    
+    if (best_move)
+    {
+        printf("info score cp %d depth %d nodes %ld\n", score, depth, neg_nodes);
+        // PLACEHOLDER: returns first move in move list
+        printf("bestmove ");
+        print_move(best_move);
+        printf("\n");
+    }
 }
 
 // evaulate the current board position
@@ -374,6 +378,12 @@ int negamax(int alpha, int beta, int depth)
     
     // increment nodes count
     neg_nodes++;
+    
+    // is king in check
+    int in_check = square_attacked((side == white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
+
+    // legal moves counter
+    int legal_moves = 0;
 
     // best move so far
     int best_sofar;
@@ -405,13 +415,16 @@ int negamax(int alpha, int beta, int depth)
             // skip to next move
             continue;
         }
+
+        // increment legal moves
+        legal_moves++;
         
         // score current move
         int score = -negamax(-beta, -alpha, depth -1);
         
         // decrement ply
         ply --;
-        
+
         // take move back
         take_back();
 
@@ -433,6 +446,20 @@ int negamax(int alpha, int beta, int depth)
                 // associate bets move with the best score
                 best_sofar = moves->moves[count];
         }
+    }
+
+    // no legal moves to make in the current position
+    if (legal_moves == 0)
+    {
+        // checkmate
+        if(in_check)
+            // return mating score
+            return -49000 + ply;
+        
+        // stalemate
+        else
+            //
+            return 0;
     }
 
     if (old_alpha != alpha)
