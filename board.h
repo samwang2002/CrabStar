@@ -56,8 +56,11 @@ void search_position(const int depth);
 // position evaluation
 int evaluate();
 
-//negamax alpha beta search
-int negamax(int alpha, int beta, int depth);
+// negamax alpha beta search
+int negamax(const int alpha, const int beta, const int depth);
+
+// quiescence search: similar to negamax but only examine captures
+int quiescence(int alpha, int beta, const int depth);
 
 /* ------------------------------- variables ------------------------------- */
 // bitboards

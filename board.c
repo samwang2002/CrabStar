@@ -370,11 +370,13 @@ int evaluate()
     return (side == white) ? score : -score;
 }
 
-int negamax(int alpha, int beta, int depth)
+int negamax(const int alpha, const int beta, const int depth)
 {
     // recursion escape condition
     if (depth == 0)
+        // run quiescence search
         return evaluate();
+        // return quiescence(alpha, beta);
     
     // increment nodes count
     neg_nodes++;
@@ -388,13 +390,13 @@ int negamax(int alpha, int beta, int depth)
     // best move so far
     int best_sofar;
     
-    // old value of alpha
-    int old_alpha = alpha;
+    // new value of alpha
+    int new_alpha = alpha;
 
-    //create move list instance
+    // create move list instance
     move_list moves[1];
 
-    //generate moves
+    // generate moves
     generate_moves(moves);
 
     // loop over moves within a movelist
@@ -420,7 +422,7 @@ int negamax(int alpha, int beta, int depth)
         legal_moves++;
         
         // score current move
-        int score = -negamax(-beta, -alpha, depth -1);
+        int score = -negamax(-beta, -new_alpha, depth -1);
         
         // decrement ply
         ply --;
@@ -436,10 +438,10 @@ int negamax(int alpha, int beta, int depth)
         }
 
         // found a better move
-        if (score > alpha)
+        if (score > new_alpha)
         {
             // principle variation node (move)
-            alpha = score;
+            new_alpha = score;
 
             // if root move
             if (ply == 0)
@@ -462,10 +464,10 @@ int negamax(int alpha, int beta, int depth)
             return 0;
     }
 
-    if (old_alpha != alpha)
+    if (new_alpha != alpha)
         best_move = best_sofar;
 
     // node (move) fails low
-    return alpha;
+    return new_alpha;
 
 }
