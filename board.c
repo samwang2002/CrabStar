@@ -370,13 +370,91 @@ int evaluate()
     return (side == white) ? score : -score;
 }
 
+// quiescence search
+int quiescence(const int alpha, const int beta)
+{
+    // evaluate position
+    int evaluation = evaluate();
+    
+    // fail-hard beta cutoff
+    if (evaluation >= beta)
+    {
+        // node (move) fails high
+        return beta;
+    }
+
+    // new value of alpha
+    int new_alpha = alpha;
+    
+    // found a better move
+    if (evaluation > alpha)
+    {
+        // PV node (move)
+        new_alpha = evaluation;
+    }
+    
+    // create move list instance
+    move_list moves[1];
+    
+    // generate moves
+    generate_moves(moves);
+    
+    // loop over moves within a movelist
+    for (int count = 0; count < moves->count; count++)
+    {
+        // preserve board state
+        copy_board();
+        
+        // increment ply
+        ply++;
+        
+        // make sure to make only legal moves
+        if (make_move(moves->moves[count], captures_only) == 0)
+        {
+            // decrement ply
+            ply--;
+            
+            // skip to next move
+            continue;
+        }
+
+        // score current move
+        int score = -quiescence(-beta, -new_alpha);
+        
+        // decrement ply
+        ply--;
+
+        // take move back
+        take_back();
+        
+        // fail-hard beta cutoff
+        if (score >= beta)
+        {
+            // node (move) fails high
+            return beta;
+        }
+        
+        // found a better move
+        if (score > new_alpha)
+        {
+            // PV node (move)
+            new_alpha = score;
+            
+        }
+    }
+    
+    // node (move) fails low
+    return new_alpha;
+}
+
+
+// negamax alpha beta search
 int negamax(const int alpha, const int beta, const int depth)
 {
     // recursion escape condition
     if (depth == 0)
         // run quiescence search
-        return evaluate();
-        // return quiescence(alpha, beta);
+        return quiescence(alpha, beta);
     
     // increment nodes count
     neg_nodes++;

@@ -60,7 +60,7 @@ int evaluate();
 int negamax(const int alpha, const int beta, const int depth);
 
 // quiescence search: similar to negamax but only examine captures
-int quiescence(int alpha, int beta, const int depth);
+int quiescence(const int alpha, const int beta);
 
 /* ------------------------------- variables ------------------------------- */
 // bitboards
