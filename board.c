@@ -22,6 +22,8 @@ int castle = 0;
 int ply = 0;
 int best_move = 0;
 int neg_nodes = 0;
+int killer_moves[2][64];
+int history_moves[12][64];
 
 // print current state of board
 void print_board()
@@ -304,9 +306,13 @@ int score_move(const int move)
                 target_piece = i-6*side;
                 break;
             }
-        return mvv_lva[get_move_piece(move)][target_piece];
+        return mvv_lva[get_move_piece(move)][target_piece] + 10000;
+    } else {                                // score quiet move
+        if (killer_moves[0][ply] == move) return 9000;
+        if (killer_moves[1][ply] == move) return 8000;
+        return history_moves[get_move_piece(move)][get_move_target(move)];
     }
-    return 0;       // quiet move
+    return 0;
 }
 
 // sort moves by priority
@@ -477,10 +483,11 @@ int quiescence(const int alpha, const int beta)
         // take move back
         take_back();
         
-        // fail-hard beta cutoff
+        // fail-hard beta cutoff, node fails high
         if (score >= beta)
         {
-            // node (move) fails high
+            killer_moves[1][ply] = killer_moves[0][ply];
+            killer_moves[0][ply] = moves->moves[count];
             return beta;
         }
         
@@ -560,10 +567,11 @@ int negamax(const int alpha, const int beta, int depth)
         // take move back
         take_back();
 
-        // fail-hard beta cutoff
+        // fail-hard beta cutoff, node fails high
         if (score >= beta)
         {
-            // node (move) fails high
+            killer_moves[1][ply] = killer_moves[0][ply];
+            killer_moves[0][ply] = moves->moves[count];
             return beta;
         }
 

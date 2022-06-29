@@ -93,4 +93,14 @@ extern int best_move;
 // negamax alpha beta nodes
 extern int neg_nodes;
 
+// killer moves [id][ply]
+// can use different number of killer moves but 2 is a good choice
+// see: https://www.chessprogramming.org/Killer_Heuristic
+extern int killer_moves[2][64];
+
+// history moves [piece][square]
+// prioritizes moves that cause more cutoffs in search tree
+// see: https://www.chessprogramming.org/History_Heuristic
+extern int history_moves[12][64];
+
 #endif
