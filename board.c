@@ -164,12 +164,12 @@ void generate_moves(move_list *moves)
 {
     moves->count = 0;
     generate_pawn_moves(moves, side, bitboards, occupancies, enpassant);
-    generate_knight_moves(moves, side, bitboards, occupancies);
     generate_castling_moves(moves, side, bitboards, occupancies, castle, &square_attacked);
-    generate_king_moves(moves, side, bitboards, occupancies);
+    generate_knight_moves(moves, side, bitboards, occupancies);
     generate_bishop_moves(moves, side, bitboards, occupancies);
     generate_rook_moves(moves, side, bitboards, occupancies);
     generate_queen_moves(moves, side, bitboards, occupancies);
+    generate_king_moves(moves, side, bitboards, occupancies);
 }
 
 // make move on chess board
@@ -302,7 +302,11 @@ void search_position(const int depth)
     
     if (best_move)
     {
-        printf("info score cp %d depth %d nodes %d\n", score, depth, neg_nodes);
+        #ifndef WIN_64
+            printf("info score cp %'d depth %'d nodes %'d\n", score, depth, neg_nodes);
+        #else
+            printf("info score cp %d depth %d nodes %d\n", score, depth, neg_nodes);
+        #endif
         // PLACEHOLDER: returns first move in move list
         printf("bestmove ");
         print_move(best_move);
@@ -373,6 +377,9 @@ int evaluate()
 // quiescence search
 int quiescence(const int alpha, const int beta)
 {
+    // increment nodes count
+    ++neg_nodes;
+
     // evaluate position
     int evaluation = evaluate();
     
