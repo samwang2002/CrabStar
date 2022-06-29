@@ -63,7 +63,7 @@ void search_position(const int depth);
 int evaluate();
 
 // negamax alpha beta search
-int negamax(const int alpha, const int beta, const int depth);
+int negamax(const int alpha, const int beta, int depth);
 
 // quiescence search: similar to negamax but only examine captures
 int quiescence(const int alpha, const int beta);

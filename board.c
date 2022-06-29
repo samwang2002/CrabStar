@@ -498,7 +498,7 @@ int quiescence(const int alpha, const int beta)
 
 
 // negamax alpha beta search
-int negamax(const int alpha, const int beta, const int depth)
+int negamax(const int alpha, const int beta, int depth)
 {
     // recursion escape condition
     if (depth == 0)
@@ -508,8 +508,9 @@ int negamax(const int alpha, const int beta, const int depth)
     // increment nodes count
     neg_nodes++;
     
-    // is king in check
+    // if king is in check, increase search depth
     int in_check = square_attacked((side == white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
+    if (in_check) ++depth;
 
     // legal moves counter
     int legal_moves = 0;
