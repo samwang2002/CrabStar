@@ -103,4 +103,17 @@ extern int killer_moves[2][64];
 // see: https://www.chessprogramming.org/History_Heuristic
 extern int history_moves[12][64];
 
+// PV (principal variation) length
+extern int pv_length[64];
+
+// PV table
+extern int pv_table[64][64];
+/*
+    diagonal structure:
+    m1 m2 m3 ...
+    0  m2 m3 ...
+    0  0  m3 ...
+    .  .  .
+*/
+
 #endif

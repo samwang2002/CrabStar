@@ -24,6 +24,8 @@ int best_move = 0;
 int neg_nodes = 0;
 int killer_moves[2][64];
 int history_moves[12][64];
+int pv_length[64];
+int pv_table[64][64];
 
 // print current state of board
 void print_board()
@@ -359,7 +361,8 @@ void search_position(const int depth)
         printf("bestmove ");
         print_move(best_move);
         printf("\n");
-    }
+    } else
+        printf("no best move found\n");
 }
 
 // evaulate the current board position
@@ -422,154 +425,50 @@ int evaluate()
     return (side == white) ? score : -score;
 }
 
-// quiescence search
-int quiescence(const int alpha, const int beta)
-{
-    // increment nodes count
-    ++neg_nodes;
-
-    // evaluate position
-    int evaluation = evaluate();
-    
-    // fail-hard beta cutoff
-    if (evaluation >= beta)
-    {
-        // node (move) fails high
-        return beta;
-    }
-
-    // new value of alpha
-    int new_alpha = alpha;
-    
-    // found a better move
-    if (evaluation > alpha)
-    {
-        // PV node (move)
-        new_alpha = evaluation;
-    }
-    
-    // create move list instance
-    move_list moves[1];
-    
-    // generate and sort moves
-    generate_moves(moves);
-    sort_moves(moves);
-    
-    // loop over moves within a movelist
-    for (int count = 0; count < moves->count; count++)
-    {
-        // preserve board state
-        copy_board();
-        
-        // increment ply
-        ply++;
-        
-        // make sure to make only legal moves
-        int move = moves->moves[count];
-        if (make_move(move, captures_only) == 0)
-        {
-            // decrement ply
-            ply--;
-            
-            // skip to next move
-            continue;
-        }
-
-        // score current move
-        int score = -quiescence(-beta, -new_alpha);
-        
-        // decrement ply
-        ply--;
-
-        // take move back
-        take_back();
-        
-        // fail-hard beta cutoff, node fails high
-        if (score >= beta)
-        {
-            return beta;
-        }
-        
-        // found a better move
-        if (score > new_alpha)
-        {
-            // PV node (move)
-            new_alpha = score;
-            
-        }
-    }
-    
-    // node (move) fails low
-    return new_alpha;
-}
-
-
 // negamax alpha beta search
+// alpha: minimum score the maximizing player is assured of
+// beta: maximum score the minimizing player is assured of
+// goal is to get alpha as high as possible
+// if beta <= alpha, then the minimizing player had a better option, so we can prune
 int negamax(const int alpha, const int beta, int depth)
 {
-    // recursion escape condition
-    if (depth == 0)
-        // run quiescence search
+    if (depth == 0)     // base case
         return quiescence(alpha, beta);
     
-    // increment nodes count
-    neg_nodes++;
-    
-    // if king is in check, increase search depth
-    int in_check = square_attacked((side == white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
-    if (in_check) ++depth;
+    ++neg_nodes;
 
-    // legal moves counter
-    int legal_moves = 0;
-
-    // best move so far
-    int best_sofar;
+    // if in check, increase search depth
+    int in_check = square_attacked((side==white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
+    if (in_check)
+        ++depth;
     
-    // new value of alpha
+    int legal_count = 0;
+    int best_sofar = 0;
     int new_alpha = alpha;
 
-    // create move list instance
-    move_list moves[1];
+    // loop through possible moves and narrow alpha and beta
+    move_list moves;
+    generate_moves(&moves);
+    sort_moves(&moves);
 
-    // generate and sort moves
-    generate_moves(moves);
-    sort_moves(moves);
-
-    // loop over moves within a movelist
-    for (int count = 0; count < moves->count; count++)
-    {
-        //preserve board state
+    for (int i = 0; i < moves.count; ++i) {
         copy_board();
-        
-        //increment ply
-        ply++;
+        ++ply;
 
-        // make sure to only make legal moves
-        int move = moves->moves[count];
-        if (!make_move(move, all_moves))
-        {
-            // decrement ply
-            ply --;
-
-            // skip to next move
+        int move = moves.moves[i];
+        if (!make_move(move, all_moves)) {      // skip illegal moves
+            --ply;
             continue;
         }
+        ++legal_count;
 
-        // increment legal moves
-        legal_moves++;
-        
-        // score current move
-        int score = -negamax(-beta, -new_alpha, depth -1);
-        
-        // decrement ply
-        ply --;
-
-        // take move back
+        // compare new score to existing scores
+        int score = -negamax(-beta, -new_alpha, depth-1);
         take_back();
+        --ply;
 
-        // fail-hard beta cutoff, node fails high
-        if (score >= beta)
-        {
+        if (score >= beta) {        // move failed hard beta cutoff
+            // if move is quiet, store in killer moves cache so it has higher priority in analysis
             if (!get_move_capture(move)) {
                 killer_moves[1][ply] = killer_moves[0][ply];
                 killer_moves[0][ply] = move;
@@ -577,42 +476,57 @@ int negamax(const int alpha, const int beta, int depth)
             return beta;
         }
 
-        // found a better move
-        if (score > new_alpha)
-        {
-            // store history moves
-            // nodes higher in tree are valued more
+        if (score > new_alpha) {    // variation is better than current best
+            new_alpha = score;
+            if (ply == 0) best_sofar = move;
+            // if move is quiet, add move to history heuristic
+            // nodes higher in the tree are valued more
             if (!get_move_capture(move))
                 history_moves[get_move_piece(move)][get_move_target(move)] += 1 << depth;
-
-            // principle variation node (move)
-            new_alpha = score;
-
-            // if root move
-            if (ply == 0)
-                // associate bets move with the best score
-                best_sofar = move;
         }
     }
 
-    // no legal moves to make in the current position
-    if (legal_moves == 0)
-    {
-        // checkmate
-        if(in_check)
-            // return mating score
-            return -49000 + ply;
-        
-        // stalemate
-        else
-            //
-            return 0;
+    // if no legal moves are possible, position is either checkmate or stalemate
+    if (legal_count == 0) return in_check ? -49000 + ply : 0;
+
+    if (new_alpha > alpha)      // improvement was found
+        best_move = best_sofar;
+    
+    return new_alpha;
+}
+
+// quiescence search, see negamax code for better documentation
+int quiescence(const int alpha, const int beta)
+{
+    ++neg_nodes;
+    int evaluation = evaluate();
+
+    if (evaluation >= beta) return beta;                // failed hard beta cutoff
+    int new_alpha = alpha;
+    if (evaluation > alpha) new_alpha = evaluation;     // found better move
+
+    // DFS over possible captures
+    move_list moves;
+    generate_moves(&moves);
+    sort_moves(&moves);
+
+    for (int i = 0; i < moves.count; ++i) {
+        copy_board();
+        ++ply;
+
+        // test out new move
+        int move = moves.moves[i];
+        if (make_move(move, captures_only) == 0) {      // skip illegal and quiet moves
+            --ply;
+            continue;
+        }
+        int score = -quiescence(-beta, -new_alpha);     // now from opposite perspective
+
+        --ply;
+        take_back();
+        if (score >= beta) return beta;
+        if (score > new_alpha) new_alpha = score;
     }
 
-    if (new_alpha != alpha)
-        best_move = best_sofar;
-
-    // node (move) fails low
     return new_alpha;
-
 }

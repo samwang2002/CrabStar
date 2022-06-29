@@ -22,8 +22,7 @@ int main()
 
     int debug = 1;
     if (debug) {
-        // parse_fen(killer_position);
-        parse_fen("6k1/3q1pp1/pp5p/1r5n/8/1P3PP1/PQ4BP/2R3K1 w - - 0 1");
+        parse_fen(tricky_position);
         print_board();
         #ifndef WIN_64
             setlocale(LC_NUMERIC, "");
