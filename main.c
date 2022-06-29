@@ -28,6 +28,8 @@ int main()
             setlocale(LC_NUMERIC, "");
         #endif
         search_position(3);
+        printf("move score P x q: %d\n", mvv_lva[P][q]);
+        printf("move score q x P: %d\n", mvv_lva[q][P]);
     } else
         uci_loop();
 
