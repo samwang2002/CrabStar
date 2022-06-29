@@ -570,8 +570,10 @@ int negamax(const int alpha, const int beta, int depth)
         // fail-hard beta cutoff, node fails high
         if (score >= beta)
         {
-            killer_moves[1][ply] = killer_moves[0][ply];
-            killer_moves[0][ply] = move;
+            if (!get_move_capture(move)) {
+                killer_moves[1][ply] = killer_moves[0][ply];
+                killer_moves[0][ply] = move;
+            }
             return beta;
         }
 
@@ -580,7 +582,8 @@ int negamax(const int alpha, const int beta, int depth)
         {
             // store history moves
             // nodes higher in tree are valued more
-            history_moves[get_move_piece(move)][get_move_target(move)] += 1 << depth;
+            if (!get_move_capture(move))
+                history_moves[get_move_piece(move)][get_move_target(move)] += 1 << depth;
 
             // principle variation node (move)
             new_alpha = score;
