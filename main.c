@@ -27,14 +27,7 @@ int main()
         #ifndef WIN_64
             setlocale(LC_NUMERIC, "");
         #endif
-        // search_position(3);
-        move_list moves;
-        generate_moves(&moves);
-        sort_moves(&moves);
-        for (int i = 0; i < moves.count; ++i) {
-            print_move(moves.moves[i]);
-            printf(" score: %d\n", score_move(moves.moves[i]));
-        }
+        search_position(5);
         // print_move_list(&moves);
     } else
         uci_loop();

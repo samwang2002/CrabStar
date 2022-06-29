@@ -159,7 +159,7 @@ int has_legal_moves()
     return 0;
 }
 
-// generate all moves
+// generate all moves least important moves first
 void generate_moves(move_list *moves)
 {
     moves->count = 0;
@@ -445,8 +445,9 @@ int quiescence(const int alpha, const int beta)
     // create move list instance
     move_list moves[1];
     
-    // generate moves
+    // generate and sort moves
     generate_moves(moves);
+    sort_moves(moves);
     
     // loop over moves within a movelist
     for (int count = 0; count < moves->count; count++)
@@ -524,8 +525,9 @@ int negamax(const int alpha, const int beta, int depth)
     // create move list instance
     move_list moves[1];
 
-    // generate moves
+    // generate and sort moves
     generate_moves(moves);
+    sort_moves(moves);
 
     // loop over moves within a movelist
     for (int count = 0; count < moves->count; count++)
