@@ -294,6 +294,21 @@ int make_move(const int move, const int move_flag)
         return 0;
 }
 
+// get priority of move
+int score_move(const int move)
+{
+    if (get_move_capture(move)) {           // capture move, use mvv_lva table
+        int target_piece = 0;
+        for (int i = p; i <= k; ++i)
+            if (get_bit(bitboards[i-6*side], get_move_target(move))) {
+                target_piece = i-6*side;
+                break;
+            }
+        return mvv_lva[get_move_piece(move)][target_piece];
+    }
+    return 0;       // quiet move
+}
+
 // search for best move and print it
 void search_position(const int depth)
 {

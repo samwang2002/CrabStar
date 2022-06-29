@@ -27,9 +27,14 @@ int main()
         #ifndef WIN_64
             setlocale(LC_NUMERIC, "");
         #endif
-        search_position(3);
-        printf("move score P x q: %d\n", mvv_lva[P][q]);
-        printf("move score q x P: %d\n", mvv_lva[q][P]);
+        // search_position(3);
+        move_list moves;
+        generate_moves(&moves);
+        for (int i = 0; i < moves.count; ++i) {
+            print_move(moves.moves[i]);
+            printf(" score: %d\n", score_move(moves.moves[i]));
+        }
+        // print_move_list(&moves);
     } else
         uci_loop();
 
