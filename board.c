@@ -465,7 +465,8 @@ int quiescence(const int alpha, const int beta)
         ply++;
         
         // make sure to make only legal moves
-        if (make_move(moves->moves[count], captures_only) == 0)
+        int move = moves->moves[count];
+        if (make_move(move, captures_only) == 0)
         {
             // decrement ply
             ply--;
@@ -486,8 +487,6 @@ int quiescence(const int alpha, const int beta)
         // fail-hard beta cutoff, node fails high
         if (score >= beta)
         {
-            killer_moves[1][ply] = killer_moves[0][ply];
-            killer_moves[0][ply] = moves->moves[count];
             return beta;
         }
         
@@ -546,7 +545,8 @@ int negamax(const int alpha, const int beta, int depth)
         ply++;
 
         // make sure to only make legal moves
-        if (!make_move(moves->moves[count], all_moves))
+        int move = moves->moves[count];
+        if (!make_move(move, all_moves))
         {
             // decrement ply
             ply --;
@@ -571,20 +571,24 @@ int negamax(const int alpha, const int beta, int depth)
         if (score >= beta)
         {
             killer_moves[1][ply] = killer_moves[0][ply];
-            killer_moves[0][ply] = moves->moves[count];
+            killer_moves[0][ply] = move;
             return beta;
         }
 
         // found a better move
         if (score > new_alpha)
         {
+            // store history moves
+            // nodes higher in tree are valued more
+            history_moves[get_move_piece(move)][get_move_target(move)] += 1 << depth;
+
             // principle variation node (move)
             new_alpha = score;
 
             // if root move
             if (ply == 0)
                 // associate bets move with the best score
-                best_sofar = moves->moves[count];
+                best_sofar = move;
         }
     }
 
