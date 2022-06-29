@@ -309,6 +309,33 @@ int score_move(const int move)
     return 0;       // quiet move
 }
 
+// sort moves by priority
+void sort_moves(move_list *moves)
+{
+    // make list of current scores
+    int scores[moves->count];
+    for (int i = 0; i < moves->count; ++i)
+        scores[i] = score_move(moves->moves[i]);
+
+    // insertion sort in descending order (fast for small arrays)
+    for (int i = 0; i < moves->count-1; ++i) {
+        // find index of largest element in unsorted part
+        int max_idx = i;
+        for (int j = i+1; j < moves->count; ++j)
+            if (scores[j] > scores[max_idx]) max_idx = j;
+        
+        // swap scores
+        int temp_score = scores[max_idx];
+        scores[max_idx] = scores[i];
+        scores[i] = temp_score;
+
+        // swap moves
+        int temp_move = moves->moves[max_idx];
+        moves->moves[max_idx] = moves->moves[i];
+        moves->moves[i] = temp_move;
+    }
+}
+
 // search for best move and print it
 void search_position(const int depth)
 {

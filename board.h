@@ -53,6 +53,9 @@ int make_move(const int move, const int move_flag);
 // score move - determines priority of move
 int score_move(const int move);
 
+// sort moves in descending order by score
+void sort_moves(move_list *moves);
+
 // search position for best move and print it to UCI interface
 void search_position(const int depth);
 

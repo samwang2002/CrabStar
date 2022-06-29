@@ -22,7 +22,7 @@ int main()
 
     int debug = 1;
     if (debug) {
-        parse_fen(cmk_position);
+        parse_fen(tricky_position);
         print_board();
         #ifndef WIN_64
             setlocale(LC_NUMERIC, "");
@@ -30,6 +30,7 @@ int main()
         // search_position(3);
         move_list moves;
         generate_moves(&moves);
+        sort_moves(&moves);
         for (int i = 0; i < moves.count; ++i) {
             print_move(moves.moves[i]);
             printf(" score: %d\n", score_move(moves.moves[i]));
