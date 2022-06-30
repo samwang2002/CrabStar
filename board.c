@@ -344,32 +344,6 @@ void sort_moves(move_list *moves)
     }
 }
 
-// search for best move and print it
-void search_position(const int depth)
-{
-    // find best move within a given position
-    int score = negamax(-50000, 50000, depth);
-    
-    if (best_move)
-    {
-        #ifndef WIN_64
-            printf("info score cp %'d depth %'d nodes %'d\n", score, depth, neg_nodes);
-        #else
-            printf("info score cp %d depth %d nodes %d\n", score, depth, neg_nodes);
-        #endif
-        // PLACEHOLDER: returns first move in move list
-        printf("bestmove ");
-        print_move(best_move);
-        printf("\nprincipal variation");
-        for (int i = 0 ; i < pv_length[0]; ++i) {
-            printf(" ");
-            print_move(pv_table[0][i]);
-        }
-        printf("\n");
-    } else
-        printf("no best move found\n");
-}
-
 // evaulate the current board position
 int evaluate()
 {
@@ -437,10 +411,13 @@ int evaluate()
 // if beta <= alpha, then the minimizing player had a better option, so we can prune
 int negamax(const int alpha, const int beta, int depth)
 {
-    if (depth == 0)     // base case
+    if (depth == 0)         // base case
         return quiescence(alpha, beta);
     
     ++neg_nodes;
+
+    if (ply >= max_ply)     // too deep, danger of exceeding arrays
+        return evaluate();
 
     // initialize pv length
     pv_length[ply] = ply;
@@ -546,4 +523,31 @@ int quiescence(const int alpha, const int beta)
     }
 
     return new_alpha;
+}
+
+// search for best move and print it
+void search_position(const int depth)
+{
+    // find best move within a given position
+    int score = negamax(-50000, 50000, depth);
+    
+    if (best_move)
+    {
+        // basic info
+        printf("info score cp %d depth %d nodes %d", score, depth, neg_nodes);
+
+        // principal variation
+        printf(" pv");
+        for (int i = 0 ; i < pv_length[0]; ++i) {
+            printf(" ");
+            print_move(pv_table[0][i]);
+        }
+        printf("\n");
+        
+        // best move
+        printf("bestmove ");
+        print_move(best_move);
+        printf("\n");
+    } else
+        printf("no best move found\n");
 }
