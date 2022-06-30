@@ -360,6 +360,11 @@ void search_position(const int depth)
         // PLACEHOLDER: returns first move in move list
         printf("bestmove ");
         print_move(best_move);
+        printf("\nprincipal variation");
+        for (int i = 0 ; i < pv_length[0]; ++i) {
+            printf(" ");
+            print_move(pv_table[0][i]);
+        }
         printf("\n");
     } else
         printf("no best move found\n");
@@ -437,6 +442,9 @@ int negamax(const int alpha, const int beta, int depth)
     
     ++neg_nodes;
 
+    // initialize pv length
+    pv_length[ply] = ply;
+
     // if in check, increase search depth
     int in_check = square_attacked((side==white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
     if (in_check)
@@ -467,7 +475,8 @@ int negamax(const int alpha, const int beta, int depth)
         take_back();
         --ply;
 
-        if (score >= beta) {        // move failed hard beta cutoff
+        // move failed hard beta cutoff
+        if (score >= beta) {
             // if move is quiet, store in killer moves cache so it has higher priority in analysis
             if (!get_move_capture(move)) {
                 killer_moves[1][ply] = killer_moves[0][ply];
@@ -476,9 +485,17 @@ int negamax(const int alpha, const int beta, int depth)
             return beta;
         }
 
-        if (score > new_alpha) {    // variation is better than current best
+        // variation is better than current best
+        if (score > new_alpha) {
             new_alpha = score;
             if (ply == 0) best_sofar = move;
+
+            // update pv table and length
+            pv_table[ply][ply] = move;
+            for (int next_ply = ply+1; next_ply < pv_length[ply+1]; ++next_ply)
+                pv_table[ply][next_ply] = pv_table[ply+1][next_ply];
+            pv_length[ply] = pv_length[ply+1];
+
             // if move is quiet, add move to history heuristic
             // nodes higher in the tree are valued more
             if (!get_move_capture(move))
