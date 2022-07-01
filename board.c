@@ -26,6 +26,8 @@ int killer_moves[2][64];
 int history_moves[12][64];
 int pv_length[64];
 int pv_table[64][64];
+int follow_pv;
+int score_pv;
 
 // print current state of board
 void print_board()
@@ -301,6 +303,17 @@ int make_move(const int move, const int move_flag)
 // get priority of move
 int score_move(const int move)
 {
+    if (score_pv){              // if PV move scoring is allowed
+        if (pv_table[0][ply] == move){   // make sure we are dealing with PV move]
+
+            score_pv = 0; //disable score PV flag
+            
+            printf("current PV move: ");
+            print_move(move);
+            printf(" ply: %d\n", ply);
+            return 20000;  //give PV move the highest score to search it first
+        } 
+    }
     if (get_move_capture(move)) {           // capture move, use mvv_lva table
         int target_piece = 0;
         for (int i = p; i <= k; ++i)
@@ -434,6 +447,10 @@ int negamax(const int alpha, const int beta, int depth)
     // loop through possible moves and narrow alpha and beta
     move_list moves;
     generate_moves(&moves);
+
+    // if we are following PV line
+    if (follow_pv)
+        enable_pv_scoring(&moves);
     sort_moves(&moves);
 
     for (int i = 0; i < moves.count; ++i) {
@@ -530,6 +547,8 @@ void search_position(const int max_depth)
 {
     // reset variables
     neg_nodes = 0;
+    follow_pv = 0;
+    score_pv = 0;
     memset(killer_moves, 0, sizeof(killer_moves));
     memset(history_moves, 0, sizeof(history_moves));
     memset(pv_table, 0, sizeof(pv_table));
@@ -537,7 +556,10 @@ void search_position(const int max_depth)
 
     // iteratively deepen analysis
     int best_score = 0;
-    for (int depth = 1; depth <= max_depth; ++depth) {
+    for (int depth = 1; depth <= max_depth; ++depth) 
+    {
+        neg_nodes = 0;
+        follow_pv = 1;
         // find best move within a given position
         int score = negamax(-50000, 50000, depth);
         if (best_move) {
@@ -558,5 +580,23 @@ void search_position(const int max_depth)
             printf("\n");
         } else
             printf("no best move found\n");
+    }
+}
+
+// enable PV move scoring
+void enable_pv_scoring(move_list *moves)
+{
+    //disable following PV
+    follow_pv =0;
+    // loop over the moves within a move list
+    for (int i = 0; i < moves->count; ++i){
+        // make sure we hit PV move
+        if(pv_table[0][ply] == moves->moves[i]){
+            //enable move scoring
+            score_pv = 1;
+
+            //enable following PV
+            follow_pv = 1;
+        }
     }
 }

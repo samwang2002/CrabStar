@@ -70,6 +70,9 @@ int quiescence(const int alpha, const int beta);
 // search position for best move and print it to UCI interface
 void search_position(const int depth);
 
+// enable PV mopve scoring
+void enable_pv_scoring(move_list *moves);
+
 /* ------------------------------- variables ------------------------------- */
 // bitboards
 extern U64 bitboards[12];
@@ -118,5 +121,11 @@ extern int pv_table[max_ply][max_ply];
     0  0  m3  ...
     .  .  .
 */
+
+// follow PV flag
+extern int follow_pv;
+
+// score PV PV flag
+extern int score_pv;
 
 #endif
