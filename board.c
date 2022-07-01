@@ -411,6 +411,9 @@ int evaluate()
 // if beta <= alpha, then the minimizing player had a better option, so we can prune
 int negamax(const int alpha, const int beta, int depth)
 {
+    // initialize pv length
+    pv_length[ply] = ply;
+
     if (depth == 0)         // base case
         return quiescence(alpha, beta);
     
@@ -418,9 +421,6 @@ int negamax(const int alpha, const int beta, int depth)
 
     if (ply >= max_ply)     // too deep, danger of exceeding arrays
         return evaluate();
-
-    // initialize pv length
-    pv_length[ply] = ply;
 
     // if in check, increase search depth
     int in_check = square_attacked((side==white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
@@ -469,7 +469,7 @@ int negamax(const int alpha, const int beta, int depth)
 
             // update pv table and length
             pv_table[ply][ply] = move;
-            for (int next_ply = ply+1; next_ply < pv_length[ply+1]; ++next_ply)
+            for (int next_ply = ply+1; next_ply < pv_length[ply+1]; ++next_ply)     // copy next row
                 pv_table[ply][next_ply] = pv_table[ply+1][next_ply];
             pv_length[ply] = pv_length[ply+1];
 
@@ -526,28 +526,37 @@ int quiescence(const int alpha, const int beta)
 }
 
 // search for best move and print it
-void search_position(const int depth)
+void search_position(const int max_depth)
 {
-    // find best move within a given position
-    int score = negamax(-50000, 50000, depth);
-    
-    if (best_move)
-    {
-        // basic info
-        printf("info score cp %d depth %d nodes %d", score, depth, neg_nodes);
+    // reset variables
+    neg_nodes = 0;
+    memset(killer_moves, 0, sizeof(killer_moves));
+    memset(history_moves, 0, sizeof(history_moves));
+    memset(pv_table, 0, sizeof(pv_table));
+    memset(pv_length, 0, sizeof(pv_length));
 
-        // principal variation
-        printf(" pv");
-        for (int i = 0 ; i < pv_length[0]; ++i) {
-            printf(" ");
-            print_move(pv_table[0][i]);
-        }
-        printf("\n");
-        
-        // best move
-        printf("bestmove ");
-        print_move(best_move);
-        printf("\n");
-    } else
-        printf("no best move found\n");
+    // iteratively deepen analysis
+    int best_score = 0;
+    for (int depth = 1; depth <= max_depth; ++depth) {
+        // find best move within a given position
+        int score = negamax(-50000, 50000, depth);
+        if (best_move) {
+            // basic info
+            printf("info score cp %d depth %d nodes %d", score, depth, neg_nodes);
+
+            // principal variation
+            printf(" pv");
+            for (int i = 0 ; i < pv_length[0]; ++i) {
+                printf(" ");
+                print_move(pv_table[0][i]);
+            }
+            printf("\n");
+
+            // best move
+            printf("bestmove ");
+            print_move(best_move);
+            printf("\n");
+        } else
+            printf("no best move found\n");
+    }
 }

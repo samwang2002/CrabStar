@@ -27,7 +27,7 @@ int main()
         #ifndef WIN_64
             setlocale(LC_NUMERIC, "");
         #endif
-        search_position(6);
+        search_position(5);
 
         // move_list moves;
         // generate_moves(&moves);
