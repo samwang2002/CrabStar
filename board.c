@@ -445,6 +445,24 @@ int negamax(const int alpha, const int beta, int depth)
     int new_alpha = alpha;
     int score;
 
+    // null move pruning
+    if (depth >= 3 && in_check == 0 && ply) {
+        // copy_board
+        copy_board();
+        //switch the side and give an opponent an extra move to make
+        side ^= 1;
+        // reset enpassant capture square
+        enpassant = no_sq;
+        // search moves with reduced depth to find beta cutoffs
+        int score = -negamax(-beta, -beta + 1, depth -1 -2);
+        //restore board state
+        take_back();
+        // fail-hard beta cutoff
+        if (score >= beta)
+            //move fails high
+            return beta;
+    }
+
     // loop through possible moves and narrow alpha and beta
     move_list moves;
     generate_moves(&moves);
