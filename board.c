@@ -421,8 +421,6 @@ int evaluate()
 // if beta <= alpha, then the minimizing player had a better option, so we can prune
 int negamax(const int alpha, const int beta, int depth)
 {
-    // define find PV node variable
-    int found_pv = 0;
 
     // initialize pv length
     pv_length[ply] = ply;
@@ -486,36 +484,25 @@ int negamax(const int alpha, const int beta, int depth)
         }
         ++legal_count;
 
-        // on PV node hit
-        if (found_pv)
-        {
-            // once move is found with a score between alph and beta, search the rest of the moves to prove they are all bad
-            score = -negamax(-new_alpha -1, -new_alpha, depth -1);
-            //if algorithm finds a move that is better in its search, search again in the normal alpha-beta manner
-            if ((score > new_alpha) && (score < beta))
-                score = -negamax(-beta, -new_alpha, depth - 1);
-        }
+        if (!moves_searched) score = -negamax(-beta, -new_alpha, depth - 1); // normal alpha beta search
 
-        else {  // for all other types of nodes do normal alpha beta search
-            if (moves_searched == 0) // full depth search
-                score = -negamax(-beta, -new_alpha, depth-1);
-            else { // late move reduction (LMR)
-                //condition to consider LMR
-                if (moves_searched >= full_depth_moves && depth >= reduction_limit && in_check == 0 
-                && get_move_capture(moves.moves[i]) == 0 && get_move_promoted(moves.moves[i]) == 0)
-                    //search current move with reduced depth
-                    score = -negamax(-new_alpha - 1, -new_alpha, depth -2);
-                else // hack to ensure that full-depth search is done
-                    score = new_alpha + 1;
-                // if a better moves is found during LMR
-                if (score > new_alpha) {
-                    score = -negamax(-new_alpha -1, -alpha, depth-1); //search again at normal depth but with narrowed score bandwith
-                    // if LMR fails re-search at full depth and full score bandwidth
-                    if ((score > new_alpha) && (score < beta))
-                        score = -negamax(-beta, -alpha, depth-1);
-                }
+        else { // late move reduction (LMR)
+            //condition to consider LMR
+            if (moves_searched >= full_depth_moves && depth >= reduction_limit && !in_check 
+            && !get_move_capture(moves.moves[i]) && !get_move_promoted(moves.moves[i]))
+                //search current move with reduced depth
+                score = -negamax(-new_alpha - 1, -new_alpha, depth -2);
+            else // hack to ensure that full-depth search is done
+                score = new_alpha + 1;
+            // principle variation search PVS
+            if (score > new_alpha) {
+                score = -negamax(-new_alpha -1, -new_alpha, depth-1); //search the remaining moves to prove they are all bad
+                // if a better move is found in the search, search again with normal alpha beta score bounds
+                if ((score > new_alpha) && (score < beta))
+                    score = -negamax(-beta, -new_alpha, depth-1);
             }
         }
+
         take_back();
         --ply;
         ++moves_searched;
@@ -534,9 +521,6 @@ int negamax(const int alpha, const int beta, int depth)
         if (score > new_alpha) {
             new_alpha = score;
             if (ply == 0) best_sofar = move;
-
-            // enable found PV flag
-            found_pv = 1;
             
             // update pv table and length
             pv_table[ply][ply] = move;
