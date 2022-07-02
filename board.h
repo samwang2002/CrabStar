@@ -128,4 +128,8 @@ extern int follow_pv;
 // score PV PV flag
 extern int score_pv;
 
+//late move reduction variables
+extern int full_depth_moves;
+extern int reduction_limit;
+
 #endif

@@ -28,6 +28,8 @@ int pv_length[64];
 int pv_table[64][64];
 int follow_pv;
 int score_pv;
+int full_depth_moves = 4;
+int reduction_limit = 3;
 
 // print current state of board
 void print_board()
@@ -421,6 +423,7 @@ int negamax(const int alpha, const int beta, int depth)
 {
     // define find PV node variable
     int found_pv = 0;
+
     // initialize pv length
     pv_length[ply] = ply;
 
@@ -451,6 +454,9 @@ int negamax(const int alpha, const int beta, int depth)
         enable_pv_scoring(&moves);
     sort_moves(&moves);
 
+    // moves searched in a move list
+    int moves_searched = 0;
+
     for (int i = 0; i < moves.count; ++i) {
         copy_board();
         ++ply;
@@ -472,10 +478,29 @@ int negamax(const int alpha, const int beta, int depth)
                 score = -negamax(-beta, -new_alpha, depth - 1);
         }
 
-        else    // for all other types of nodes do normal alpha beta search
-            score = -negamax(-beta, -new_alpha, depth-1);
+        else {  // for all other types of nodes do normal alpha beta search
+            if (moves_searched == 0) // full depth search
+                score = -negamax(-beta, -new_alpha, depth-1);
+            else { // late move reduction (LMR)
+                //condition to consider LMR
+                if (moves_searched >= full_depth_moves && depth >= reduction_limit && in_check == 0 
+                && get_move_capture(moves.moves[i]) == 0 && get_move_promoted(moves.moves[i]) == 0)
+                    //search current move with reduced depth
+                    score = -negamax(-new_alpha - 1, -new_alpha, depth -2);
+                else // hack to ensure that full-depth search is done
+                    score = new_alpha + 1;
+                // if a better moves is found during LMR
+                if (score > new_alpha) {
+                    score = -negamax(-new_alpha -1, -alpha, depth-1); //search again at normal depth but with narrowed score bandwith
+                    // if LMR fails re-search at full depth and full score bandwidth
+                    if ((score > new_alpha) && (score < beta))
+                        score = -negamax(-beta, -alpha, depth-1);
+                }
+            }
+        }
         take_back();
         --ply;
+        ++moves_searched;
 
         // move failed hard beta cutoff
         if (score >= beta) {

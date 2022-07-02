@@ -22,7 +22,7 @@ int main()
 
     int debug = 1;
     if (debug) {
-        parse_fen(cmk_position);
+        parse_fen(tricky_position);
         print_board();
         #ifndef WIN_64
             setlocale(LC_NUMERIC, "");
