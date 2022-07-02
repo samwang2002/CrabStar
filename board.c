@@ -305,12 +305,7 @@ int score_move(const int move)
 {
     if (score_pv){              // if PV move scoring is allowed
         if (pv_table[0][ply] == move){   // make sure we are dealing with PV move]
-
             score_pv = 0; //disable score PV flag
-            
-            printf("current PV move: ");
-            print_move(move);
-            printf(" ply: %d\n", ply);
             return 20000;  //give PV move the highest score to search it first
         } 
     }
@@ -424,6 +419,8 @@ int evaluate()
 // if beta <= alpha, then the minimizing player had a better option, so we can prune
 int negamax(const int alpha, const int beta, int depth)
 {
+    // define find PV node variable
+    int found_pv = 0;
     // initialize pv length
     pv_length[ply] = ply;
 
@@ -443,6 +440,7 @@ int negamax(const int alpha, const int beta, int depth)
     int legal_count = 0;
     int best_sofar = 0;
     int new_alpha = alpha;
+    int score;
 
     // loop through possible moves and narrow alpha and beta
     move_list moves;
@@ -464,8 +462,18 @@ int negamax(const int alpha, const int beta, int depth)
         }
         ++legal_count;
 
-        // compare new score to existing scores
-        int score = -negamax(-beta, -new_alpha, depth-1);
+        // on PV node hit
+        if (found_pv)
+        {
+            // once move is found with a score between alph and beta, search the rest of the moves to prove they are all bad
+            score = -negamax(-new_alpha -1, -new_alpha, depth -1);
+            //if algorithm finds a move that is better in its search, search again in the normal alpha-beta manner
+            if ((score > new_alpha) && (score < beta))
+                score = -negamax(-beta, -new_alpha, depth - 1);
+        }
+
+        else    // for all other types of nodes do normal alpha beta search
+            score = -negamax(-beta, -new_alpha, depth-1);
         take_back();
         --ply;
 
@@ -484,6 +492,9 @@ int negamax(const int alpha, const int beta, int depth)
             new_alpha = score;
             if (ply == 0) best_sofar = move;
 
+            // enable found PV flag
+            found_pv = 1;
+            
             // update pv table and length
             pv_table[ply][ply] = move;
             for (int next_ply = ply+1; next_ply < pv_length[ply+1]; ++next_ply)     // copy next row
@@ -558,7 +569,6 @@ void search_position(const int max_depth)
     int best_score = 0;
     for (int depth = 1; depth <= max_depth; ++depth) 
     {
-        neg_nodes = 0;
         follow_pv = 1;
         // find best move within a given position
         int score = negamax(-50000, 50000, depth);

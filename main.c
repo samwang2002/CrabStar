@@ -22,12 +22,12 @@ int main()
 
     int debug = 1;
     if (debug) {
-        parse_fen(tricky_position);
+        parse_fen(cmk_position);
         print_board();
         #ifndef WIN_64
             setlocale(LC_NUMERIC, "");
         #endif
-        search_position(3);
+        search_position(6);
 
         // move_list moves;
         // generate_moves(&moves);
