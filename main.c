@@ -20,7 +20,7 @@ int main()
 {
     init_attacks();
 
-    int debug = 0;
+    int debug = 1;
     if (debug) {
         parse_fen(tricky_position);
         print_board();

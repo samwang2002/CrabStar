@@ -608,13 +608,24 @@ void search_position(const int max_depth)
     memset(pv_table, 0, sizeof(pv_table));
     memset(pv_length, 0, sizeof(pv_length));
 
+    //define intial alpha and beta bounds
+    int alpha = -50000;
+    int beta = 50000;
     // iteratively deepen analysis
     int best_score = 0;
     for (int depth = 1; depth <= max_depth; ++depth) 
     {
         follow_pv = 1;
         // find best move within a given position
-        int score = negamax(-50000, 50000, depth);
+        int score = negamax(alpha, beta, depth);
+        // we fell outide the window, so try again with a full-wdth window
+        if ((score <= alpha) || (score >= beta)) {
+            alpha = -50000;
+            beta = 50000;
+            continue;
+        }
+        alpha = score - 50;
+        beta = score + 50;
         if (best_move) {
             // basic info
             printf("info score cp %d depth %d nodes %d", score, depth, neg_nodes);
