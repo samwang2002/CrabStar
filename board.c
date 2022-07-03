@@ -624,7 +624,7 @@ void search_position(const int max_depth)
     }
             // best move
             printf("bestmove ");
-            print_move(best_move);
+            print_move(pv_table[0][0]);
             printf("\n");
         //} else
         //    printf("no best move found\n");
