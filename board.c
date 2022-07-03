@@ -596,12 +596,12 @@ void search_position(const int max_depth)
     int alpha = -50000;
     int beta = 50000;
     // iteratively deepen analysis
-    int best_score = 0;
+    int score = 0;
     for (int depth = 1; depth <= max_depth; ++depth) 
     {
         follow_pv = 1;
         // find best move within a given position
-        int score = negamax(alpha, beta, depth);
+        score = negamax(alpha, beta, depth);
         // we fell outide the window, so try again with a full-wdth window
         if ((score <= alpha) || (score >= beta)) {
             alpha = -50000;
@@ -610,7 +610,7 @@ void search_position(const int max_depth)
         }
         alpha = score - 50;
         beta = score + 50;
-        if (best_move) {
+        //if (best_move) {
             // basic info
             printf("info score cp %d depth %d nodes %d", score, depth, neg_nodes);
 
@@ -621,14 +621,14 @@ void search_position(const int max_depth)
                 print_move(pv_table[0][i]);
             }
             printf("\n");
-
+    }
             // best move
             printf("bestmove ");
             print_move(best_move);
             printf("\n");
-        } else
-            printf("no best move found\n");
-    }
+        //} else
+        //    printf("no best move found\n");
+    //}
 }
 
 // enable PV move scoring
