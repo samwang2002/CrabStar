@@ -393,7 +393,7 @@ int evaluate()
                 case N: score += knight_score[square]; break;
                 case B: score += bishop_score[square]; break;
                 case R: score += rook_score[square]; break;
-                //case Q: score += (rook_score[square] + bishop_score[square]); break;
+                case Q: score += (rook_score[square] + bishop_score[square]); break;
                 case K: score += king_score[square]; break;
 
                 //evaulate black pieces
@@ -401,7 +401,7 @@ int evaluate()
                 case n: score -= knight_score[mirror_score[square]]; break;
                 case b: score -= bishop_score[mirror_score[square]]; break;
                 case r: score -= rook_score[mirror_score[square]]; break;
-                //case q: score -= (rook_score[mirror_score[square]] + bishop_score[mirror_score[square]]); break;
+                case q: score -= (rook_score[mirror_score[square]] + bishop_score[mirror_score[square]]); break;
                 case k: score -= king_score[mirror_score[square]]; break;
             }
 
