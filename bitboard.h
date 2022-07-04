@@ -28,6 +28,16 @@ void print_bitboard(const U64 bitboard);
 // initializes bitboard using index to describe which bits in attack mask are set
 U64 set_occupancy(const int index, const int masked_bits, U64 attack_mask);
 
+// generate a random 64-bit number
+U64 get_random_U64_number();
+
+// generate a random 32-bit number
+unsigned int get_random_U32_number();
+//---------------------random number state ----------------------------------
+
+// pseudo random number state
+static unsigned int random_state = 1804289383;
+
 /* ------------------------------- constants ------------------------------- */
 // board squares
 enum {

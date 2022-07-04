@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "perft.h"
 #include "timecontrol.h"
+#include "hash.h"
 
 #include "pawn.h"
 #include "knight.h"
@@ -19,7 +20,7 @@
 
 int main()
 {
-    init_attacks();
+    init_all();
 
     parse_fen("8/8/8/8/31b3/8/6P1/8 w - - 0 1");
     print_board();
