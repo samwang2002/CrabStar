@@ -374,36 +374,85 @@ int evaluate()
                 case P:
                     score += pawn_score[square];
                     doubled_pawns = count_bits(bitboards[P] & file_masks[square]);
-                    if (doubled_pawns > 1)
+                    if (doubled_pawns > 1)                              // doubled
                         score += doubled_pawns * doubled_pen;
-                    if ((bitboards[P] & isolated_masks[square]) == 0)
+                    if ((bitboards[P] & isolated_masks[square]) == 0)   // isolated
                         score += isolated_pen;
-                    if ((passed_masks[white][square] & bitboards[p]) == 0)
+                    if ((passed_masks[white][square] & bitboards[p]) == 0)  // passed
                         score += passed_bonus[get_rank[square]];
                     break;
                 
                 case N: score += knight_score[square]; break;
-                case B: score += bishop_score[square]; break;
-                case R: score += rook_score[square]; break;
-                case Q: score += (rook_score[square] + bishop_score[square]); break;
-                case K: score += king_score[square]; break;
+
+                case B:
+                    score += bishop_score[square];
+                    score += count_bits(get_bishop_attacks(square, occupancies[both])); // mobility bonus
+                    break;
+
+                case R:
+                    score += rook_score[square];
+                    if ((bitboards[P] & file_masks[square]) == 0) {         // semi open file bonus
+                        score += semi_bonus;
+                        if ((bitboards[p] & file_masks[square]) == 0)       // open file bonus
+                            score += open_bonus;
+                    }
+                    break;
+                
+                case Q:
+                    score += rook_score[square] + bishop_score[square];
+                    score += count_bits(get_queen_attacks(square, occupancies[both]));  // mobility bonus
+                    break;
+
+                case K:
+                    score += king_score[square];
+                    if ((bitboards[P] & file_masks[square]) == 0) {         // semi open file penalty
+                        score -= semi_bonus;
+                        if ((bitboards[p] & file_masks[square]) == 0)       // open file penalty
+                            score -= open_bonus;
+                    }
+                    break;
+
 
                 case p:
                     score -= pawn_score[mirror_score[square]];
                     doubled_pawns = count_bits(bitboards[p] & file_masks[square]);
-                    if (doubled_pawns > 1)
+                    if (doubled_pawns > 1)                              // doubled
                         score -= doubled_pawns * doubled_pen;
-                    if ((bitboards[p] & isolated_masks[square]) == 0)
+                    if ((bitboards[p] & isolated_masks[square]) == 0)   // isolated
                         score -= isolated_pen;
-                    if ((passed_masks[black][square] & bitboards[P]) == 0)
+                    if ((passed_masks[black][square] & bitboards[P]) == 0)  // passed
                         score -= passed_bonus[get_rank[mirror_score[square]]];
                     break;
                 
                 case n: score -= knight_score[mirror_score[square]]; break;
-                case b: score -= bishop_score[mirror_score[square]]; break;
-                case r: score -= rook_score[mirror_score[square]]; break;
-                case q: score -= (rook_score[mirror_score[square]] + bishop_score[mirror_score[square]]); break;
-                case k: score -= king_score[mirror_score[square]]; break;
+
+                case b:
+                    score -= bishop_score[mirror_score[square]];
+                    score -= count_bits(get_bishop_attacks(square, occupancies[both])); // mobility bonus
+                    break;
+
+                case r:
+                    score -= rook_score[mirror_score[square]];
+                    if ((bitboards[p] & file_masks[square]) == 0) {         // semi open file bonus
+                        score -= semi_bonus;
+                        if ((bitboards[P] & file_masks[square]) == 0)       // open file bonus
+                            score -= open_bonus;
+                    }
+                    break;
+                
+                case q:
+                    score -= rook_score[mirror_score[square]] + bishop_score[mirror_score[square]];
+                    score -= count_bits(get_queen_attacks(square, occupancies[both]));  // mobility bonus
+                    break;
+
+                case k:
+                    score -= king_score[mirror_score[square]];
+                    if ((bitboards[p] & file_masks[square]) == 0) {         // semi open file penalty
+                        score += semi_bonus;
+                        if ((bitboards[P] & file_masks[square]) == 0)       // open file penalty
+                            score += open_bonus;
+                    }
+                    break;
             }
             pop_bit(bitboard, square);
         }

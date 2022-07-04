@@ -21,7 +21,7 @@ int main()
 {
     init_attacks();
 
-    parse_fen("8/p6P/8/8/8/8/8/8 w - - 0 1");
+    parse_fen("8/8/8/8/31b3/8/6P1/8 w - - 0 1");
     print_board();
     printf("evaluation: %d cp\n", evaluate());
 

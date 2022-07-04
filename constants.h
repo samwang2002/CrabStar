@@ -491,10 +491,18 @@ static const int get_rank[64] = {
     0, 0, 0, 0, 0, 0, 0, 0
 };
 
-// pawn structure constants
+// -- positional advantages and disadvantages --
+// penalty for each doubled pawn
 static const int doubled_pen = -10;
+// penalty for each isolated pawn
 static const int isolated_pen = -10;
+// bonus for passed pawns on different ranks
 static const int passed_bonus[8] = {0, 5, 10, 20, 35, 60, 100, 200};
+
+// bonus for rook on semi-open file, penalty for king
+static const int semi_bonus = 10;
+// bonus for rook on open file, penalty for king
+static const int open_bonus = 15;
 
 // mirror positional score tables for opposite side
 static const int mirror_score[128] =
