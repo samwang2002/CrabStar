@@ -412,6 +412,7 @@ int evaluate()
                         if ((bitboards[p] & file_masks[square]) == 0)       // open file penalty
                             score -= open_bonus;
                     }
+                    score += shield_bonus * count_bits(king_attacks[square] & occupancies[white]);  // shield
                     break;
 
 
@@ -454,6 +455,7 @@ int evaluate()
                         if ((bitboards[P] & file_masks[square]) == 0)       // open file penalty
                             score += open_bonus;
                     }
+                    score -= shield_bonus * count_bits(king_attacks[square] & occupancies[black]);  // shield
                     break;
             }
             pop_bit(bitboard, square);

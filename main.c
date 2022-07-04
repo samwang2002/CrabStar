@@ -22,7 +22,7 @@ int main()
 {
     init_all();
 
-    parse_fen("8/8/8/8/31b3/8/6P1/8 w - - 0 1");
+    parse_fen("6k1/p5p1/8/8/8/8/6PP/6K1 w - - 0 1");
     print_board();
     printf("evaluation: %d cp\n", evaluate());
 

@@ -503,6 +503,8 @@ static const int passed_bonus[8] = {0, 5, 10, 20, 35, 60, 100, 200};
 static const int semi_bonus = 10;
 // bonus for rook on open file, penalty for king
 static const int open_bonus = 15;
+// bonus for each place within 1 square of king
+static const int shield_bonus = 5;
 
 // mirror positional score tables for opposite side
 static const int mirror_score[128] =
