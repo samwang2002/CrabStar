@@ -95,11 +95,11 @@ void parse_go(const char *command)
     // match UCI "wtime" command
     if ((argument = strstr(command,"wtime")) && side == white)
         // parse white time limit
-        time = atoi(argument + 6);
+        mseconds = atoi(argument + 6);
     // match UCI "btime" command
     if ((argument = strstr(command,"btime")) && side == black)
         // parse black time limit
-        time = atoi(argument + 6);
+        mseconds = atoi(argument + 6);
     // match UCI "movestogo" command
     if ((argument = strstr(command,"movestogo")))
         // parse number of moves to go
@@ -112,7 +112,7 @@ void parse_go(const char *command)
     if(movetime != -1)
     {
         // set time equal to move time
-        time = movetime;
+        mseconds = movetime;
         // set moves to go to 1
         movestogo = 1;
     }
@@ -122,18 +122,18 @@ void parse_go(const char *command)
     depth = depth;
 
     // if time control is available
-    if(time != -1)
+    if(mseconds != -1)
     {
         // flag we're playing with time control
         timeset = 1;
         // set up timing
-        time /= movestogo;
-        time -= 50;
-        stoptime = starttime + time + inc;
+        mseconds /= movestogo;
+        mseconds -= 50;
+        stoptime = starttime + mseconds + inc;
     }
     // print debug info
     printf("time:%d start:%d stop:%d depth:%d timeset:%d\n",
-    time, starttime, stoptime, depth, timeset);
+    mseconds, starttime, stoptime, depth, timeset);
 
     if(depth == -1) depth = 10; // depth is not available
     search_position(depth);

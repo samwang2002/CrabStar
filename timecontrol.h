@@ -13,7 +13,7 @@ extern int movestogo;
 extern int movetime;
 
 // UCI "time" command holder (ms)
-extern int time;
+extern int mseconds;
 
 // UCI "inc" command's time increment holder
 extern int inc;
