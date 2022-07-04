@@ -139,7 +139,7 @@ static const int king_score[64] =
      0,   0,   5,   0, -15,   0,  10,   0
 };
 
-// rank and file masks [square], 64 elements so faster lookup
+// file masks [square]
 static const U64 file_masks[64] = {
     0x101010101010101ULL,
     0x202020202020202ULL,
@@ -207,6 +207,7 @@ static const U64 file_masks[64] = {
     0x8080808080808080ULL
 };
 
+// rank masks [square]
 static const U64 rank_masks[64] = {
     0xffULL,
     0xffULL,
@@ -477,6 +478,23 @@ static const U64 passed_masks[2][64] = {
         0x0ULL
     }
 };
+
+// extracts rank from a square [square]
+static const int get_rank[64] = {
+    7, 7, 7, 7, 7, 7, 7, 7,
+    6, 6, 6, 6, 6, 6, 6, 6,
+    5, 5, 5, 5, 5, 5, 5, 5,
+    4, 4, 4, 4, 4, 4, 4, 4,
+    3, 3, 3, 3, 3, 3, 3, 3,
+    2, 2, 2, 2, 2, 2, 2, 2,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    0, 0, 0, 0, 0, 0, 0, 0
+};
+
+// pawn structure constants
+static const int doubled_pen = -10;
+static const int isolated_pen = -10;
+static const int passed_bonus[8] = {0, 5, 10, 20, 35, 60, 100, 200};
 
 // mirror positional score tables for opposite side
 static const int mirror_score[128] =

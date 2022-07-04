@@ -358,60 +358,56 @@ void sort_moves(move_list *moves)
 // evaulate the current board position
 int evaluate()
 {
-    //static evaluation score
     int score = 0;
 
-    // current pieces bitboard copy
-    U64 bitboard;
-
-    // initialize piece and square
-    int piece, square;
-
     // loop over piece bitboards
-    for (int bb_piece = P; bb_piece<= k; bb_piece++)
-    {
-        // init piece bitboard copy
-        bitboard = bitboards[bb_piece];
-
-
-        // loop over pieces within a bitboard
-        while (bitboard)
-        {
-            // init piece
-            piece = bb_piece;  
-
-            // init square
-            square = ls1b(bitboard);
-            
-            // score material weights
+    for (int bb_piece = P; bb_piece<= k; bb_piece++) {
+        U64 bitboard = bitboards[bb_piece];
+        while (bitboard) {
+            int piece = bb_piece;
+            int square = ls1b(bitboard);
+            int doubled_pawns = 0;
             score += material_score[piece];
 
             // score positional piece scores
-            switch (piece)
-            {
-                //evaluate white pieces
-                case P: score += pawn_score[square]; break;
+            switch (piece) {
+                case P:
+                    score += pawn_score[square];
+                    doubled_pawns = count_bits(bitboards[P] & file_masks[square]);
+                    if (doubled_pawns > 1)
+                        score += doubled_pawns * doubled_pen;
+                    if ((bitboards[P] & isolated_masks[square]) == 0)
+                        score += isolated_pen;
+                    if ((passed_masks[white][square] & bitboards[p]) == 0)
+                        score += passed_bonus[get_rank[square]];
+                    break;
+                
                 case N: score += knight_score[square]; break;
                 case B: score += bishop_score[square]; break;
                 case R: score += rook_score[square]; break;
                 case Q: score += (rook_score[square] + bishop_score[square]); break;
                 case K: score += king_score[square]; break;
 
-                //evaulate black pieces
-                case p: score -= pawn_score[mirror_score[square]]; break;
+                case p:
+                    score -= pawn_score[mirror_score[square]];
+                    doubled_pawns = count_bits(bitboards[p] & file_masks[square]);
+                    if (doubled_pawns > 1)
+                        score -= doubled_pawns * doubled_pen;
+                    if ((bitboards[p] & isolated_masks[square]) == 0)
+                        score -= isolated_pen;
+                    if ((passed_masks[black][square] & bitboards[P]) == 0)
+                        score -= passed_bonus[get_rank[mirror_score[square]]];
+                    break;
+                
                 case n: score -= knight_score[mirror_score[square]]; break;
                 case b: score -= bishop_score[mirror_score[square]]; break;
                 case r: score -= rook_score[mirror_score[square]]; break;
                 case q: score -= (rook_score[mirror_score[square]] + bishop_score[mirror_score[square]]); break;
                 case k: score -= king_score[mirror_score[square]]; break;
             }
-
-            // pop ls1b
             pop_bit(bitboard, square);
         }
     }
-
-    // return final evaluation based on side
     return (side == white) ? score : -score;
 }
 
