@@ -503,6 +503,8 @@ static const int passed_bonus[8] = {0, 5, 10, 20, 35, 60, 100, 200};
 static const int semi_bonus = 10;
 // bonus for rook on open file, penalty for king
 static const int open_bonus = 15;
+// bonus for each square bishops and queens can access (personal guess)
+static const int mobility_bonus = 2;
 // bonus for each place within 1 square of king
 static const int shield_bonus = 5;
 

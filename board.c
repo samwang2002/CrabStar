@@ -388,7 +388,8 @@ int evaluate()
 
                 case B:
                     score += bishop_score[square];
-                    score += count_bits(get_bishop_attacks(square, occupancies[both])); // mobility bonus
+                    score += mobility_bonus *
+                             count_bits(get_bishop_attacks(square, occupancies[both])); // mobility bonus
                     break;
 
                 case R:
@@ -402,7 +403,8 @@ int evaluate()
                 
                 case Q:
                     score += rook_score[square] + bishop_score[square];
-                    score += count_bits(get_queen_attacks(square, occupancies[both]));  // mobility bonus
+                    score += mobility_bonus *
+                             count_bits(get_queen_attacks(square, occupancies[both]));  // mobility bonus
                     break;
 
                 case K:
@@ -431,7 +433,8 @@ int evaluate()
 
                 case b:
                     score -= bishop_score[mirror_score[square]];
-                    score -= count_bits(get_bishop_attacks(square, occupancies[both])); // mobility bonus
+                    score -= mobility_bonus *
+                             count_bits(get_bishop_attacks(square, occupancies[both])); // mobility bonus
                     break;
 
                 case r:
@@ -445,7 +448,8 @@ int evaluate()
                 
                 case q:
                     score -= rook_score[mirror_score[square]] + bishop_score[mirror_score[square]];
-                    score -= count_bits(get_queen_attacks(square, occupancies[both]));  // mobility bonus
+                    score -= mobility_bonus *
+                             count_bits(get_queen_attacks(square, occupancies[both]));  // mobility bonus
                     break;
 
                 case k:
