@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "perft.h"
 #include "timecontrol.h"
+#include "hash.h"
 
 #include "pawn.h"
 #include "knight.h"
@@ -19,16 +20,18 @@
 
 int main()
 {
-    init_attacks();
+    init_all();
 
-    int debug = 0;
+    int debug = 1;
     if (debug) {
-        parse_fen("8/5pk1/3Rp1p1/2p1P1Pp/2P1P2P/R7/3r4/5bK1 b - - 0 38");
+        parse_fen(tricky_position);
         print_board();
         #ifndef WIN_64
             setlocale(LC_NUMERIC, "");
         #endif
-        search_position(7);
+        //search_position(7);
+
+        init_random_keys();
 
         // move_list moves;
         // generate_moves(&moves);

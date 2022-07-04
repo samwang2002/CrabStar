@@ -34,8 +34,8 @@
 // print state of board
 void print_board();
 
-// initialize all attack tables
-void init_attacks();
+// initialize all tables
+void init_all();
 
 // initialize position from FEN string
 void parse_fen(const char *fen);

@@ -6,6 +6,7 @@
 #include "bitboard.h"
 #include "constants.h"
 #include "timecontrol.h"
+#include "hash.h"
 
 #include "pawn.h"
 #include "knight.h"
@@ -66,13 +67,14 @@ void print_board()
 }
 
 // initialize all attacks
-void init_attacks()
+void init_all()
 {
     init_pawn_attacks();
     init_knight_attacks();
     init_king_attacks();
     init_bishop_attacks();
     init_rook_attacks();
+    init_random_keys();
 }
 
 // parse fen from string
