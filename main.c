@@ -21,13 +21,13 @@ int main()
 {
     init_attacks();
 
-    int debug = 0;
+    print_bitboard(passed_masks[white][a5]);
+    print_bitboard(passed_masks[black][a5]);
+
+    int debug = 1;
     if (debug) {
         parse_fen("8/5pk1/3Rp1p1/2p1P1Pp/2P1P2P/R7/3r4/5bK1 b - - 0 38");
         print_board();
-        #ifndef WIN_64
-            setlocale(LC_NUMERIC, "");
-        #endif
         search_position(7);
 
         // move_list moves;
