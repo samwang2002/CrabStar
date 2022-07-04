@@ -8,6 +8,7 @@
 #include "move.h"
 #include "constants.h"
 #include "perft.h"
+#include "timecontrol.h"
 
 #include "pawn.h"
 #include "knight.h"

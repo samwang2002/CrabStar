@@ -2,6 +2,7 @@
 #include "move.h"
 #include "board.h"
 #include "constants.h"
+#include "timecontrol.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -79,11 +80,62 @@ void parse_position(const char *command)
 void parse_go(const char *command)
 {
     int depth = -1;
-    const char *curr_depth = NULL;
-    if ((curr_depth = strstr(command, "depth")))
-        depth = atoi(curr_depth + 6);
-    else
-        depth = 6;          // defualt depth
+    const char *argument = NULL;
+    if ((argument = strstr(command, "depth"))) // depth command
+        depth = atoi(argument + 6);
+    if ((argument = strstr(command, "infinite"))) {} // infinite search
+    // match UCI "binc" command
+    if ((argument = strstr(command, "binc")) && side == black)
+        //parse white time increment 
+        inc = atoi(argument + 5);
+     // match UCI "winc" command
+    if ((argument = strstr(command,"winc")) && side == white)
+        // parse white time increment
+        inc = atoi(argument + 5);
+    // match UCI "wtime" command
+    if ((argument = strstr(command,"wtime")) && side == white)
+        // parse white time limit
+        time = atoi(argument + 6);
+    // match UCI "btime" command
+    if ((argument = strstr(command,"btime")) && side == black)
+        // parse black time limit
+        time = atoi(argument + 6);
+    // match UCI "movestogo" command
+    if ((argument = strstr(command,"movestogo")))
+        // parse number of moves to go
+        movestogo = atoi(argument + 10);
+    // match UCI "movetime" command
+    if ((argument = strstr(command,"movetime")))
+        // parse amount of time allowed to spend to make a move
+        movetime = atoi(argument + 9);
+    // if move time is not available
+    if(movetime != -1)
+    {
+        // set time equal to move time
+        time = movetime;
+        // set moves to go to 1
+        movestogo = 1;
+    }
+    // init start time
+    starttime = get_time_ms();
+    // init search depth
+    depth = depth;
+
+    // if time control is available
+    if(time != -1)
+    {
+        // flag we're playing with time control
+        timeset = 1;
+        // set up timing
+        time /= movestogo;
+        time -= 50;
+        stoptime = starttime + time + inc;
+    }
+    // print debug info
+    printf("time:%d start:%d stop:%d depth:%d timeset:%d\n",
+    time, starttime, stoptime, depth, timeset);
+
+    if(depth == -1) depth = 10; // depth is not available
     search_position(depth);
 }
 

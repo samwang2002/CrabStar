@@ -5,6 +5,7 @@
 #include "move.h"
 #include "bitboard.h"
 #include "constants.h"
+#include "timecontrol.h"
 
 #include "pawn.h"
 #include "knight.h"
@@ -422,6 +423,9 @@ int evaluate()
 int negamax(const int alpha, const int beta, int depth)
 {
 
+    // every 2047 communicate with gui/user input
+    if (!(neg_nodes & 2047))
+        communicate();
     // initialize pv length
     pv_length[ply] = ply;
 
@@ -455,6 +459,8 @@ int negamax(const int alpha, const int beta, int depth)
         int score = -negamax(-beta, -beta + 1, depth -1 -2);
         //restore board state
         take_back();
+        // if time is up return 0
+        if (stopped) return 0;
         // fail-hard beta cutoff
         if (score >= beta)
             //move fails high
@@ -505,6 +511,7 @@ int negamax(const int alpha, const int beta, int depth)
 
         take_back();
         --ply;
+        if (stopped) return 0; // if time is up
         ++moves_searched;
 
         // move failed hard beta cutoff
@@ -547,6 +554,11 @@ int negamax(const int alpha, const int beta, int depth)
 // quiescence search, see negamax code for better documentation
 int quiescence(const int alpha, const int beta)
 {
+    // every 2047 nodes
+    if (!(neg_nodes & 2047))
+        // listen to gui/user input
+        communicate();
+
     ++neg_nodes;
     int evaluation = evaluate();
 
@@ -573,6 +585,7 @@ int quiescence(const int alpha, const int beta)
 
         --ply;
         take_back();
+        if (stopped) return 0; //time is up
         if (score >= beta) return beta;
         if (score > new_alpha) new_alpha = score;
     }
@@ -587,6 +600,7 @@ void search_position(const int max_depth)
     neg_nodes = 0;
     follow_pv = 0;
     score_pv = 0;
+    stopped = 0;
     memset(killer_moves, 0, sizeof(killer_moves));
     memset(history_moves, 0, sizeof(history_moves));
     memset(pv_table, 0, sizeof(pv_table));
@@ -599,6 +613,7 @@ void search_position(const int max_depth)
     int score = 0;
     for (int depth = 1; depth <= max_depth; ++depth) 
     {
+        if (stopped) break; //time is up
         follow_pv = 1;
         // find best move within a given position
         score = negamax(alpha, beta, depth);
