@@ -2,7 +2,7 @@
 #include "stdio.h"
 #include "perft.h"
 #include <unistd.h>
-#include <winsock2.h>
+#include <string.h>
 #ifdef WIN64
     #include <windows.h>
     #include <winsock2.h>
@@ -15,7 +15,7 @@
 int quit = 0;
 int movestogo = 30;
 int movetime = -1;
-int time = -1;
+int mseconds = -1;
 int inc = 0;
 int starttime = 0;
 int stoptime = 0;
