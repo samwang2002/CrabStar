@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include <string.h>
 #ifdef WIN64
-    #include <windows.h>
     #include <winsock2.h>
+    #include <windows.h>
 #else
     #include <sys/time.h>
 

@@ -22,12 +22,15 @@ int main()
 {
     init_all();
 
-    parse_fen("6k1/p5p1/8/8/8/8/6PP/6K1 w - - 0 1");
-    print_board();
-    printf("evaluation: %d cp\n", evaluate());
+    // parse_fen("6k1/p5p1/8/8/8/8/6PP/6K1 w - - 0 1");
+    // print_board();
+    // printf("evaluation: %d cp\n", evaluate());
 
-    // int debug = 1;
-    // if (debug) {
+    int debug = 1;
+    if (debug) {
+        parse_fen(tricky_position);
+        print_board();
+        //printf("hash key: %llx\n", generate_hash_key());
     //     parse_fen("8/5pk1/3Rp1p1/2p1P1Pp/2P1P2P/R7/3r4/5bK1 b - - 0 38");
     //     print_board();
     //     search_position(7);
@@ -43,8 +46,7 @@ int main()
     //     //     print_move(moves.moves[i]);
     //     //     printf(": %d\n", score_move(moves.moves[i]));
     //     // }
-    // } else
-    //     uci_loop();
-
+    } else
+         uci_loop();
     return 0;
 }

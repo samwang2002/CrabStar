@@ -64,6 +64,8 @@ void print_board()
     printf("     Enpass:      %s\n", (enpassant != no_sq) ? square_to_coordinates[enpassant] : "no");
     printf("     Castling:  %c%c%c%c\n\n", (castle & wk) ? 'K' : '-', (castle & wq) ? 'Q' : '-',
            (castle & bk) ? 'k' : '-', (castle & bq) ? 'q' : '-');
+    // print hash key
+    printf("     Hash key:  %llx\n", hash_key);
 }
 
 // initialize all attacks
@@ -131,6 +133,9 @@ void parse_fen(const char *fen)
     for (int piece = P; piece <= K; ++piece) occupancies[white] |= bitboards[piece];
     for (int piece = p; piece <= k; ++piece) occupancies[black] |= bitboards[piece];
     occupancies[both] |= occupancies[white] | occupancies[black];
+
+    // initialize hash key
+    hash_key = generate_hash_key();
 }
 
 // get whether square is currently attacked by given side
