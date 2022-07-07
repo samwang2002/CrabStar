@@ -10,6 +10,7 @@
 #include "perft.h"
 #include "timecontrol.h"
 #include "hash.h"
+#include "process.h"
 
 #include "pawn.h"
 #include "knight.h"
@@ -21,32 +22,7 @@
 int main()
 {
     init_all();
+    process_data("data_uci.pgn", "stockfish.csv");
 
-    // parse_fen("6k1/p5p1/8/8/8/8/6PP/6K1 w - - 0 1");
-    // print_board();
-    // printf("evaluation: %d cp\n", evaluate());
-
-    int debug = 1;
-    if (debug) {
-        parse_fen(tricky_position);
-        print_board();
-        //printf("hash key: %llx\n", generate_hash_key());
-    //     parse_fen("8/5pk1/3Rp1p1/2p1P1Pp/2P1P2P/R7/3r4/5bK1 b - - 0 38");
-    //     print_board();
-    //     search_position(7);
-
-    //     // move_list moves;
-    //     // generate_moves(&moves);
-    //     // killer_moves[0][ply] = moves.moves[0];
-    //     // killer_moves[1][ply] = moves.moves[2];
-    //     // history_moves[P][a4] = 30;
-    //     // sort_moves(&moves);
-
-    //     // for (int i = 0; i < moves.count; ++i) {
-    //     //     print_move(moves.moves[i]);
-    //     //     printf(": %d\n", score_move(moves.moves[i]));
-    //     // }
-    } else
-         uci_loop();
     return 0;
 }
