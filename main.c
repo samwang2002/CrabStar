@@ -28,8 +28,9 @@ int main()
 
     int debug = 1;
     if (debug) {
-        parse_fen(tricky_position);
+        parse_fen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ");
         print_board();
+        perft_test(2);
         //printf("hash key: %llx\n", generate_hash_key());
     //     parse_fen("8/5pk1/3Rp1p1/2p1P1Pp/2P1P2P/R7/3r4/5bK1 b - - 0 38");
     //     print_board();

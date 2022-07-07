@@ -3,6 +3,12 @@
 #include "constants.h"
 #include "board.h"
 
+U64 piece_keys[12][64];
+U64 enpassant_keys[64];
+U64 castle_keys[16];
+U64 side_key;
+U64 hash_key;
+
 // initialize random hash keys
 void init_random_keys()
 {

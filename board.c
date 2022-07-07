@@ -213,26 +213,39 @@ int make_move(const int move, const int move_flag)
         pop_bit(bitboards[piece], source);
         pop_bit(occupancies[side], source);
         pop_bit(occupancies[both], source);
+        hash_key ^= piece_keys[piece][source];
 
         // clear target square
         if (capture) {
             if (side == white) {
-                for (int i = p; i <= k; ++i)
-                    pop_bit(bitboards[i], target);
+                for (int i = p; i <= k; ++i){
+                    if (get_bit(bitboards[i], target)){
+                        pop_bit(bitboards[i], target);
+                        hash_key ^= piece_keys[i][target];
+                    }
+                }
                 pop_bit(occupancies[black], target);
             } else {
-                for (int i = P; i <= K; ++i)
-                    pop_bit(bitboards[i], target);
+                for (int i = P; i <= K; ++i){
+                    if (get_bit(bitboards[i], target)) {
+                        pop_bit(bitboards[i], target);
+                        hash_key ^= piece_keys[i][target];
+                    }
+                }
                 pop_bit(occupancies[white], target);
             }
             // don't need to clear occupancy for both colors on target square
         }
 
         // place piece on target square
-        if (promoted_piece)
+        if (promoted_piece) {
             set_bit(bitboards[promoted_piece], target);
-        else
+            hash_key ^= piece_keys[promoted_piece][target];
+        }
+        else {
             set_bit(bitboards[piece], target);
+            hash_key ^= piece_keys[piece][target];
+        }
         set_bit(occupancies[side], target);
         set_bit(occupancies[both], target);
 
@@ -242,10 +255,12 @@ int make_move(const int move, const int move_flag)
                 pop_bit(bitboards[p], target+8);
                 pop_bit(occupancies[black], target+8);
                 pop_bit(occupancies[both], target+8);
+                hash_key ^= piece_keys[p][target+8];
             } else {
                 pop_bit(bitboards[P], target-8);
                 pop_bit(occupancies[white], target-8);
                 pop_bit(occupancies[both], target-8);
+                hash_key ^= piece_keys[P][target-8];
             }
         }
         enpassant = no_sq;
@@ -258,9 +273,10 @@ int make_move(const int move, const int move_flag)
 
         // -- update state variables --
         // handle double pawn pushes
-        if (double_push)
+        if (double_push) {
             enpassant = target + ((side==white) ? 8 : -8);
-        
+            hash_key ^= enpassant_keys[target + ((side == white) ? 8 : -8)];   
+        }
         // handle castling
         if (castling) {
             switch (target) {
@@ -271,6 +287,8 @@ int make_move(const int move, const int move_flag)
                     set_bit(bitboards[R], f1);
                     set_bit(occupancies[white], f1);
                     set_bit(occupancies[both], f1);
+                    hash_key ^= piece_keys[R][h1];
+                    hash_key ^= piece_keys[R][f1];
                     break;
                 case c1:
                     pop_bit(bitboards[R], a1);
@@ -279,6 +297,8 @@ int make_move(const int move, const int move_flag)
                     set_bit(bitboards[R], d1);
                     set_bit(occupancies[white], d1);
                     set_bit(occupancies[both], d1);
+                    hash_key ^= piece_keys[R][a1];
+                    hash_key ^= piece_keys[R][d1];
                     break;
                 case g8:
                     pop_bit(bitboards[r], h8);
@@ -287,6 +307,8 @@ int make_move(const int move, const int move_flag)
                     set_bit(bitboards[r], f8);
                     set_bit(occupancies[black], f8);
                     set_bit(occupancies[both], f8);
+                    hash_key ^= piece_keys[r][h8];
+                    hash_key ^= piece_keys[r][f8];
                     break;
                 case c8:
                     pop_bit(bitboards[r], a8);
@@ -295,16 +317,20 @@ int make_move(const int move, const int move_flag)
                     set_bit(bitboards[r], d8);
                     set_bit(occupancies[black], d8);
                     set_bit(occupancies[both], d8);
+                    hash_key ^= piece_keys[r][a8];
+                    hash_key ^= piece_keys[r][d8];
                     break;
             }
         }
 
+        hash_key ^= castle_keys[castle];
         // update castling rights
         castle &= castling_rights[source] & castling_rights[target];
+        hash_key ^= castle_keys[castle];
 
         // flip side
         side ^= 1;
-
+        hash_key ^= side_key;
         return 1;
     } else          // quiet move, ignore because flag asks only for captures
         return 0;

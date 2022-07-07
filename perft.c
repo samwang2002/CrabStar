@@ -9,6 +9,7 @@
 #include "move.h"
 #include "board.h"
 #include "constants.h"
+#include "hash.h"
 
 // get current time in ms
 int get_time_ms()
@@ -64,7 +65,8 @@ void perft_driver(const int depth, const int last_move)
         if (!make_move(current_move, all_moves))
             // skip to the next move
             continue;
-        
+
+
         // call perft driver recursively
         perft_driver(depth - 1, current_move);
         
