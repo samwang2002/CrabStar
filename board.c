@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include "board.h"
 #include "move.h"
 #include "bitboard.h"
@@ -708,7 +709,7 @@ void search_position(const int max_depth)
 void enable_pv_scoring(move_list *moves)
 {
     //disable following PV
-    follow_pv =0;
+    follow_pv = 0;
     // loop over the moves within a move list
     for (int i = 0; i < moves->count; ++i){
         // make sure we hit PV move
@@ -720,4 +721,37 @@ void enable_pv_scoring(move_list *moves)
             follow_pv = 1;
         }
     }
+}
+
+// encode position for neural network
+// nodes 0-383: player to move's bitboards
+// nodes 384-767: enemy's bitboards
+// nodes 768-831: enpassant square
+// nodes 832-1023: castling rights (48 bits for each option)
+char *encode_position()
+{
+    char *encoding = malloc(input_nodes);
+    memset(encoding, 0, 832);
+
+    // encode bitboards
+    for (int piece = 0; piece < 12; ++piece) {
+        U64 bitboard = bitboards[(side == white) ? piece : (piece+6)%12];
+        while (bitboard) {
+            int loc = ls1b(bitboard);
+            encoding[64*piece + ((side == white) ? loc : 63-loc)] = 1;
+            pop_bit(bitboard, loc);
+        }
+    }
+
+    // encode en passant square
+    if (enpassant != no_sq)
+        encoding[64*12 + ((side == white) ? enpassant : 63-enpassant)] = 1;
+    
+    // encode castling rights
+    memset(encoding+832, castle&wk, 48);
+    memset(encoding+880, (castle&wq)>>1, 48);
+    memset(encoding+928, (castle&bk)>>2, 48);
+    memset(encoding+976, (castle&bq)>>3, 48);
+
+    return encoding;
 }

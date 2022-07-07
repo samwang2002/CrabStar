@@ -6,6 +6,7 @@
 #include <string.h>
 
 #define max_ply 64
+#define input_nodes 1024
 
 // FEN debug positions
 #define empty_board "8/8/8/8/8/8/8/8 w - - "
@@ -72,6 +73,9 @@ void search_position(const int depth);
 
 // enable PV mopve scoring
 void enable_pv_scoring(move_list *moves);
+
+// encode position for neural network
+char *encode_position();
 
 /* ------------------------------- variables ------------------------------- */
 // bitboards

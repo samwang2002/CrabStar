@@ -22,7 +22,26 @@
 int main()
 {
     init_all();
-    process_data("data_uci.pgn", "stockfish.csv");
+    // process_data("data_uci.pgn", "stockfish.csv");
+
+    parse_fen(cmk_position);
+    // side = black;
+    print_board();
+    char *encoding = encode_position();
+
+    // print encoding as bitboards
+    for (int count = 0; count < 16; ++count) {
+        for (int i = 0; i < 8; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                if (encoding[count*64 + i*8 + j])
+                    printf("%d ", encoding[count*64 + i*8 + j]);
+                else
+                    printf(". ");
+            }
+            printf("\n");
+        }
+        printf("\n");
+    }
 
     return 0;
 }

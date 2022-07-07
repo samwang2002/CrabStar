@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 
 
 // parse move string input
@@ -24,10 +25,10 @@ int parse_move(const char *move_str)
         if (source == get_move_source(move) && target == get_move_target(move)) {
             int prom_piece = get_move_promoted(move);
             if (prom_piece) {
-                if ((prom_piece == Q || prom_piece == q) && move_str[4] == 'q') return move;
-                if ((prom_piece == R || prom_piece == r) && move_str[4] == 'r') return move;
-                if ((prom_piece == B || prom_piece == b) && move_str[4] == 'b') return move;
-                if ((prom_piece == N || prom_piece == n) && move_str[4] == 'n') return move;
+                if ((prom_piece == Q || prom_piece == q) && toupper(move_str[4]) == 'Q') return move;
+                if ((prom_piece == R || prom_piece == r) && toupper(move_str[4]) == 'R') return move;
+                if ((prom_piece == B || prom_piece == b) && toupper(move_str[4]) == 'B') return move;
+                if ((prom_piece == N || prom_piece == n) && toupper(move_str[4]) == 'N') return move;
             } else
                 return move;
         }
