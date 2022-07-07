@@ -118,8 +118,6 @@ void parse_go(const char *command)
     }
     // init start time
     starttime = get_time_ms();
-    // init search depth
-    depth = depth;
 
     // if time control is available
     if(mseconds != -1)
