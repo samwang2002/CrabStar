@@ -6,7 +6,7 @@
 #include <string.h>
 
 #define max_ply 64
-#define input_nodes 1024
+#define input_nodes 1025        // last char is newline
 
 // FEN debug positions
 #define empty_board "8/8/8/8/8/8/8/8 w - - "

@@ -2,17 +2,23 @@
 #include "uci.h"
 #include "move.h"
 #include "board.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-void process_data(const char *pos_url, const char *eval_url)
+void process_data(const char *pos_url, const char *eval_url, const char *out_url)
 {
-    FILE *positions = fopen(pos_url, "r");
-    if (positions == NULL) return;
-    FILE *evaluations = fopen(eval_url, "r");
-    if (evaluations == NULL) return;
+    srand(time(NULL));
+
+    // open files
+    FILE *positions, *evaluations, *output;
+    if ((positions = fopen(pos_url, "r")) == NULL) return;
+    if ((evaluations = fopen(eval_url, "r")) == NULL) return;
+    if ((output = fopen(out_url, "w")) == NULL) return;
+
     char pos_buf[128], eval_buf[128];
+
+    int position_count = 0;
 
     // skip evaluation file header
     fgets(eval_buf, sizeof(eval_buf), evaluations);
@@ -52,13 +58,27 @@ void process_data(const char *pos_url, const char *eval_url)
             eval_buf[char_count] = '\0';
             int eval = atoi(eval_buf);
 
-            // print results
-            if (idx > 49990) {
-                print_move(move);
-                printf(", %d cp\n", eval);
+            // 1/5 chance of writing position to output
+            if (rand()%5 == 0) {
+                write_to_output(output, eval);
+                ++position_count;
             }
         }
-
-        if (idx > 49990) printf("---------------------------------------\n");
     }
+
+    fclose(positions);
+    fclose(evaluations);
+    fclose(output);
+
+    printf("%d positions written to %s\n", position_count, out_url);
+}
+
+// writes current position and evaluation to output file
+void write_to_output(FILE *fp, int evaluation)
+{
+    // fwrite(encode_position(), sizeof(char), input_nodes, fp);
+    char *encoding = encode_position();
+    fputs(encoding, fp);
+    free(encoding);
+    fprintf(fp, " %d\n", evaluation);
 }

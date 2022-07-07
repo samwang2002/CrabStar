@@ -723,7 +723,7 @@ void enable_pv_scoring(move_list *moves)
     }
 }
 
-// encode position for neural network
+// encode position for neural network (1024 total nodes, 1 extra null character)
 // nodes 0-383: player to move's bitboards
 // nodes 384-767: enemy's bitboards
 // nodes 768-831: enpassant square
@@ -731,14 +731,14 @@ void enable_pv_scoring(move_list *moves)
 char *encode_position()
 {
     char *encoding = malloc(input_nodes);
-    memset(encoding, 0, 832);
+    memset(encoding, '0', 832);
 
     // encode bitboards
     for (int piece = 0; piece < 12; ++piece) {
         U64 bitboard = bitboards[(side == white) ? piece : (piece+6)%12];
         while (bitboard) {
             int loc = ls1b(bitboard);
-            encoding[64*piece + ((side == white) ? loc : 63-loc)] = 1;
+            encoding[64*piece + ((side == white) ? loc : 63-loc)] = '1';
             pop_bit(bitboard, loc);
         }
     }
@@ -748,10 +748,13 @@ char *encode_position()
         encoding[64*12 + ((side == white) ? enpassant : 63-enpassant)] = 1;
     
     // encode castling rights
-    memset(encoding+832, castle&wk, 48);
-    memset(encoding+880, (castle&wq)>>1, 48);
-    memset(encoding+928, (castle&bk)>>2, 48);
-    memset(encoding+976, (castle&bq)>>3, 48);
+    memset(encoding+832, (castle&wk) ? '1' : '0', 48);
+    memset(encoding+880, (castle&wq) ? '1' : '0', 48);
+    memset(encoding+928, (castle&bk) ? '1' : '0', 48);
+    memset(encoding+976, (castle&bq) ? '1' : '0', 48);
+
+    // null terminator
+    encoding[input_nodes-1] = '\0';
 
     return encoding;
 }
