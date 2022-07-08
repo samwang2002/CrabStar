@@ -731,7 +731,7 @@ void enable_pv_scoring(move_list *moves)
 char *encode_position()
 {
     char *encoding = malloc(input_nodes);
-    memset(encoding, '0', 832);
+    memset(encoding, '0', input_nodes-1);
 
     // encode bitboards
     for (int piece = 0; piece < 12; ++piece) {
@@ -745,7 +745,7 @@ char *encode_position()
 
     // encode en passant square
     if (enpassant != no_sq)
-        encoding[64*12 + ((side == white) ? enpassant : 63-enpassant)] = 1;
+        encoding[64*12 + ((side == white) ? enpassant : 63-enpassant)] = '1';
     
     // encode castling rights
     memset(encoding+832, (castle&wk) ? '1' : '0', 48);
