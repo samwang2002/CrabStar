@@ -78,3 +78,41 @@ void clear_hash_table()
         hash_table[i].score = 0;
     }
 }
+
+int read_hash_entry(int alpha, int beta, int depth)
+{
+    // create a TT instance pointer
+    tt *hash_entry = &hash_table[hash_key % hash_size];
+
+    //make sure we're dealing with exact position we need
+    if (hash_entry->hash_key == hash_key)
+    {
+        // make sure that we match the exact depth our search is at
+        if (hash_entry->depth >= depth)
+        {
+            // match the exact PV node score
+            if (hash_entry->flag == hash_flag_exact)
+                {printf("exact score: "); return hash_entry->score;}
+            // match alpha (fail-low node) score
+            if (hash_entry->flag == hash_flag_alpha && hash_entry->score <= alpha)
+                {printf("alpha score: "); return alpha;}
+                // match beta (fail-high node) score
+            if (hash_entry->flag == hash_flag_beta && hash_entry->score >= beta)
+                {printf("beta score: "); return beta;}
+        }
+    }
+    return no_hash_entry;
+
+}
+
+void write_hash_entry(int score, int depth, int hash_flag)
+{
+    // create a TT instance pointer to particular hash entry storing
+    tt *hash_entry = &hash_table[hash_key % hash_size];
+
+    // write hash entry data 
+    hash_entry->hash_key = hash_key;
+    hash_entry->score = score;
+    hash_entry->flag = hash_flag;
+    hash_entry->depth = depth;
+}

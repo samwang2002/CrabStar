@@ -8,6 +8,9 @@
 // hash table size
 #define hash_size 0x400000
 
+// no hash entry found constant
+#define no_hash_entry 100000
+
 // tranposition table hash flags
 #define hash_flag_exact 0
 #define hash_flag_alpha 1
@@ -49,4 +52,9 @@ void init_random_keys();
 U64 generate_hash_key();
 
 void clear_hash_table();
+
+int read_hash_entry(int alpha, int beta, int depth);
+
+void write_hash_entry(int score, int depth, int hash_flag);
+
 #endif

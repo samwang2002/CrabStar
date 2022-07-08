@@ -31,6 +31,11 @@ int main()
         parse_fen(start_position);
         print_board();
         clear_hash_table();
+        
+        write_hash_entry(45, 1, hash_flag_beta);
+        int score = read_hash_entry(20, 30, 1);
+
+        printf("%d\n", score);
         //printf("hash key: %llx\n", generate_hash_key());
     //     parse_fen("8/5pk1/3Rp1p1/2p1P1Pp/2P1P2P/R7/3r4/5bK1 b - - 0 38");
     //     print_board();

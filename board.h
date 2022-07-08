@@ -75,6 +75,8 @@ void search_position(const int depth);
 // enable PV mopve scoring
 void enable_pv_scoring(move_list *moves);
 
+int 
+
 /* ------------------------------- variables ------------------------------- */
 // bitboards
 extern U64 bitboards[12];
