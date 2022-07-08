@@ -222,6 +222,7 @@ int make_move(const int move, const int move_flag)
                     if (get_bit(bitboards[i], target)){
                         pop_bit(bitboards[i], target);
                         hash_key ^= piece_keys[i][target];
+                        break;
                     }
                 }
                 pop_bit(occupancies[black], target);
@@ -331,6 +332,7 @@ int make_move(const int move, const int move_flag)
         // flip side
         side ^= 1;
         hash_key ^= side_key;
+
         return 1;
     } else          // quiet move, ignore because flag asks only for captures
         return 0;

@@ -22,6 +22,7 @@
     memcpy(bitboards_copy, bitboards, sizeof(bitboards));               \
     memcpy(occupancies_copy, occupancies, sizeof(occupancies));         \
     side_copy = side, enpassant_copy = enpassant, castle_copy = castle; \
+    U64 hash_key_copy = hash_key;                                       \
 
 
 // restore board state
@@ -29,6 +30,7 @@
     memcpy(bitboards, bitboards_copy, sizeof(bitboards));               \
     memcpy(occupancies, occupancies_copy, sizeof(occupancies));         \
     side = side_copy, enpassant = enpassant_copy, castle = castle_copy; \
+    hash_key = hash_key_copy;                                           \
 
 /* ------------------------------- functions ------------------------------- */
 // print state of board
