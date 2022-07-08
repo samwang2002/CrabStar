@@ -3,6 +3,8 @@
 #include "constants.h"
 #include "board.h"
 
+tt hash_table[hash_size];
+
 U64 piece_keys[12][64];
 U64 enpassant_keys[64];
 U64 castle_keys[16];
@@ -62,4 +64,17 @@ U64 generate_hash_key()
     if (side == black) final_key ^= side_key;
 
     return final_key;
+}
+
+void clear_hash_table()
+{
+    // loop over TT elements
+    for (int i= 0; i < hash_size; ++i)
+    {
+        // reset TT inner fields
+        hash_table[i].hash_key = 0;
+        hash_table[i].depth = 0;
+        hash_table[i].flag = 0;
+        hash_table[i].score = 0;
+    }
 }
