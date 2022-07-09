@@ -164,8 +164,10 @@ void uci_loop()
             continue;
         } else if (strncmp(input, "position", 8) == 0)      // position
             parse_position(input);
-        else if (strncmp(input, "ucinewgame", 10) == 0)     // ucinewgame
+        else if (strncmp(input, "ucinewgame", 10) == 0){     // ucinewgame
             parse_position("position startpos");
+            clear_hash_table();
+        }
         else if (strncmp(input, "go", 2) == 0)              // go
             parse_go(input);
         else if (strncmp(input, "quit", 4) == 0)            // quit

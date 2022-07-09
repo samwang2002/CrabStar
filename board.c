@@ -77,6 +77,7 @@ void init_all()
     init_bishop_attacks();
     init_rook_attacks();
     init_random_keys();
+    clear_hash_table();
 }
 
 // parse fen from string
@@ -514,7 +515,7 @@ int negamax(const int alpha, const int beta, int depth)
     int hash_flag = hash_flag_alpha;
 
     //read hash entry
-    if ((score = read_hash_entry(alpha, beta, depth)) != no_hash_entry){
+    if (ply && (score = read_hash_entry(alpha, beta, depth)) != no_hash_entry){
         // if the move has already been searched return the score for this move without searching it
         return score;
     }
@@ -546,7 +547,8 @@ int negamax(const int alpha, const int beta, int depth)
     if (depth >= 3 && in_check == 0 && ply) {
         // copy_board
         copy_board();
-
+        // increment ply
+        ++ply;
         // hash enpassant if available
         if (enpassant != no_sq) hash_key ^= enpassant_keys[enpassant];
         // reset enpassant capture square
@@ -557,6 +559,8 @@ int negamax(const int alpha, const int beta, int depth)
         hash_key ^= side_key;
         // search moves with reduced depth to find beta cutoffs
         int score = -negamax(-beta, -beta + 1, depth -1 -2);
+        //decrement ply
+        --ply;
         //restore board state
         take_back();
         // if time is up return 0
@@ -614,22 +618,15 @@ int negamax(const int alpha, const int beta, int depth)
         if (stopped) return 0; // if time is up
         ++moves_searched;
 
-        // move failed hard beta cutoff
-        if (score >= beta) {
-            // store hash entry with score equal to beta
-            write_hash_entry(beta, depth, hash_flag_beta);
-            // if move is quiet, store in killer moves cache so it has higher priority in analysis
-            if (!get_move_capture(move)) {
-                killer_moves[1][ply] = killer_moves[0][ply];
-                killer_moves[0][ply] = move;
-            }
-            return beta;
-        }
-
         // variation is better than current best
         if (score > new_alpha) {
             // switch hash flag to one for storing PV node score
             hash_flag = hash_flag_exact;
+
+            // if move is quiet, add move to history heuristic
+            // nodes higher in the tree are valued more
+            if (!get_move_capture(move))
+                history_moves[get_move_piece(move)][get_move_target(move)] += 1 << depth;
 
             new_alpha = score;
             if (ply == 0) best_sofar = move;
@@ -639,11 +636,18 @@ int negamax(const int alpha, const int beta, int depth)
             for (int next_ply = ply+1; next_ply < pv_length[ply+1]; ++next_ply)     // copy next row
                 pv_table[ply][next_ply] = pv_table[ply+1][next_ply];
             pv_length[ply] = pv_length[ply+1];
+                    // move failed hard beta cutoff
+            if (score >= beta) {
+                // store hash entry with score equal to beta
+                write_hash_entry(beta, depth, hash_flag_beta);
+                // if move is quiet, store in killer moves cache so it has higher priority in analysis
+                if (!get_move_capture(move)) {
+                    killer_moves[1][ply] = killer_moves[0][ply];
+                    killer_moves[0][ply] = move;
+                }
+                return beta;
+            }
 
-            // if move is quiet, add move to history heuristic
-            // nodes higher in the tree are valued more
-            if (!get_move_capture(move))
-                history_moves[get_move_piece(move)][get_move_target(move)] += 1 << depth;
         }
     }
 
@@ -713,9 +717,6 @@ void search_position(const int max_depth)
     memset(history_moves, 0, sizeof(history_moves));
     memset(pv_table, 0, sizeof(pv_table));
     memset(pv_length, 0, sizeof(pv_length));
-    
-    // clear hash table
-    clear_hash_table();
 
     //define intial alpha and beta bounds
     int alpha = -50000;
