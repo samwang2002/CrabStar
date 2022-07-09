@@ -509,6 +509,15 @@ int evaluate()
 int negamax(const int alpha, const int beta, int depth)
 {
 
+    int score;
+    // define hash flag
+    int hash_flag = hash_flag_alpha;
+
+    //read hash entry
+    if ((score = read_hash_entry(alpha, beta, depth)) != no_hash_entry){
+        // if the move has already been searched return the score for this move without searching it
+        return score;
+    }
     // every 2047 communicate with gui/user input
     if (!(neg_nodes & 2047))
         communicate();
@@ -531,16 +540,21 @@ int negamax(const int alpha, const int beta, int depth)
     int legal_count = 0;
     int best_sofar = 0;
     int new_alpha = alpha;
-    int score;
+    
 
     // null move pruning
     if (depth >= 3 && in_check == 0 && ply) {
         // copy_board
         copy_board();
-        //switch the side and give an opponent an extra move to make
-        side ^= 1;
+
+        // hash enpassant if available
+        if (enpassant != no_sq) hash_key ^= enpassant_keys[enpassant];
         // reset enpassant capture square
         enpassant = no_sq;
+        //switch the side and give an opponent an extra move to make
+        side ^= 1;
+        // hash side
+        hash_key ^= side_key;
         // search moves with reduced depth to find beta cutoffs
         int score = -negamax(-beta, -beta + 1, depth -1 -2);
         //restore board state
@@ -602,6 +616,8 @@ int negamax(const int alpha, const int beta, int depth)
 
         // move failed hard beta cutoff
         if (score >= beta) {
+            // store hash entry with score equal to beta
+            write_hash_entry(beta, depth, hash_flag_beta);
             // if move is quiet, store in killer moves cache so it has higher priority in analysis
             if (!get_move_capture(move)) {
                 killer_moves[1][ply] = killer_moves[0][ply];
@@ -612,6 +628,9 @@ int negamax(const int alpha, const int beta, int depth)
 
         // variation is better than current best
         if (score > new_alpha) {
+            // switch hash flag to one for storing PV node score
+            hash_flag = hash_flag_exact;
+
             new_alpha = score;
             if (ply == 0) best_sofar = move;
             
@@ -630,6 +649,9 @@ int negamax(const int alpha, const int beta, int depth)
 
     // if no legal moves are possible, position is either checkmate or stalemate
     if (legal_count == 0) return in_check ? -49000 + ply : 0;
+
+    // store hash entry with the score equal to alpha
+    write_hash_entry(new_alpha, depth, hash_flag);
 
     if (new_alpha > alpha)      // improvement was found
         best_move = best_sofar;
@@ -691,6 +713,9 @@ void search_position(const int max_depth)
     memset(history_moves, 0, sizeof(history_moves));
     memset(pv_table, 0, sizeof(pv_table));
     memset(pv_length, 0, sizeof(pv_length));
+    
+    // clear hash table
+    clear_hash_table();
 
     //define intial alpha and beta bounds
     int alpha = -50000;
@@ -713,7 +738,7 @@ void search_position(const int max_depth)
         beta = score + 50;
         //if (best_move) {
             // basic info
-            printf("info score cp %d depth %d nodes %d", score, depth, neg_nodes);
+            printf("info score cp %d depth %d nodes %d time %d", score, depth, neg_nodes, get_time_ms() - starttime);
 
             // principal variation
             printf(" pv");

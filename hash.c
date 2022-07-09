@@ -92,13 +92,13 @@ int read_hash_entry(int alpha, int beta, int depth)
         {
             // match the exact PV node score
             if (hash_entry->flag == hash_flag_exact)
-                {printf("exact score: "); return hash_entry->score;}
+                return hash_entry->score;
             // match alpha (fail-low node) score
             if (hash_entry->flag == hash_flag_alpha && hash_entry->score <= alpha)
-                {printf("alpha score: "); return alpha;}
+                return alpha;
                 // match beta (fail-high node) score
             if (hash_entry->flag == hash_flag_beta && hash_entry->score >= beta)
-                {printf("beta score: "); return beta;}
+                return beta;
         }
     }
     return no_hash_entry;
