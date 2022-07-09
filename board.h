@@ -32,6 +32,15 @@
     side = side_copy, enpassant = enpassant_copy, castle = castle_copy; \
     hash_key = hash_key_copy;                                           \
 
+/*---------------------------------mating scores ----------------------------*/
+// score layout
+
+// [-infinity, -mate_value ... -mate_score, ... score ... mate_score ... mate_value, infinity]
+#define infinity 50000
+#define mate_value 49000
+#define mate_score 48000
+
+
 /* ------------------------------- functions ------------------------------- */
 // print state of board
 void print_board();

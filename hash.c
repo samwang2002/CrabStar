@@ -90,14 +90,21 @@ int read_hash_entry(int alpha, int beta, int depth)
         // make sure that we match the exact depth our search is at
         if (hash_entry->depth >= depth)
         {
+            // extract stored score from TT entry
+            int score = hash_entry->score;
+
+            // retrieve score independent from actual path
+            if (score < -mate_score) score += ply;
+            if (score > mate_score) score -= ply;
+            
             // match the exact PV node score
             if (hash_entry->flag == hash_flag_exact)
-                return hash_entry->score;
+                return score;
             // match alpha (fail-low node) score
-            if (hash_entry->flag == hash_flag_alpha && hash_entry->score <= alpha)
+            if (hash_entry->flag == hash_flag_alpha && score <= alpha)
                 return alpha;
                 // match beta (fail-high node) score
-            if (hash_entry->flag == hash_flag_beta && hash_entry->score >= beta)
+            if (hash_entry->flag == hash_flag_beta && score >= beta)
                 return beta;
         }
     }
@@ -109,6 +116,9 @@ void write_hash_entry(int score, int depth, int hash_flag)
 {
     // create a TT instance pointer to particular hash entry storing
     tt *hash_entry = &hash_table[hash_key % hash_size];
+
+    if (score < -mate_score) score -= ply;
+    if (score > mate_score) score += ply;
 
     // write hash entry data 
     hash_entry->hash_key = hash_key;

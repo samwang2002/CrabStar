@@ -3,6 +3,7 @@
 #include "board.h"
 #include "constants.h"
 #include "timecontrol.h"
+#include "hash.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -162,8 +163,10 @@ void uci_loop()
         if (strncmp(input, "isready", 7) == 0) {            // isready
             printf("readyok\n");
             continue;
-        } else if (strncmp(input, "position", 8) == 0)      // position
+        } else if (strncmp(input, "position", 8) == 0){      // position
             parse_position(input);
+            clear_hash_table();
+        }
         else if (strncmp(input, "ucinewgame", 10) == 0){     // ucinewgame
             parse_position("position startpos");
             clear_hash_table();

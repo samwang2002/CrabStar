@@ -26,14 +26,13 @@ int main()
     // print_board();
     // printf("evaluation: %d cp\n", evaluate());
 
-    int debug = 1;
+    int debug = 0;
     if (debug) {
         parse_fen(start_position);
         print_board();
-        search_position(10);
     //     parse_fen("8/5pk1/3Rp1p1/2p1P1Pp/2P1P2P/R7/3r4/5bK1 b - - 0 38");
     //     print_board();
-    //     search_position(7);
+        search_position(10);
 
     //     // move_list moves;
     //     // generate_moves(&moves);

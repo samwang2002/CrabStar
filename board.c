@@ -514,8 +514,11 @@ int negamax(const int alpha, const int beta, int depth)
     // define hash flag
     int hash_flag = hash_flag_alpha;
 
-    //read hash entry
-    if (ply && (score = read_hash_entry(alpha, beta, depth)) != no_hash_entry){
+    // figure out if the current node is PV node or not
+    int pv_node = (beta - alpha > 1);
+
+    //read hash entry if we're not in a root ply and hash entry is available and current node is not a PV node
+    if (ply && (score = read_hash_entry(alpha, beta, depth)) != no_hash_entry && !pv_node){
         // if the move has already been searched return the score for this move without searching it
         return score;
     }
@@ -652,7 +655,7 @@ int negamax(const int alpha, const int beta, int depth)
     }
 
     // if no legal moves are possible, position is either checkmate or stalemate
-    if (legal_count == 0) return in_check ? -49000 + ply : 0;
+    if (legal_count == 0) return in_check ? -mate_value + ply : 0;
 
     // store hash entry with the score equal to alpha
     write_hash_entry(new_alpha, depth, hash_flag);
@@ -719,8 +722,8 @@ void search_position(const int max_depth)
     memset(pv_length, 0, sizeof(pv_length));
 
     //define intial alpha and beta bounds
-    int alpha = -50000;
-    int beta = 50000;
+    int alpha = -infinity;
+    int beta = infinity;
     // iteratively deepen analysis
     int score = 0;
     for (int depth = 1; depth <= max_depth; ++depth) 
@@ -731,30 +734,32 @@ void search_position(const int max_depth)
         score = negamax(alpha, beta, depth);
         // we fell outide the window, so try again with a full-wdth window
         if ((score <= alpha) || (score >= beta)) {
-            alpha = -50000;
-            beta = 50000;
+            alpha = -infinity;
+            beta = infinity;
             continue;
         }
         alpha = score - 50;
         beta = score + 50;
-        //if (best_move) {
-            // basic info
-            printf("info score cp %d depth %d nodes %d time %d", score, depth, neg_nodes, get_time_ms() - starttime);
 
-            // principal variation
-            printf(" pv");
-            for (int i = 0 ; i < pv_length[0]; ++i) {
-                printf(" ");
-                print_move(pv_table[0][i]);
-            }
-            printf("\n");
-    }
-            // best move
-            printf("bestmove ");
-            print_move(pv_table[0][0]);
-            printf("\n");
-        //} else
-        //    printf("no best move found\n");
+        if (score > -mate_value && score < -mate_score)
+            printf("info score mate %d depth %d nodes %ld time %d pv ", -(score + mate_value) / 2 - 1, depth, neg_nodes, get_time_ms() - starttime);
+        
+        else if (score > mate_score && score < mate_value)
+            printf("info score mate %d depth %d nodes %ld time %d pv ", (mate_value - score) / 2 + 1, depth, neg_nodes, get_time_ms() - starttime);   
+        
+        else
+            printf("info score cp %d depth %d nodes %ld time %d pv ", score, depth, neg_nodes, get_time_ms() - starttime);
+
+        for (int i = 0 ; i < pv_length[0]; ++i) {
+            printf(" ");
+            print_move(pv_table[0][i]);
+        }
+        printf("\n");
+}
+        // best move
+        printf("bestmove ");
+        print_move(pv_table[0][0]);
+        printf("\n");
     //}
 }
 
