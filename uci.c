@@ -1,5 +1,6 @@
 #include "uci.h"
 #include "move.h"
+#include "search.h"
 #include "board.h"
 #include "constants.h"
 #include "timecontrol.h"

@@ -546,4 +546,10 @@ static const int mvv_lva[12][12] = {
              queen captures pawn (not as important) => 101
 */
 
+// move scores
+// [-infinity, -mate_value ... -mate_score, ... score ... mate_score ... mate_value, infinity]
+#define infinity 50000
+#define mate_value 49000
+#define mate_score 48000
+
 #endif
