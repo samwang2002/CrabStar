@@ -10,4 +10,7 @@ void process_data(const char *pos_url, const char *eval_url, const char *out_url
 // writes current position and evaluation to output file
 void write_to_output(FILE *fp, int evaluation);
 
+// calculates loss from two inputs
+double loss(int eval1, int eval2);
+
 #endif

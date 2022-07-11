@@ -2,9 +2,11 @@
 #include "uci.h"
 #include "move.h"
 #include "board.h"
+#include "constants.h"
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 void process_data(const char *pos_url, const char *eval_url, const char *out_url)
 {
@@ -18,7 +20,8 @@ void process_data(const char *pos_url, const char *eval_url, const char *out_url
 
     char pos_buf[128], eval_buf[128];
 
-    int position_count = 0;
+    U64 position_count = 0;
+    double total_err = 0;
 
     // skip evaluation file header
     fgets(eval_buf, sizeof(eval_buf), evaluations);
@@ -58,9 +61,24 @@ void process_data(const char *pos_url, const char *eval_url, const char *out_url
             eval_buf[char_count] = '\0';
             int eval = atoi(eval_buf);
 
-            // 1/5 chance of writing position to output
-            if (rand()%5 == 0) {
-                write_to_output(output, eval);
+            // only write quiet positions to output
+            int capture_count = 0;
+            move_list moves;
+            generate_moves(&moves);
+            for (int i = 0; i < moves.count; ++i) {
+                copy_board();
+                if (make_move(moves.moves[i], captures_only)) {
+                    ++capture_count;
+                    take_back();
+                    break;
+                }
+                take_back();
+            }
+
+            if (!capture_count && !in_check()) {
+                write_to_output(output, (side == white) ? eval : -eval);
+                int crab_eval = evaluate();
+                total_err += loss(crab_eval, eval);
                 ++position_count;
             }
         }
@@ -70,15 +88,24 @@ void process_data(const char *pos_url, const char *eval_url, const char *out_url
     fclose(evaluations);
     fclose(output);
 
-    printf("%d positions written to %s\n", position_count, out_url);
+    printf("%llu positions written to %s\n", position_count, out_url);
+    printf("MSE of crabstar eval: %0.3f\n", sqrt(total_err/position_count));
 }
 
 // writes current position and evaluation to output file
 void write_to_output(FILE *fp, int evaluation)
 {
-    // fwrite(encode_position(), sizeof(char), input_nodes, fp);
     char *encoding = encode_position();
     fputs(encoding, fp);
     free(encoding);
-    fprintf(fp, " %d\n", evaluation);
+    int crab_eval = evaluate();
+    fprintf(fp, " %d %d\n", evaluation, crab_eval);
+}
+
+// calculates loss given two evaluation inputs
+double loss(int eval1, int eval2)
+{
+    double sigmoid1 = 1 / (1 + exp(eval1*0.01));
+    double sigmoid2 = 1 / (1 + exp(eval2*0.01));
+    return (sigmoid1 - sigmoid2) * (sigmoid1 - sigmoid2);
 }
