@@ -26,7 +26,9 @@ int main()
     init_all();
     init_weights();
 
-    parse_fen(start_position);
+    parse_fen(tricky_position);
+    print_board();
+    // net_eval();
 
     // clock_t start, end;
     // start = clock();
@@ -39,7 +41,8 @@ int main()
     // end = clock();
     // printf("network eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
 
-    search_position(5);
+    // search_position(3);
+    perft_test(3);
 
     int debug = 1;
     if (debug) {
