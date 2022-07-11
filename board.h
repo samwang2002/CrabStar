@@ -44,6 +44,9 @@ void parse_fen(const char *fen);
 // get whether square is currently attacked by given side
 int square_attacked(const int square, const int side);
 
+// get whether current side is in check
+int in_check();
+
 // get whether side has legal moves
 int has_legal_moves();
 

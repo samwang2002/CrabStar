@@ -161,7 +161,13 @@ int square_attacked(const int square, const int side)
     }
 }
 
-// get whether side has legal moves
+// get whether current side is in check
+int in_check()
+{
+    return square_attacked((side==white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
+}
+
+// get whether current side has legal moves
 int has_legal_moves()
 {
     copy_board();
@@ -497,8 +503,8 @@ int negamax(const int alpha, const int beta, int depth)
         return evaluate();
 
     // if in check, increase search depth
-    int in_check = square_attacked((side==white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
-    if (in_check)
+    int checked = in_check();
+    if (checked)
         ++depth;
     
     int legal_count = 0;
@@ -507,7 +513,7 @@ int negamax(const int alpha, const int beta, int depth)
     int score;
 
     // null move pruning
-    if (depth >= 3 && in_check == 0 && ply) {
+    if (depth >= 3 && checked == 0 && ply) {
         // copy_board
         copy_board();
         //switch the side and give an opponent an extra move to make
@@ -553,7 +559,7 @@ int negamax(const int alpha, const int beta, int depth)
 
         else { // late move reduction (LMR)
             //condition to consider LMR
-            if (moves_searched >= full_depth_moves && depth >= reduction_limit && !in_check 
+            if (moves_searched >= full_depth_moves && depth >= reduction_limit && !checked 
             && !get_move_capture(moves.moves[i]) && !get_move_promoted(moves.moves[i]))
                 //search current move with reduced depth
                 score = -negamax(-new_alpha - 1, -new_alpha, depth -2);
@@ -602,7 +608,7 @@ int negamax(const int alpha, const int beta, int depth)
     }
 
     // if no legal moves are possible, position is either checkmate or stalemate
-    if (legal_count == 0) return in_check ? -49000 + ply : 0;
+    if (legal_count == 0) return checked ? -49000 + ply : 0;
 
     if (new_alpha > alpha)      // improvement was found
         best_move = best_sofar;
