@@ -742,13 +742,13 @@ void search_position(const int max_depth)
         beta = score + 50;
 
         if (score > -mate_value && score < -mate_score)
-            printf("info score mate %d depth %d nodes %ld time %d pv ", -(score + mate_value) / 2 - 1, depth, neg_nodes, get_time_ms() - starttime);
+            printf("info score mate %d depth %d nodes %d time %d pv ", -(score + mate_value) / 2 - 1, depth, neg_nodes, get_time_ms() - starttime);
         
         else if (score > mate_score && score < mate_value)
-            printf("info score mate %d depth %d nodes %ld time %d pv ", (mate_value - score) / 2 + 1, depth, neg_nodes, get_time_ms() - starttime);   
+            printf("info score mate %d depth %d nodes %d time %d pv ", (mate_value - score) / 2 + 1, depth, neg_nodes, get_time_ms() - starttime);   
         
         else
-            printf("info score cp %d depth %d nodes %ld time %d pv ", score, depth, neg_nodes, get_time_ms() - starttime);
+            printf("info score cp %d depth %d nodes %d time %d pv ", score, depth, neg_nodes, get_time_ms() - starttime);
 
         for (int i = 0 ; i < pv_length[0]; ++i) {
             printf(" ");
