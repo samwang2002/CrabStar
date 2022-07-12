@@ -100,6 +100,7 @@ int negamax(const int alpha, const int beta, int depth)
     pv_length[ply] = ply;
 
     if (depth == 0)         // base case
+        // return (int)(net_eval()*net_weight + evaluate()*(1-net_weight));
         return quiescence(alpha, beta);
     
     ++neg_nodes;

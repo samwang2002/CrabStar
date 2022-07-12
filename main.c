@@ -28,7 +28,10 @@ int main()
 
     parse_fen(tricky_position);
     print_board();
-    // net_eval();
+    // printf("%d\n", net_eval());
+
+    // side = black;
+    // printf("%d\n", net_eval());
 
     // clock_t start, end;
     // start = clock();
@@ -41,8 +44,11 @@ int main()
     // end = clock();
     // printf("network eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
 
-    // search_position(3);
-    perft_test(3);
+    clock_t start, end;
+    start = clock();
+    search_position(8);
+    end = clock();
+    printf("time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
 
     int debug = 1;
     if (debug) {

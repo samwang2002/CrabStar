@@ -43,7 +43,7 @@ int net_eval()
 
     // loop through bitboards
     for (int piece = 0; piece < 12; ++piece) {
-        U64 bitboard = bitboards[piece];
+        U64 bitboard = bitboards[(piece + ((side==black)*6)) % 12];
         while (bitboard) {
             int loc = ls1b(bitboard);
             int idx = piece*64 + ((side==white) ? loc : 63-loc);
