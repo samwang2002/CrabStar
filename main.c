@@ -28,19 +28,21 @@ int main()
     init_all();
     srand(time(NULL));
 
-    net_weights player1, player2, player3, player4;
-    read_weights(&player1, "seed1");
-    
-    player2 = player1;
-    player3 = player1;
-    player4 = player1;
-    mutate(&player2, 1, 1);
-    mutate(&player3, 2, 1);
-    mutate(&player4, 3, 0.2);
+    // create array of players
+    int n_players = 8;
+    net_weights **players = malloc(n_players * sizeof(net_weights *));
+    int results[n_players];
 
-    int results[4];
-    net_weights *players[] = {&player1, &player2, &player3, &player4};
-    tournament(&players, 2, 3, results);
+    players[0] = malloc(sizeof(net_weights));
+    read_weights(players[0], "seed1");
+
+    for (int i = 1; i < n_players; ++i) {
+        players[i] = malloc(sizeof(net_weights));
+        copy_weights(players[i], players[0]);
+        mutate(players[i], 5, 0.2);
+    }
+
+    tournament(players, n_players/2, 3, &results);
 
     return 0;
 }

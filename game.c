@@ -52,7 +52,7 @@ float match(const net_weights *player1, const net_weights *player2, const int de
 }
 
 // writes array of elo results from round robin tournament
-void tournament(const net_weights **players, const int n_pairings, const int depth, int *elos)
+void tournament(net_weights **players, const int n_pairings, const int depth, int *elos)
 {
     memset(elos, 0, 2*n_pairings * sizeof(int));
 

@@ -94,6 +94,19 @@ int net_eval(const net_weights *weights)
     return (int)(final * 100);
 }
 
+// copy weights from one network to the other
+void copy_weights(net_weights *destination, net_weights *source)
+{
+    memcpy(destination->weights1, source->weights1, nodes0*nodes1*sizeof(float));
+    memcpy(destination->weights2, source->weights2, nodes1*nodes2*sizeof(float));
+    memcpy(destination->weights3, source->weights3, nodes2*nodes3*sizeof(float));
+    memcpy(destination->weights4, source->weights4, nodes3*nodes4*sizeof(float));
+    memcpy(destination->biases1, source->biases1, nodes1*sizeof(float));
+    memcpy(destination->biases2, source->biases2, nodes2*sizeof(float));
+    memcpy(destination->biases3, source->biases3, nodes3*sizeof(float));
+    memcpy(destination->biases4, source->biases4, nodes4*sizeof(float));
+}
+
 // mutate weights in network
 void mutate(net_weights *weights, const int inv_rate, const float std_dev)
 {
