@@ -4,7 +4,8 @@
 #include "net.h"
 
 #define max_moves 100
-#define node_bonus 0.1            // bonus in result for using fewer nodes
+#define node_bonus 0.1              // bonus in result for using fewer nodes
+#define elo_k 16                    // multiplier to calculate elo scores
 
 // simulate game between two neural networks, return 1 for player 1 win, -1 for loss, 0 for draw,
 // with small bonus for using fewer nodes

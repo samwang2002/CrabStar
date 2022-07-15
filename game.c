@@ -78,6 +78,7 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
             printf("%d vs %d: %f\n", idxs2[i], idxs1[i], result2);
             adjust_elos(&elos[idxs2[i]], &elos[idxs1[i]], result2);
         }
+        printf("-------------------\n");
 
         // cycle pairings
         for (int i = 1; i < n_pairings; ++i) idxs1[i] = (idxs1[i]>1) ? idxs1[i]-1 : 2*n_pairings-1;
@@ -95,6 +96,6 @@ void adjust_elos(int *elo1, int *elo2, int result)
 {
     float expected = 1.0 / (1.0 + pow(10, (*elo1-*elo2)*0.02));
     float actual = result*0.5 + 0.5;
-    *elo1 += (int)(32*(actual-expected));
-    *elo2 -= (int)(32*(actual-expected));
+    *elo1 += (int)(elo_k*(actual-expected));
+    *elo2 -= (int)(elo_k*(actual-expected));
 }

@@ -29,7 +29,7 @@ int main()
     srand(time(NULL));
 
     // create array of players
-    int n_players = 8;
+    int n_players = 16;
     net_weights **players = malloc(n_players * sizeof(net_weights *));
     int results[n_players];
 
