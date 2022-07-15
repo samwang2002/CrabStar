@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <locale.h>
 #include <time.h>
 
 #include "board.h"
-#include "uci.h"
 #include "bitboard.h"
 #include "move.h"
 #include "constants.h"
@@ -13,6 +13,8 @@
 #include "hash.h"
 #include "net.h"
 #include "search.h"
+#include "game.h"
+#include "random.h"
 
 #include "pawn.h"
 #include "knight.h"
@@ -24,23 +26,17 @@
 int main()
 {
     init_all();
-    net_weights nw;
-    printf("%d\n", sizeof(nw));
-    read_weights(&nw, "model");
+    srand(time(NULL));
 
-    parse_fen(tricky_position);
+    net_weights player1, player2;
+    read_weights(&player1, "seed1");
+    // read_weights(&player2, "seed2");
+    player2 = player1;
+    mutate(&player2, 1, 1);
+
+    parse_fen(start_position);
+    printf("result: %d\n|", match(&player1, &player2, 3, 1));
     print_board();
 
-    clock_t start, end;
-    start = clock();
-    negamax(-infinity, infinity, 5, &nw);
-    end = clock();
-    printf("time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
-
-    int debug = 1;
-    if (debug) {
-
-    } else
-         uci_loop();
     return 0;
 }
