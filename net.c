@@ -5,6 +5,7 @@
 #include "bitboard.h"
 #include "board.h"
 #include "constants.h"
+#include "random.h"
 
 // load weights from text file into 1d array
 void load_weights(float *weights, const int dim, const char *path)
@@ -91,4 +92,26 @@ int net_eval(const net_weights *weights)
     }
     
     return (int)(final * 100);
+}
+
+// mutate weights in network
+void mutate(net_weights *weights, const int inv_rate, const float std_dev)
+{
+    for (float *w = weights->weights1; w < weights->weights1 + nodes0*nodes1; ++w)
+        if (rand() % inv_rate == 0) *w += gaussian_rand() * std_dev;
+    for (float *w = weights->weights2; w < weights->weights2 + nodes1*nodes2; ++w)
+        if (rand() % inv_rate == 0) *w += gaussian_rand() * std_dev;
+    for (float *w = weights->weights3; w < weights->weights3 + nodes2*nodes3; ++w)
+        if (rand() % inv_rate == 0) *w += gaussian_rand() * std_dev;
+    for (float *w = weights->weights4; w < weights->weights4 + nodes3*nodes4; ++w)
+        if (rand() % inv_rate == 0) *w += gaussian_rand() * std_dev;
+    
+    for (float *w = weights->biases1; w < weights->biases1 + nodes1; ++w)
+        if (rand() % inv_rate == 0) *w += gaussian_rand() * std_dev;
+    for (float *w = weights->biases2; w < weights->biases1 + nodes2; ++w)
+        if (rand() % inv_rate == 0) *w += gaussian_rand() * std_dev;
+    for (float *w = weights->biases3; w < weights->biases1 + nodes3; ++w)
+        if (rand() % inv_rate == 0) *w += gaussian_rand() * std_dev;
+    for (float *w = weights->biases4; w < weights->biases1 + nodes4; ++w)
+        if (rand() % inv_rate == 0) *w += gaussian_rand() * std_dev;
 }

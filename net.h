@@ -38,16 +38,8 @@ void read_weights(net_weights *weights, const char *path);
 // evaluate position using neural network
 int net_eval(const net_weights *weights);
 
-// // weight vectors
-// static float weights1[nodes0 * nodes1];
-// static float weights2[nodes1 * nodes2];
-// static float weights3[nodes2 * nodes3];
-// static float weights4[nodes3 * nodes4];
-
-// // bias vectors
-// static float biases1[nodes1];
-// static float biases2[nodes2];
-// static float biases3[nodes3];
-// static float biases4[nodes4];
+// ------------ handling net evolution ------------
+// add normal(0, std_dev^2) noise randomly to one in inv_rate weight parameters
+void mutate(net_weights *weights, const int inv_rate, const float std_dev);
 
 #endif
