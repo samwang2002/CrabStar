@@ -7,35 +7,48 @@
 #include <math.h>
 
 // returns result of match between player1 (white) and player2 (black)
-int match(const net_weights *player1, const net_weights *player2, const int depth, const int verbose)
+// small bonus for using fewer nodes
+float match(const net_weights *player1, const net_weights *player2, const int depth, const int verbose)
 {
     int move_count = 0;
+    int w_nodes = 0;
+    int b_nodes = 0;
+    int winner = 0;
 
     while (move_count++ < max_moves) {
         // white moves
-        negamax(-infinity, infinity, depth, player1);
-        make_move(pv_table[0][0], all_moves);
+        int w_move = quick_search(depth, player1);
+        make_move(w_move, all_moves);
+        w_nodes += neg_nodes;
 
         if (verbose) {
             printf("%d ", move_count);
-            print_move(pv_table[0][0]);
+            print_move(w_move);
             printf(" ");
         }
 
-        if (!has_legal_moves()) return (square_attacked(ls1b(bitboards[k]), white) ? 1 : 0);
-
-        // black moves
-        negamax(-infinity, infinity, depth, player2);
-        make_move(pv_table[0][0], all_moves);
-
-        if (verbose) {
-            print_move(pv_table[0][0]);
-            printf("\n");
+        if (!has_legal_moves()) {
+            if (verbose) printf("\n");
+            winner = (square_attacked(ls1b(bitboards[k]), white) ? 1 : 0);
+            break;
         }
 
-        if (!has_legal_moves()) return (square_attacked(ls1b(bitboards[K]), black) ? -1 : 0);
+        // black moves
+        int b_move = quick_search(depth, player2);
+        make_move(b_move, all_moves);
+        b_nodes += neg_nodes;
+
+        if (verbose) {
+            print_move(b_move);
+            printf(" %d %d\n", w_nodes, b_nodes);
+        }
+
+        if (!has_legal_moves()) {
+            winner = (square_attacked(ls1b(bitboards[K]), black) ? -1 : 0);
+            break;
+        }
     }
-    return 0;
+    return winner + ((w_nodes < b_nodes) ? node_bonus : -node_bonus);
 }
 
 // writes array of elo results from round robin tournament
@@ -56,13 +69,13 @@ void tournament(const net_weights **players, const int n_pairings, const int dep
         // play matches
         for (int i = 0; i < n_pairings; ++i) {
             parse_fen(start_position);
-            int result1 = match(players[idxs1[i]], players[idxs2[i]], depth, 0);
-            printf("%d vs %d: %d\n", idxs1[i], idxs2[i], result1);
+            float result1 = match(players[idxs1[i]], players[idxs2[i]], depth, 0);
+            printf("%d vs %d: %f\n", idxs1[i], idxs2[i], result1);
             adjust_elos(&elos[idxs1[i]], &elos[idxs2[i]], result1);
 
             parse_fen(start_position);
-            int result2 = match(players[idxs2[i]], players[idxs1[i]], depth, 0);
-            printf("%d vs %d: %d\n", idxs2[i], idxs1[i], result2);
+            float result2 = match(players[idxs2[i]], players[idxs1[i]], depth, 0);
+            printf("%d vs %d: %f\n", idxs2[i], idxs1[i], result2);
             adjust_elos(&elos[idxs2[i]], &elos[idxs1[i]], result2);
         }
 

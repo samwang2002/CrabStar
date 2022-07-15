@@ -4,9 +4,11 @@
 #include "net.h"
 
 #define max_moves 100
+#define node_bonus 0.1            // bonus in result for using fewer nodes
 
-// simulate game between two neural networks, return 1 for player 1 win, -1 for loss, 0 for draw
-int match(const net_weights *player1, const net_weights *player2, const int depth, const int verbose);
+// simulate game between two neural networks, return 1 for player 1 win, -1 for loss, 0 for draw,
+// with small bonus for using fewer nodes
+float match(const net_weights *player1, const net_weights *player2, const int depth, const int verbose);
 
 // writes array of elo results from round robin tournament
 void tournament(const net_weights **players, const int n_pairings, const int depth, int *elo_results);
