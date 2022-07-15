@@ -24,6 +24,9 @@ int quiescence(const int alpha, const int beta, const net_weights *weights);
 // search position for best move and print it to UCI interface
 void search_position(const int depth, const net_weights *weights);
 
+// search at low depths and return best move
+int quick_search(const int depth, const net_weights *weights);
+
 // enable PV mopve scoring
 void enable_pv_scoring(move_list *moves);
 

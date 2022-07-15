@@ -356,3 +356,21 @@ void enable_pv_scoring(move_list *moves)
         }
     }
 }
+
+// search at low depths and return best move
+int quick_search(const int depth, const net_weights *weights)
+{
+    // reset variables
+    neg_nodes = 0;
+    follow_pv = 0;
+    score_pv = 0;
+    stopped = 0;
+    memset(killer_moves, 0, sizeof(killer_moves));
+    memset(history_moves, 0, sizeof(history_moves));
+    memset(pv_table, 0, sizeof(pv_table));
+    memset(pv_length, 0, sizeof(pv_length));
+
+    // find move
+    negamax(-infinity, infinity, depth, weights);
+    return pv_table[0][0];
+}
