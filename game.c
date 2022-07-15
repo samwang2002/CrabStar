@@ -72,7 +72,7 @@ void tournament(const net_weights **players, const int n_pairings, const int dep
     }
 
     // print new elos
-    printf("new ratings:\n");
+    printf("\nnew ratings:\n");
     for (int i = 0; i < 2*n_pairings; ++i)
         printf("player %d: %d\n", i, elos[i]);
 }
