@@ -63,20 +63,25 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
         idxs2[i] = 2*n_pairings - i - 1;
     }
 
-    printf("games:\n");
     // loop through rounds
+    printf("matchups:\n");
     for (int round = 0; round < 2*n_pairings-1; ++round) {
         // play matches
         for (int i = 0; i < n_pairings; ++i) {
-            parse_fen(start_position);
-            float result1 = match(players[idxs1[i]], players[idxs2[i]], depth, 0);
-            printf("%d vs %d: %f\n", idxs1[i], idxs2[i], result1);
-            adjust_elos(&elos[idxs1[i]], &elos[idxs2[i]], result1);
+            float tally = 0;
+            // loop through starting positions
+            for (int j = 0; j < n_starting_positions; ++j) {
+                parse_fen(starting_positions[j]);
+                float result1 = match(players[idxs1[i]], players[idxs2[i]], depth, 0);
+                tally += result1;
+                adjust_elos(&elos[idxs1[i]], &elos[idxs2[i]], result1);
 
-            parse_fen(start_position);
-            float result2 = match(players[idxs2[i]], players[idxs1[i]], depth, 0);
-            printf("%d vs %d: %f\n", idxs2[i], idxs1[i], result2);
-            adjust_elos(&elos[idxs2[i]], &elos[idxs1[i]], result2);
+                parse_fen(starting_positions[j]);
+                float result2 = match(players[idxs2[i]], players[idxs1[i]], depth, 0);
+                tally -= result2;
+                adjust_elos(&elos[idxs2[i]], &elos[idxs1[i]], result2);
+            }
+            printf("%d vs %d: %0.1f\n", idxs1[i], idxs2[i], tally);
         }
         printf("-------------------\n");
 
@@ -86,7 +91,7 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
     }
 
     // print new elos
-    printf("\nnew ratings:\n");
+    printf("new ratings:\n");
     for (int i = 0; i < 2*n_pairings; ++i)
         printf("player %d: %d\n", i, elos[i]);
 }
