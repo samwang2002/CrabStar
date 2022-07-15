@@ -78,7 +78,7 @@ void sort_moves(move_list *moves)
 // beta: maximum score the minimizing player is assured of
 // goal is to get alpha as high as possible
 // if beta <= alpha, then the minimizing player had a better option, so we can prune
-int negamax(const int alpha, const int beta, int depth)
+int negamax(const int alpha, const int beta, int depth, const net_weights *weights)
 {
 
     int score;
@@ -100,14 +100,12 @@ int negamax(const int alpha, const int beta, int depth)
     pv_length[ply] = ply;
 
     if (depth == 0)         // base case
-        // return (int)(net_eval()*net_weight + evaluate()*(1-net_weight));
-        return quiescence(alpha, beta);
+        return quiescence(alpha, beta, weights);
     
     ++neg_nodes;
 
     if (ply >= max_ply)     // too deep, danger of exceeding arrays
-        return (int)(net_eval()*net_weight + evaluate()*(1-net_weight));
-        // return evaluate();
+        return net_eval(weights);
 
     // if in check, increase search depth
     int in_check = square_attacked((side==white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
@@ -134,7 +132,7 @@ int negamax(const int alpha, const int beta, int depth)
         // hash side
         hash_key ^= side_key;
         // search moves with reduced depth to find beta cutoffs
-        int score = -negamax(-beta, -beta + 1, depth -1 -2);
+        int score = -negamax(-beta, -beta + 1, depth - 1, weights);
         //decrement ply
         --ply;
         //restore board state
@@ -170,22 +168,23 @@ int negamax(const int alpha, const int beta, int depth)
         }
         ++legal_count;
 
-        if (!moves_searched) score = -negamax(-beta, -new_alpha, depth - 1); // normal alpha beta search
+        if (!moves_searched) score = -negamax(-beta, -new_alpha, depth - 1, weights); // normal alpha beta search
 
         else { // late move reduction (LMR)
             //condition to consider LMR
             if (moves_searched >= full_depth_moves && depth >= reduction_limit && !in_check 
             && !get_move_capture(moves.moves[i]) && !get_move_promoted(moves.moves[i]))
                 //search current move with reduced depth
-                score = -negamax(-new_alpha - 1, -new_alpha, depth -2);
+                score = -negamax(-new_alpha - 1, -new_alpha, depth - 2, weights);
             else // hack to ensure that full-depth search is done
                 score = new_alpha + 1;
             // principle variation search PVS
             if (score > new_alpha) {
-                score = -negamax(-new_alpha -1, -new_alpha, depth-1); //search the remaining moves to prove they are all bad
+                // search the remaining moves to ensure they are all bad
+                score = -negamax(-new_alpha -1, -new_alpha, depth - 1, weights);
                 // if a better move is found in the search, search again with normal alpha beta score bounds
                 if ((score > new_alpha) && (score < beta))
-                    score = -negamax(-beta, -new_alpha, depth-1);
+                    score = -negamax(-beta, -new_alpha, depth-1, weights);
             }
         }
 
@@ -240,7 +239,7 @@ int negamax(const int alpha, const int beta, int depth)
 }
 
 // quiescence search, see negamax code for better documentation
-int quiescence(const int alpha, const int beta)
+int quiescence(const int alpha, const int beta, const net_weights *weights)
 {
     // every 2047 nodes
     if (!(neg_nodes & 2047))
@@ -249,7 +248,7 @@ int quiescence(const int alpha, const int beta)
 
     ++neg_nodes;
     // int evaluation = evaluate();
-    int evaluation = (int)(net_eval()*net_weight + evaluate()*(1-net_weight));
+    int evaluation = net_eval(weights);
 
     if (evaluation >= beta) return beta;                // failed hard beta cutoff
     int new_alpha = alpha;
@@ -270,7 +269,7 @@ int quiescence(const int alpha, const int beta)
             --ply;
             continue;
         }
-        int score = -quiescence(-beta, -new_alpha);     // now from opposite perspective
+        int score = -quiescence(-beta, -new_alpha, weights);     // now from opposite perspective
 
         --ply;
         take_back();
@@ -283,7 +282,7 @@ int quiescence(const int alpha, const int beta)
 }
 
 // search for best move and print it
-void search_position(const int max_depth)
+void search_position(const int max_depth, const net_weights *weights)
 {
     // reset variables
     neg_nodes = 0;
@@ -305,7 +304,7 @@ void search_position(const int max_depth)
         if (stopped) break; //time is up
         follow_pv = 1;
         // find best move within a given position
-        score = negamax(alpha, beta, depth);
+        score = negamax(alpha, beta, depth, weights);
         // we fell outide the window, so try again with a full-wdth window
         if ((score <= alpha) || (score >= beta)) {
             alpha = -infinity;
@@ -316,13 +315,16 @@ void search_position(const int max_depth)
         beta = score + 50;
 
         if (score > -mate_value && score < -mate_score)
-            printf("info score mate %d depth %d nodes %d time %d pv ", -(score + mate_value) / 2 - 1, depth, neg_nodes, get_time_ms() - starttime);
+            printf("info score mate %d depth %d nodes %d time %d pv ", -(score + mate_value) / 2 - 1, depth,
+                    neg_nodes, get_time_ms() - starttime);
         
         else if (score > mate_score && score < mate_value)
-            printf("info score mate %d depth %d nodes %d time %d pv ", (mate_value - score) / 2 + 1, depth, neg_nodes, get_time_ms() - starttime);   
+            printf("info score mate %d depth %d nodes %d time %d pv ", (mate_value - score) / 2 + 1, depth,
+                    neg_nodes, get_time_ms() - starttime);   
         
         else
-            printf("info score cp %d depth %d nodes %d time %d pv ", score, depth, neg_nodes, get_time_ms() - starttime);
+            printf("info score cp %d depth %d nodes %d time %d pv ", score, depth, neg_nodes,
+                    get_time_ms() - starttime);
 
         for (int i = 0 ; i < pv_length[0]; ++i) {
             printf(" ");

@@ -24,29 +24,16 @@
 int main()
 {
     init_all();
-    init_weights();
+    net_weights nw;
+    printf("%d\n", sizeof(nw));
+    read_weights(&nw, "model");
 
     parse_fen(tricky_position);
     print_board();
-    // printf("%d\n", net_eval());
-
-    // side = black;
-    // printf("%d\n", net_eval());
-
-    // clock_t start, end;
-    // start = clock();
-    // for (int i = 0; i < 100000; ++i) evaluate();
-    // end = clock();
-    // printf("regular eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
-
-    // start = clock();
-    // for (int i = 0; i < 100000; ++i) net_eval();
-    // end = clock();
-    // printf("network eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
 
     clock_t start, end;
     start = clock();
-    search_position(8);
+    negamax(-infinity, infinity, 5, &nw);
     end = clock();
     printf("time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
 

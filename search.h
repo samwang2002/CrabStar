@@ -3,6 +3,7 @@
 
 #include "bitboard.h"
 #include "move.h"
+#include "net.h"
 
 #define max_ply 64
 #define net_weight 0
@@ -15,13 +16,13 @@ int score_move(const int move);
 void sort_moves(move_list *moves);
 
 // negamax alpha beta search
-int negamax(const int alpha, const int beta, int depth);
+int negamax(const int alpha, const int beta, int depth, const net_weights *weights);
 
 // quiescence search: similar to negamax but only examine captures
-int quiescence(const int alpha, const int beta);
+int quiescence(const int alpha, const int beta, const net_weights *weights);
 
 // search position for best move and print it to UCI interface
-void search_position(const int depth);
+void search_position(const int depth, const net_weights *weights);
 
 // enable PV mopve scoring
 void enable_pv_scoring(move_list *moves);
