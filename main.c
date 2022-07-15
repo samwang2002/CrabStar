@@ -28,15 +28,19 @@ int main()
     init_all();
     srand(time(NULL));
 
-    net_weights player1, player2;
+    net_weights player1, player2, player3, player4;
     read_weights(&player1, "seed1");
-    // read_weights(&player2, "seed2");
+    
     player2 = player1;
+    player3 = player1;
+    player4 = player1;
     mutate(&player2, 1, 1);
+    mutate(&player3, 2, 1);
+    mutate(&player4, 3, 0.2);
 
-    parse_fen(start_position);
-    printf("result: %d\n|", match(&player1, &player2, 3, 1));
-    print_board();
+    int results[4];
+    net_weights *players[] = {&player1, &player2, &player3, &player4};
+    tournament(&players, 2, 3, results);
 
     return 0;
 }
