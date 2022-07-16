@@ -4,7 +4,7 @@
 #include "net.h"
 
 #define max_moves 100
-#define node_bonus 0.1              // bonus in result for using fewer nodes
+#define node_bonus 0.05             // bonus in result for using fewer nodes
 #define elo_k 16                    // multiplier to calculate elo scores
 
 // start positions for games

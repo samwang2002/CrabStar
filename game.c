@@ -80,16 +80,18 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
             // loop through starting positions
             for (int j = 0; j < n_starting_positions; ++j) {
                 float result1 = match(players[idxs1[i]], players[idxs2[i]], starting_positions[j], depth, 0);
+                printf("%d vs %d: %0.2f\n", idxs1[i], idxs2[i], result1);
                 tally += result1;
                 adjust_elos(&elos[idxs1[i]], &elos[idxs2[i]], result1);
 
                 float result2 = match(players[idxs2[i]], players[idxs1[i]], starting_positions[j], depth, 0);
+                printf("%d vs %d: %0.2f\n", idxs2[i], idxs1[i], result2);
                 tally -= result2;
                 adjust_elos(&elos[idxs2[i]], &elos[idxs1[i]], result2);
             }
-            printf("%d vs %d: %0.1f\n", idxs1[i], idxs2[i], tally);
+            printf("--------------------\n%d vs %d summary: %0.2f\n--------------------\n", idxs1[i], idxs2[i], tally);
         }
-        printf("-------------------\n");
+        printf("--------------------\n");
 
         // cycle pairings
         for (int i = 1; i < n_pairings; ++i) idxs1[i] = (idxs1[i]>1) ? idxs1[i]-1 : 2*n_pairings-1;
