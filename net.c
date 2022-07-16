@@ -63,6 +63,7 @@ int net_eval()
         for (int j = 0; j < nodes2; ++j)
             prods2[j] += prods1[i] * weights2[i*nodes2 + j];
     }
+    free(prods1);
     // printf("prods2[0] = %f\n", prods2[0]);
 
     // pass through third layer
@@ -74,6 +75,7 @@ int net_eval()
         for (int j = 0; j < nodes2; ++j)
             prods3[j] += prods2[i] * weights3[i*nodes2 + j];
     }
+    free(prods2);
     // printf("prods3[0] = %f\n", prods3[0]);
 
     // pass through final layer
@@ -82,6 +84,7 @@ int net_eval()
         if (prods3[i] <= 0) continue;
         final += prods3[i] * weights4[i];
     }
+    free(prods3);
 
     // printf("%f\n", final);
     
