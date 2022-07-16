@@ -73,6 +73,7 @@ int net_eval(const net_weights *weights)
         for (int j = 0; j < nodes2; ++j)
             prods2[j] += prods1[i] * weights->weights2[i*nodes2 + j];
     }
+    free(prods1);
 
     // pass through third layer
     float *prods3 = malloc(sizeof(weights->biases3));
@@ -83,6 +84,7 @@ int net_eval(const net_weights *weights)
         for (int j = 0; j < nodes2; ++j)
             prods3[j] += prods2[i] * weights->weights3[i*nodes2 + j];
     }
+    free(prods2);
 
     // pass through final layer
     float final = weights->biases4[0];
@@ -90,6 +92,7 @@ int net_eval(const net_weights *weights)
         if (prods3[i] <= 0) continue;
         final += prods3[i] * weights->weights4[i];
     }
+    free(prods3);
     
     return (int)(final * 100);
 }
