@@ -5,54 +5,53 @@
 #include "board.h"
 #include "move.h"
 #include "constants.h"
-#include "timecontrol.h"
-#include "hash.h"
 #include "net.h"
 
 // declaring global variables
-int best_move = 0;
-int neg_nodes = 0;
-int killer_moves[2][64];
-int history_moves[12][64];
-int pv_length[64];
-int pv_table[64][64];
-int follow_pv;
-int score_pv;
-int full_depth_moves = 4;
-int reduction_limit = 3;
+// int best_move = 0;
+// int neg_nodes = 0;
+// int killer_moves[2][64];
+// int history_moves[12][64];
+// int pv_length[64];
+// int pv_table[64][64];
+// int follow_pv;
+// int score_pv;
+// int full_depth_moves = 4;
+// int reduction_limit = 3;
 
 // get priority of move
-int score_move(const int move)
+int score_move(search_state *search, const int move)
 {
-    if (score_pv){              // if PV move scoring is allowed
-        if (pv_table[0][ply] == move){   // make sure we are dealing with PV move]
-            score_pv = 0; //disable score PV flag
-            return 20000;  //give PV move the highest score to search it first
+    if (search->score_pv){                                  // if PV move scoring is allowed
+        if (search->pv_table[0][search->ply] == move) {     // make sure we are dealing with PV move
+            search->score_pv = 0;                           // disable score PV flag
+            return 20000;                                   // give PV move the highest score to search it first
         } 
     }
     if (get_move_capture(move)) {           // capture move, use mvv_lva table
+        board_state *board = search->board;
         int target_piece = 0;
         for (int i = p; i <= k; ++i)
-            if (get_bit(bitboards[i-6*side], get_move_target(move))) {
-                target_piece = i-6*side;
+            if (get_bit(board->bitboards[i-6*board->side], get_move_target(move))) {
+                target_piece = i-6*board->side;
                 break;
             }
         return mvv_lva[get_move_piece(move)][target_piece] + 10000;
     } else {                                // score quiet move
-        if (killer_moves[0][ply] == move) return 9000;
-        if (killer_moves[1][ply] == move) return 8000;
-        return history_moves[get_move_piece(move)][get_move_target(move)];
+        if (search->killer_moves[0][search->ply] == move) return 9000;
+        if (search->killer_moves[1][search->ply] == move) return 8000;
+        return search->history_moves[get_move_piece(move)][get_move_target(move)];
     }
     return 0;
 }
 
 // sort moves by priority
-void sort_moves(move_list *moves)
+void sort_moves(search_state *search, move_list *moves)
 {
     // make list of current scores
     int scores[moves->count];
     for (int i = 0; i < moves->count; ++i)
-        scores[i] = score_move(moves->moves[i]);
+        scores[i] = score_move(search, moves->moves[i]);
 
     // insertion sort in descending order (fast for small arrays)
     for (int i = 0; i < moves->count-1; ++i) {
@@ -78,37 +77,24 @@ void sort_moves(move_list *moves)
 // beta: maximum score the minimizing player is assured of
 // goal is to get alpha as high as possible
 // if beta <= alpha, then the minimizing player had a better option, so we can prune
-int negamax(const int alpha, const int beta, int depth, const net_weights *weights)
+int negamax(search_state *search, const int alpha, const int beta, int depth, const net_weights *weights)
 {
-
     int score;
-    // define hash flag
-    int hash_flag = hash_flag_alpha;
+    board_state *board = search->board;
 
-    // figure out if the current node is PV node or not
-    int pv_node = (beta - alpha > 1);
-
-    //read hash entry if we're not in a root ply and hash entry is available and current node is not a PV node
-    if (ply && (score = read_hash_entry(alpha, beta, depth)) != no_hash_entry && !pv_node){
-        // if the move has already been searched return the score for this move without searching it
-        return score;
-    }
-    // every 2047 communicate with gui/user input
-    if (!(neg_nodes & 2047))
-        communicate();
     // initialize pv length
-    pv_length[ply] = ply;
+    search->pv_length[search->ply] = search->ply;
 
     if (depth == 0)         // base case
-        return quiescence(alpha, beta, weights);
+        return quiescence(search, alpha, beta, weights);
     
-    ++neg_nodes;
+    ++search->neg_nodes;
 
-    if (ply >= max_ply)     // too deep, danger of exceeding arrays
-        return net_eval(weights);
+    if (search->ply >= max_ply)     // too deep, danger of exceeding arrays
+        return net_eval(board, weights);
 
     // if in check, increase search depth
-    int in_check = square_attacked((side==white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
+    int in_check = square_attacked(board, ls1b(board->bitboards[(board->side==white) ? K : k]), (board->side)^1);
     if (in_check)
         ++depth;
     
@@ -118,27 +104,22 @@ int negamax(const int alpha, const int beta, int depth, const net_weights *weigh
     
 
     // null move pruning
-    if (depth >= 3 && in_check == 0 && ply) {
+    if (depth >= 3 && in_check == 0 && search->ply) {
         // copy_board
-        copy_board();
+        board_state board_copy;
+        memcpy(&board_copy, board, sizeof(board_state));
         // increment ply
-        ++ply;
-        // hash enpassant if available
-        if (enpassant != no_sq) hash_key ^= enpassant_keys[enpassant];
+        ++search->ply;
         // reset enpassant capture square
-        enpassant = no_sq;
-        //switch the side and give an opponent an extra move to make
-        side ^= 1;
-        // hash side
-        hash_key ^= side_key;
+        board->enpassant = no_sq;
+        // switch the side and give an opponent an extra move to make
+        board->side ^= 1;
         // search moves with reduced depth to find beta cutoffs
-        int score = -negamax(-beta, -beta + 1, depth - 1, weights);
+        int score = -negamax(search, -beta, -beta + 1, depth - 1, weights);
         //decrement ply
-        --ply;
+        --search->ply;
         //restore board state
-        take_back();
-        // if time is up return 0
-        if (stopped) return 0;
+        memcpy(board, &board_copy, sizeof(board_state));
         // fail-hard beta cutoff
         if (score >= beta)
             //move fails high
@@ -147,133 +128,121 @@ int negamax(const int alpha, const int beta, int depth, const net_weights *weigh
 
     // loop through possible moves and narrow alpha and beta
     move_list moves;
-    generate_moves(&moves);
+    generate_moves(board, &moves);
 
     // if we are following PV line
-    if (follow_pv)
-        enable_pv_scoring(&moves);
-    sort_moves(&moves);
+    if (search->follow_pv)
+        enable_pv_scoring(search, &moves);
+    sort_moves(search, &moves);
 
     // moves searched in a move list
     int moves_searched = 0;
 
     for (int i = 0; i < moves.count; ++i) {
-        copy_board();
-        ++ply;
+        board_state board_copy;
+        memcpy(&board_copy, board, sizeof(board_state));
+        ++search->ply;
 
         int move = moves.moves[i];
-        if (!make_move(move, all_moves)) {      // skip illegal moves
-            --ply;
+        if (!make_move(board, move, all_moves)) {      // skip illegal moves
+            --search->ply;
             continue;
         }
         ++legal_count;
 
-        if (!moves_searched) score = -negamax(-beta, -new_alpha, depth - 1, weights); // normal alpha beta search
+        // normal alpha beta search
+        if (!moves_searched) score = -negamax(search, -beta, -new_alpha, depth - 1, weights); 
 
         else { // late move reduction (LMR)
             //condition to consider LMR
-            if (moves_searched >= full_depth_moves && depth >= reduction_limit && !in_check 
+            if (moves_searched >= search->full_depth_moves && depth >= search->reduction_limit && !in_check 
             && !get_move_capture(moves.moves[i]) && !get_move_promoted(moves.moves[i]))
                 //search current move with reduced depth
-                score = -negamax(-new_alpha - 1, -new_alpha, depth - 2, weights);
+                score = -negamax(search, -new_alpha - 1, -new_alpha, depth - 2, weights);
             else // hack to ensure that full-depth search is done
                 score = new_alpha + 1;
             // principle variation search PVS
             if (score > new_alpha) {
                 // search the remaining moves to ensure they are all bad
-                score = -negamax(-new_alpha -1, -new_alpha, depth - 1, weights);
+                score = -negamax(search, -new_alpha -1, -new_alpha, depth - 1, weights);
                 // if a better move is found in the search, search again with normal alpha beta score bounds
                 if ((score > new_alpha) && (score < beta))
-                    score = -negamax(-beta, -new_alpha, depth-1, weights);
+                    score = -negamax(search, -beta, -new_alpha, depth-1, weights);
             }
         }
 
-        take_back();
-        --ply;
-        if (stopped) return 0; // if time is up
+        memcpy(board, &board_copy, sizeof(board_state));
+        --search->ply;
         ++moves_searched;
 
         // variation is better than current best
         if (score > new_alpha) {
-            // switch hash flag to one for storing PV node score
-            hash_flag = hash_flag_exact;
-
             // if move is quiet, add move to history heuristic
             // nodes higher in the tree are valued more
             if (!get_move_capture(move))
-                history_moves[get_move_piece(move)][get_move_target(move)] += 1 << depth;
+                search->history_moves[get_move_piece(move)][get_move_target(move)] += 1 << depth;
 
             new_alpha = score;
-            if (ply == 0) best_sofar = move;
+            if (search->ply == 0) best_sofar = move;
             
             // update pv table and length
-            pv_table[ply][ply] = move;
-            for (int next_ply = ply+1; next_ply < pv_length[ply+1]; ++next_ply)     // copy next row
-                pv_table[ply][next_ply] = pv_table[ply+1][next_ply];
-            pv_length[ply] = pv_length[ply+1];
+            search->pv_table[search->ply][search->ply] = move;
+            // copy next row
+            for (int next_ply = search->ply+1; next_ply < search->pv_length[search->ply+1]; ++next_ply)
+                search->pv_table[search->ply][next_ply] = search->pv_table[search->ply+1][next_ply];
+            search->pv_length[search->ply] = search->pv_length[search->ply+1];
                     // move failed hard beta cutoff
             if (score >= beta) {
-                // store hash entry with score equal to beta
-                write_hash_entry(beta, depth, hash_flag_beta);
                 // if move is quiet, store in killer moves cache so it has higher priority in analysis
                 if (!get_move_capture(move)) {
-                    killer_moves[1][ply] = killer_moves[0][ply];
-                    killer_moves[0][ply] = move;
+                    search->killer_moves[1][search->ply] = search->killer_moves[0][search->ply];
+                    search->killer_moves[0][search->ply] = move;
                 }
                 return beta;
             }
-
         }
     }
 
     // if no legal moves are possible, position is either checkmate or stalemate
-    if (legal_count == 0) return in_check ? -mate_value + ply : 0;
-
-    // store hash entry with the score equal to alpha
-    write_hash_entry(new_alpha, depth, hash_flag);
+    if (legal_count == 0) return in_check ? -mate_value + search->ply : 0;
 
     if (new_alpha > alpha)      // improvement was found
-        best_move = best_sofar;
+        search->best_move = best_sofar;
     
     return new_alpha;
 }
 
 // quiescence search, see negamax code for better documentation
-int quiescence(const int alpha, const int beta, const net_weights *weights)
+int quiescence(search_state *search, const int alpha, const int beta, const net_weights *weights)
 {
-    // every 2047 nodes
-    if (!(neg_nodes & 2047))
-        // listen to gui/user input
-        communicate();
-
-    ++neg_nodes;
-    // int evaluation = evaluate();
-    int evaluation = net_eval(weights);
+    ++search->neg_nodes;
+    int evaluation = net_eval(search->board, weights);
 
     if (evaluation >= beta) return beta;                // failed hard beta cutoff
     int new_alpha = alpha;
     if (evaluation > alpha) new_alpha = evaluation;     // found better move
 
     // DFS over possible captures
+    board_state *board = search->board;
     move_list moves;
-    generate_moves(&moves);
-    sort_moves(&moves);
+    generate_moves(board, &moves);
+    sort_moves(search, &moves);
 
     for (int i = 0; i < moves.count; ++i) {
-        copy_board();
-        ++ply;
+        board_state board_copy;
+        memcpy(&board_copy, board, sizeof(board_state));
+        ++search->ply;
 
         // test out new move
         int move = moves.moves[i];
-        if (make_move(move, captures_only) == 0) {      // skip illegal and quiet moves
-            --ply;
+        if (make_move(board, move, captures_only) == 0) {      // skip illegal and quiet moves
+            --search->ply;
             continue;
         }
-        int score = -quiescence(-beta, -new_alpha, weights);     // now from opposite perspective
+        int score = -quiescence(search, -beta, -new_alpha, weights);     // now from opposite perspective
 
-        --ply;
-        take_back();
-        if (stopped) return 0; //time is up
+        --search->ply;
+        memcpy(board, &board_copy, sizeof(board_state));
         if (score >= beta) return beta;
         if (score > new_alpha) new_alpha = score;
     }
@@ -282,29 +251,27 @@ int quiescence(const int alpha, const int beta, const net_weights *weights)
 }
 
 // search for best move and print it
-void search_position(const int max_depth, const net_weights *weights)
+void search_position(search_state *search, board_state *board, const int max_depth, const net_weights *weights)
 {
-    // reset variables
-    neg_nodes = 0;
-    follow_pv = 0;
-    score_pv = 0;
-    stopped = 0;
-    memset(killer_moves, 0, sizeof(killer_moves));
-    memset(history_moves, 0, sizeof(history_moves));
-    memset(pv_table, 0, sizeof(pv_table));
-    memset(pv_length, 0, sizeof(pv_length));
+    // initialize search state
+    search->board = board;
+    search->neg_nodes = 0;
+    search->follow_pv = 0;
+    search->score_pv = 0;
+    memset(search->killer_moves, 0, sizeof(search->killer_moves));
+    memset(search->history_moves, 0, sizeof(search->history_moves));
+    memset(search->pv_table, 0, sizeof(search->pv_table));
+    memset(search->pv_length, 0, sizeof(search->pv_length));
 
-    //define intial alpha and beta bounds
+    // define intial alpha and beta bounds
     int alpha = -infinity;
     int beta = infinity;
     // iteratively deepen analysis
     int score = 0;
-    for (int depth = 1; depth <= max_depth; ++depth) 
-    {
-        if (stopped) break; //time is up
-        follow_pv = 1;
+    for (int depth = 1; depth <= max_depth; ++depth) {
+        search->follow_pv = 1;
         // find best move within a given position
-        score = negamax(alpha, beta, depth, weights);
+        score = negamax(search, alpha, beta, depth, weights);
         // we fell outide the window, so try again with a full-wdth window
         if ((score <= alpha) || (score >= beta)) {
             alpha = -infinity;
@@ -314,63 +281,62 @@ void search_position(const int max_depth, const net_weights *weights)
         alpha = score - 50;
         beta = score + 50;
 
-        if (score > -mate_value && score < -mate_score)
-            printf("info score mate %d depth %d nodes %d time %d pv ", -(score + mate_value) / 2 - 1, depth,
-                    neg_nodes, get_time_ms() - starttime);
+        // if (score > -mate_value && score < -mate_score)
+        //     printf("info score mate %d depth %d nodes %d time %d pv ", -(score + mate_value) / 2 - 1, depth,
+        //             search.neg_nodes, get_time_ms() - starttime);
         
-        else if (score > mate_score && score < mate_value)
-            printf("info score mate %d depth %d nodes %d time %d pv ", (mate_value - score) / 2 + 1, depth,
-                    neg_nodes, get_time_ms() - starttime);   
+        // else if (score > mate_score && score < mate_value)
+        //     printf("info score mate %d depth %d nodes %d time %d pv ", (mate_value - score) / 2 + 1, depth,
+        //             search.neg_nodes, get_time_ms() - starttime);   
         
-        else
-            printf("info score cp %d depth %d nodes %d time %d pv ", score, depth, neg_nodes,
-                    get_time_ms() - starttime);
+        // else
+        //     printf("info score cp %d depth %d nodes %d time %d pv ", score, depth, search.neg_nodes,
+        //             get_time_ms() - starttime);
 
-        for (int i = 0 ; i < pv_length[0]; ++i) {
-            printf(" ");
-            print_move(pv_table[0][i]);
-        }
-        printf("\n");
-}
-        // best move
-        printf("bestmove ");
-        print_move(pv_table[0][0]);
-        printf("\n");
-    //}
+        // for (int i = 0 ; i < search.pv_length[0]; ++i) {
+        //     printf(" ");
+        //     print_move(search.pv_table[0][i]);
+        // }
+        // printf("\n");
+    }
+    // best move
+    printf("bestmove ");
+    print_move(search->pv_table[0][0]);
+    printf("\n");
 }
 
 // enable PV move scoring
-void enable_pv_scoring(move_list *moves)
+void enable_pv_scoring(search_state *search, move_list *moves)
 {
     //disable following PV
-    follow_pv =0;
+    search->follow_pv = 0;
     // loop over the moves within a move list
     for (int i = 0; i < moves->count; ++i){
         // make sure we hit PV move
-        if(pv_table[0][ply] == moves->moves[i]){
+        if(search->pv_table[0][search->ply] == moves->moves[i]){
             //enable move scoring
-            score_pv = 1;
+            search->score_pv = 1;
 
             //enable following PV
-            follow_pv = 1;
+            search->follow_pv = 1;
         }
     }
 }
 
 // search at low depths and return best move
-int quick_search(const int depth, const net_weights *weights)
+int quick_search(search_state *search, board_state *board, const int depth, const net_weights *weights)
 {
-    // reset variables
-    neg_nodes = 0;
-    follow_pv = 0;
-    score_pv = 0;
-    stopped = 0;
-    memset(killer_moves, 0, sizeof(killer_moves));
-    memset(history_moves, 0, sizeof(history_moves));
-    memset(pv_table, 0, sizeof(pv_table));
-    memset(pv_length, 0, sizeof(pv_length));
+    // initialize search state
+    search->board = board;
+    search->neg_nodes = 0;
+    search->follow_pv = 0;
+    search->score_pv = 0;
+    memset(search->killer_moves, 0, sizeof(search->killer_moves));
+    memset(search->history_moves, 0, sizeof(search->history_moves));
+    memset(search->pv_table, 0, sizeof(search->pv_table));
+    memset(search->pv_length, 0, sizeof(search->pv_length));
 
     // find move
-    negamax(-infinity, infinity, depth, weights);
-    return pv_table[0][0];
+    negamax(search, -infinity, infinity, depth, weights);
+    return search->pv_table[0][0];
 }

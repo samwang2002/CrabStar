@@ -18,7 +18,8 @@ static const char *starting_positions[4] = {open_game, open_sicilian, closed_gam
 
 // simulate game between two neural networks, return 1 for player 1 win, -1 for loss, 0 for draw,
 // with small bonus for using fewer nodes
-float match(const net_weights *player1, const net_weights *player2, const int depth, const int verbose);
+float match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
+            const int verbose);
 
 // writes array of elo results from round robin tournament
 void tournament(net_weights **players, const int n_pairings, const int depth, int *elo_results);

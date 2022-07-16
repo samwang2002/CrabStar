@@ -1,6 +1,8 @@
 #ifndef NET_H
 #define NET_H
 
+#include "board.h"
+
 /*
     neural net structure:
     768 input nodes: 12 piece bitboards, all from perspective of player to move
@@ -36,7 +38,7 @@ void load_weights(float *weights, const int dim, const char *path);
 void read_weights(net_weights *weights, const char *path);
 
 // evaluate position using neural network
-int net_eval(const net_weights *weights);
+int net_eval(const board_state *board, const net_weights *weights);
 
 // ------------ handling net evolution ------------
 // copy weights from one network to the other

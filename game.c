@@ -8,18 +8,25 @@
 
 // returns result of match between player1 (white) and player2 (black)
 // small bonus for using fewer nodes
-float match(const net_weights *player1, const net_weights *player2, const int depth, const int verbose)
+float match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
+            const int verbose)
 {
     int move_count = 0;
     int w_nodes = 0;
     int b_nodes = 0;
     int winner = 0;
 
+    // initialize position
+    board_state board;
+    parse_fen(&board, start_fen);
+    search_state search;
+
+    // simulate game
     while (move_count++ < max_moves) {
         // white moves
-        int w_move = quick_search(depth, player1);
-        make_move(w_move, all_moves);
-        w_nodes += neg_nodes;
+        int w_move = quick_search(&search, &board, depth, player1);
+        make_move(&board, w_move, all_moves);
+        w_nodes += search.neg_nodes;
 
         if (verbose) {
             printf("%d ", move_count);
@@ -27,27 +34,28 @@ float match(const net_weights *player1, const net_weights *player2, const int de
             printf(" ");
         }
 
-        if (!has_legal_moves()) {
+        if (!has_legal_moves(&board)) {
             if (verbose) printf("\n");
-            winner = (square_attacked(ls1b(bitboards[k]), white) ? 1 : 0);
+            winner = (square_attacked(&board, ls1b(board.bitboards[k]), white) ? 1 : 0);
             break;
         }
 
         // black moves
-        int b_move = quick_search(depth, player2);
-        make_move(b_move, all_moves);
-        b_nodes += neg_nodes;
+        int b_move = quick_search(&search, &board, depth, player2);
+        make_move(&board, b_move, all_moves);
+        b_nodes += search.neg_nodes;
 
         if (verbose) {
             print_move(b_move);
             printf(" %d %d\n", w_nodes, b_nodes);
         }
 
-        if (!has_legal_moves()) {
-            winner = (square_attacked(ls1b(bitboards[K]), black) ? -1 : 0);
+        if (!has_legal_moves(&board)) {
+            winner = (square_attacked(&board, ls1b(board.bitboards[K]), black) ? -1 : 0);
             break;
         }
     }
+    print_board(&board);
     return winner + ((w_nodes < b_nodes) ? node_bonus : -node_bonus);
 }
 
@@ -71,13 +79,11 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
             float tally = 0;
             // loop through starting positions
             for (int j = 0; j < n_starting_positions; ++j) {
-                parse_fen(starting_positions[j]);
-                float result1 = match(players[idxs1[i]], players[idxs2[i]], depth, 0);
+                float result1 = match(players[idxs1[i]], players[idxs2[i]], starting_positions[j], depth, 0);
                 tally += result1;
                 adjust_elos(&elos[idxs1[i]], &elos[idxs2[i]], result1);
 
-                parse_fen(starting_positions[j]);
-                float result2 = match(players[idxs2[i]], players[idxs1[i]], depth, 0);
+                float result2 = match(players[idxs2[i]], players[idxs1[i]], starting_positions[j], depth, 0);
                 tally -= result2;
                 adjust_elos(&elos[idxs2[i]], &elos[idxs1[i]], result2);
             }

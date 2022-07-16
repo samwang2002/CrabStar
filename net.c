@@ -46,7 +46,7 @@ void read_weights(net_weights *weights, const char *path)
 }
 
 // evaluate position using neural network
-int net_eval(const net_weights *weights)
+int net_eval(const board_state *board, const net_weights *weights)
 {
     // pass through first layer
     float *prods1 = malloc(sizeof(weights->biases1));
@@ -54,10 +54,10 @@ int net_eval(const net_weights *weights)
 
     // loop through bitboards
     for (int piece = 0; piece < 12; ++piece) {
-        U64 bitboard = bitboards[(piece + ((side==black)*6)) % 12];
+        U64 bitboard = board->bitboards[(piece + ((board->side==black)*6)) % 12];
         while (bitboard) {
             int loc = ls1b(bitboard);
-            int idx = piece*64 + ((side==white) ? loc : 63-loc);
+            int idx = piece*64 + ((board->side==white) ? loc : 63-loc);
             for (int i = 0; i < nodes1; ++i)
                 prods1[i] += weights->weights1[idx*nodes1 + i];
             pop_bit(bitboard, loc);
