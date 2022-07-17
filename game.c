@@ -26,7 +26,6 @@ float single_match(const net_weights *player1, const net_weights *player2, const
     while (move_count++ < max_moves) {
         // white moves
         int w_move = quick_search(&search, &board, depth, player1);
-        printf("hi2\n");
         make_move(&board, w_move, all_moves);
         w_nodes += search.neg_nodes;
 
@@ -61,16 +60,6 @@ float single_match(const net_weights *player1, const net_weights *player2, const
     return winner + ((w_nodes < b_nodes) ? node_bonus : -node_bonus);
 }
 
-void foo2(int *a) {
-    *a++;
-}
-
-void foo(int a, int b) {
-    printf("%d+%d=%d\n", a, b, a+b);
-    int c = 5;
-    foo2(&c);
-}
-
 // takes in match_params structure and simulates match between players, writing elo results to array
 void *thread_match(void *params)
 {
@@ -88,7 +77,6 @@ void *thread_match(void *params)
     search_state search;
 
     // simulate game
-    // foo(5, 6);
     while (move_count++ < max_moves) {
         printf("move %d\n", move_count);
         // white moves
