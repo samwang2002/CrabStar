@@ -5,10 +5,11 @@
 #include "net.h"
 #include <stdio.h>
 #include <math.h>
+#include <pthread.h>
 
 // returns result of match between player1 (white) and player2 (black)
 // small bonus for using fewer nodes
-float match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
+float single_match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
             const int verbose)
 {
     int move_count = 0;
@@ -25,6 +26,7 @@ float match(const net_weights *player1, const net_weights *player2, const char *
     while (move_count++ < max_moves) {
         // white moves
         int w_move = quick_search(&search, &board, depth, player1);
+        printf("hi2\n");
         make_move(&board, w_move, all_moves);
         w_nodes += search.neg_nodes;
 
@@ -59,6 +61,65 @@ float match(const net_weights *player1, const net_weights *player2, const char *
     return winner + ((w_nodes < b_nodes) ? node_bonus : -node_bonus);
 }
 
+void foo2(int *a) {
+    *a++;
+}
+
+void foo(int a, int b) {
+    printf("%d+%d=%d\n", a, b, a+b);
+    int c = 5;
+    foo2(&c);
+}
+
+// takes in match_params structure and simulates match between players, writing elo results to array
+void *thread_match(void *params)
+{
+    match_params *args = (match_params *)params;
+    
+    // simulate match
+    int move_count = 0;
+    int w_nodes = 0;
+    int b_nodes = 0;
+    int winner = 0;
+
+    // initialize position
+    board_state board;
+    parse_fen(&board, args->start_fen);
+    search_state search;
+
+    // simulate game
+    // foo(5, 6);
+    while (move_count++ < max_moves) {
+        printf("move %d\n", move_count);
+        // white moves
+        int w_move = quick_search(&search, &board, args->depth, args->player1);
+        make_move(&board, w_move, all_moves);
+        w_nodes += search.neg_nodes;
+
+        if (!has_legal_moves(&board)) {
+            winner = (square_attacked(&board, ls1b(board.bitboards[k]), white) ? 1 : 0);
+            break;
+        }
+
+        // black moves
+        int b_move = quick_search(&search, &board, args->depth, args->player2);
+        make_move(&board, b_move, all_moves);
+        b_nodes += search.neg_nodes;
+
+        if (!has_legal_moves(&board)) {
+            winner = (square_attacked(&board, ls1b(board.bitboards[K]), black) ? -1 : 0);
+            break;
+        }
+    }
+    print_board(&board);
+    float result = winner + ((w_nodes < b_nodes) ? node_bonus : -node_bonus);
+
+    printf("%d vs %d: %0.2f\n", args->player1_num, args->player2_num, result);
+    adjust_elos(args->elo1, args->elo2, result);
+
+    pthread_exit(NULL);
+}
+
 // writes array of elo results from round robin tournament
 void tournament(net_weights **players, const int n_pairings, const int depth, int *elos)
 {
@@ -71,26 +132,34 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
         idxs2[i] = 2*n_pairings - i - 1;
     }
 
+    // pthread_t tid2;
+    // match_params params2 = (match_params){ .player1 = players[0], .player2 = players[1],
+    //                                     .player1_num = 0, .player2_num = 1,
+    //                                     .start_fen = start_position, .depth = depth,
+    //                                     .elo1 = &elos[0], .elo2 = &elos[1] };
+    // pthread_create(&tid2, NULL, thread_match, (void *)&params2);
+    // pthread_join(tid2, NULL);
+
     // loop through rounds
     printf("matchups:\n");
     for (int round = 0; round < 2*n_pairings-1; ++round) {
         // play matches
+        pthread_t tid[n_pairings];
         for (int i = 0; i < n_pairings; ++i) {
-            float tally = 0;
             // loop through starting positions
-            for (int j = 0; j < n_starting_positions; ++j) {
-                float result1 = match(players[idxs1[i]], players[idxs2[i]], starting_positions[j], depth, 0);
-                printf("%d vs %d: %0.2f\n", idxs1[i], idxs2[i], result1);
-                tally += result1;
-                adjust_elos(&elos[idxs1[i]], &elos[idxs2[i]], result1);
-
-                float result2 = match(players[idxs2[i]], players[idxs1[i]], starting_positions[j], depth, 0);
-                printf("%d vs %d: %0.2f\n", idxs2[i], idxs1[i], result2);
-                tally -= result2;
-                adjust_elos(&elos[idxs2[i]], &elos[idxs1[i]], result2);
-            }
-            printf("--------------------\n%d vs %d summary: %0.2f\n--------------------\n", idxs1[i], idxs2[i], tally);
+            // for (int j = 0; j < n_starting_positions; ++j) {
+                match_params params = (match_params){ .player1 = players[idxs1[i]], .player2 = players[idxs2[i]],
+                                        .player1_num = idxs1[i], .player2_num = idxs2[i],
+                                        .start_fen = start_position, .depth = depth,
+                                        .elo1 = &elos[idxs1[i]], .elo2 = &elos[idxs2[i]] };
+                pthread_create(&tid[i], NULL, thread_match, (void *)&params);
+            // }
         }
+
+        // join all threads
+        for (int i = 0; i < n_pairings; ++i)
+            pthread_join(tid[i], NULL);
+        
         printf("--------------------\n");
 
         // cycle pairings

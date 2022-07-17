@@ -29,7 +29,7 @@ int main()
     // read_weights(&player1, "seed1");
     // player2 = player1;
     // mutate(&player2, 5, 0.2);
-    // match(&player1, &player2, start_position, 3, 1);
+    // single_match(&player1, &player2, start_position, 3, 1);
 
     clock_t start, end;
     start = clock();

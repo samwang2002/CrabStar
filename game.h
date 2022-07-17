@@ -18,13 +18,25 @@ static const char *starting_positions[4] = {open_game, open_sicilian, closed_gam
 
 // simulate game between two neural networks, return 1 for player 1 win, -1 for loss, 0 for draw,
 // with small bonus for using fewer nodes
-float match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
+float single_match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
             const int verbose);
+
+// takes in match_params structure and simulates multi-round match between players, writing elo results to array
+void *thread_match(void *params);
 
 // writes array of elo results from round robin tournament
 void tournament(net_weights **players, const int n_pairings, const int depth, int *elo_results);
 
 // adjust elo ratings for two players based on result
 void adjust_elos(int *elo1, int *elo2, int result);
+
+// struct to pass parameters to match function
+typedef struct {
+    net_weights *player1, *player2;
+    int player1_num, player2_num;
+    const char *start_fen;
+    const int depth;
+    int *elo1, *elo2;
+} match_params;
 
 #endif

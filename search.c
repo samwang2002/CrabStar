@@ -337,6 +337,8 @@ int quick_search(search_state *search, board_state *board, const int depth, cons
     memset(search->pv_length, 0, sizeof(search->pv_length));
 
     // find move
+    printf("searching at depth %d\n", depth);
     negamax(search, -infinity, infinity, depth, weights);
+    printf("finished negamax\n");
     return search->pv_table[0][0];
 }
