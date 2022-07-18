@@ -97,17 +97,19 @@ int net_eval(const board_state *board, const net_weights *weights)
     return (int)(final * 100);
 }
 
-// copy weights from one network to the other
-void copy_weights(net_weights *destination, const net_weights *source)
+// returns copy of network
+net_weights *duplicate_weights(const net_weights *weights)
 {
-    for (int i = 0; i < nodes0*nodes1; ++i) destination->weights1[i] = source->weights1[i];
-    for (int i = 0; i < nodes1*nodes2; ++i) destination->weights2[i] = source->weights2[i];
-    for (int i = 0; i < nodes2*nodes3; ++i) destination->weights3[i] = source->weights3[i];
-    for (int i = 0; i < nodes3*nodes4; ++i) destination->weights4[i] = source->weights4[i];
-    for (int i = 0; i < nodes1; ++i) destination->biases1[i] = source->biases1[i];
-    for (int i = 0; i < nodes2; ++i) destination->biases2[i] = source->biases2[i];
-    for (int i = 0; i < nodes3; ++i) destination->biases3[i] = source->biases3[i];
-    for (int i = 0; i < nodes4; ++i) destination->biases4[i] = source->biases4[i];
+    net_weights *copy = malloc(sizeof(net_weights));
+    for (int i = 0; i < nodes0*nodes1; ++i) copy->weights1[i] = weights->weights1[i];
+    for (int i = 0; i < nodes1*nodes2; ++i) copy->weights2[i] = weights->weights2[i];
+    for (int i = 0; i < nodes2*nodes3; ++i) copy->weights3[i] = weights->weights3[i];
+    for (int i = 0; i < nodes3*nodes4; ++i) copy->weights4[i] = weights->weights4[i];
+    for (int i = 0; i < nodes1; ++i) copy->biases1[i] = weights->biases1[i];
+    for (int i = 0; i < nodes2; ++i) copy->biases2[i] = weights->biases2[i];
+    for (int i = 0; i < nodes3; ++i) copy->biases3[i] = weights->biases3[i];
+    for (int i = 0; i < nodes4; ++i) copy->biases4[i] = weights->biases4[i];
+    return copy;
 }
 
 // mutate weights in network

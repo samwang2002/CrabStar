@@ -54,22 +54,22 @@ int main()
 
     players[0] = malloc(sizeof(net_weights));
     read_weights(players[0], "seed1");
+    for (int i = 1; i < n_players; ++i) {
+        players[i] = duplicate_weights(players[0]);
+        mutate(players[i], 5, 0.2);
+    }
 
-    players[1] = malloc(sizeof(net_weights));
-    read_weights(players[1], "seed1");
-    mutate(players[1], 5, 0.2);
+    // single_match(players[0], players[1], start_position, 3, 1);
+    // single_match(players[1], players[2], start_position, 3, 1);
 
-    single_match(players[0], players[1], start_position, 3, 1);
 
-    // single_match(&players[0], &players[1], start_position, 3, 1);
+    // have players face off
+    int results[n_players];
+    tournament(players, n_players/2, 3, results);
 
-    // // have players face off
-    // tournament(players, n_players/2, 3, results);
-
-    // // free player array
-    // for (int i = 0; i < n_players; ++i)
-    //     free(players[i]);
-    // free(players);
+    // free player array
+    for (int i = 0; i < n_players; ++i)
+        free(players[i]);
 
     end = clock();
     printf("-------------------\ntime taken: %0.2fs\n", (double)(end-start)/CLOCKS_PER_SEC);
