@@ -98,7 +98,7 @@ int net_eval(const board_state *board, const net_weights *weights)
 }
 
 // copy weights from one network to the other
-void copy_weights(net_weights *destination, net_weights *source)
+void copy_weights(net_weights *destination, const net_weights *source)
 {
     for (int i = 0; i < nodes0*nodes1; ++i) destination->weights1[i] = source->weights1[i];
     for (int i = 0; i < nodes1*nodes2; ++i) destination->weights2[i] = source->weights2[i];

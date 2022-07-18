@@ -42,7 +42,7 @@ int net_eval(const board_state *board, const net_weights *weights);
 
 // ------------ handling net evolution ------------
 // copy weights from one network to the other
-void copy_weights(net_weights *destination, net_weights *source);
+void copy_weights(net_weights *destination, const net_weights *source);
 
 // add normal(0, std_dev^2) noise randomly to one in inv_rate weight parameters
 void mutate(net_weights *weights, const int inv_rate, const float std_dev);
