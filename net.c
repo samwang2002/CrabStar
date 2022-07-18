@@ -100,14 +100,14 @@ int net_eval(const board_state *board, const net_weights *weights)
 // copy weights from one network to the other
 void copy_weights(net_weights *destination, net_weights *source)
 {
-    memcpy(destination->weights1, source->weights1, nodes0*nodes1*sizeof(float));
-    memcpy(destination->weights2, source->weights2, nodes1*nodes2*sizeof(float));
-    memcpy(destination->weights3, source->weights3, nodes2*nodes3*sizeof(float));
-    memcpy(destination->weights4, source->weights4, nodes3*nodes4*sizeof(float));
-    memcpy(destination->biases1, source->biases1, nodes1*sizeof(float));
-    memcpy(destination->biases2, source->biases2, nodes2*sizeof(float));
-    memcpy(destination->biases3, source->biases3, nodes3*sizeof(float));
-    memcpy(destination->biases4, source->biases4, nodes4*sizeof(float));
+    for (int i = 0; i < nodes0*nodes1; ++i) destination->weights1[i] = source->weights1[i];
+    for (int i = 0; i < nodes1*nodes2; ++i) destination->weights2[i] = source->weights2[i];
+    for (int i = 0; i < nodes2*nodes3; ++i) destination->weights3[i] = source->weights3[i];
+    for (int i = 0; i < nodes3*nodes4; ++i) destination->weights4[i] = source->weights4[i];
+    for (int i = 0; i < nodes1; ++i) destination->biases1[i] = source->biases1[i];
+    for (int i = 0; i < nodes2; ++i) destination->biases2[i] = source->biases2[i];
+    for (int i = 0; i < nodes3; ++i) destination->biases3[i] = source->biases3[i];
+    for (int i = 0; i < nodes4; ++i) destination->biases4[i] = source->biases4[i];
 }
 
 // mutate weights in network

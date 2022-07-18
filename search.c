@@ -280,24 +280,6 @@ void search_position(search_state *search, board_state *board, const int max_dep
         }
         alpha = score - 50;
         beta = score + 50;
-
-        // if (score > -mate_value && score < -mate_score)
-        //     printf("info score mate %d depth %d nodes %d time %d pv ", -(score + mate_value) / 2 - 1, depth,
-        //             search.neg_nodes, get_time_ms() - starttime);
-        
-        // else if (score > mate_score && score < mate_value)
-        //     printf("info score mate %d depth %d nodes %d time %d pv ", (mate_value - score) / 2 + 1, depth,
-        //             search.neg_nodes, get_time_ms() - starttime);   
-        
-        // else
-        //     printf("info score cp %d depth %d nodes %d time %d pv ", score, depth, search.neg_nodes,
-        //             get_time_ms() - starttime);
-
-        // for (int i = 0 ; i < search.pv_length[0]; ++i) {
-        //     printf(" ");
-        //     print_move(search.pv_table[0][i]);
-        // }
-        // printf("\n");
     }
     // best move
     printf("bestmove ");
@@ -337,8 +319,6 @@ int quick_search(search_state *search, board_state *board, const int depth, cons
     memset(search->pv_length, 0, sizeof(search->pv_length));
 
     // find move
-    printf("searching at depth %d\n", depth);
     negamax(search, -infinity, infinity, depth, weights);
-    printf("finished negamax\n");
     return search->pv_table[0][0];
 }
