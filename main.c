@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <time.h>
+#include <pthread.h>
 
 #include "board.h"
 #include "bitboard.h"
@@ -52,7 +53,7 @@ int main()
     int n_players = 4;
     net_weights *players[n_players];
 
-    players[0] = malloc(sizeof(net_weights));
+    players[0] = calloc(1, sizeof(net_weights));
     read_weights(players[0], "seed1");
     for (int i = 1; i < n_players; ++i) {
         players[i] = duplicate_weights(players[0]);
@@ -63,9 +64,18 @@ int main()
     // single_match(players[1], players[2], start_position, 3, 1);
 
 
+    // simulate match using thread_match
+    pthread_t tid;
+    int elo1 = 0;
+    int elo2 = 0;
+    match_params params = { .player1 = players[0], .player2 = players[1], .player1_num = 0, .player2_num = 1,
+	    		    .start_fen = start_position, .depth = 2, .elo1 = &elo1, .elo2 = &elo2 };
+    pthread_create(&tid, NULL, thread_match, (void *)&params);
+    pthread_join(tid, NULL);
+
     // have players face off
-    int results[n_players];
-    tournament(players, n_players/2, 3, results);
+//    int results[n_players];
+//    tournament(players, n_players/2, 3, results);
 
     // free player array
     for (int i = 0; i < n_players; ++i)

@@ -18,9 +18,9 @@ float single_match(const net_weights *player1, const net_weights *player2, const
     int winner = 0;
 
     // initialize position
-    board_state board;
+    board_state board = {};
     parse_fen(&board, start_fen);
-    search_state search;
+    search_state search = {};
 
     // simulate game
     while (move_count++ < max_moves) {
@@ -63,45 +63,8 @@ float single_match(const net_weights *player1, const net_weights *player2, const
 // takes in match_params structure and simulates match between players, writing elo results to array
 void *thread_match(void *params)
 {
-    match_params *args = (match_params *)params;
-    
-    // simulate match
-    int move_count = 0;
-    int w_nodes = 0;
-    int b_nodes = 0;
-    int winner = 0;
-
-    // initialize position
-    board_state board;
-    parse_fen(&board, args->start_fen);
-    search_state search;
-
-    // simulate game
-    while (move_count++ < max_moves) {
-        printf("move %d\n", move_count);
-        // white moves
-        int w_move = quick_search(&search, &board, args->depth, args->player1);
-        make_move(&board, w_move, all_moves);
-        w_nodes += search.neg_nodes;
-
-        if (!has_legal_moves(&board)) {
-            winner = (square_attacked(&board, ls1b(board.bitboards[k]), white) ? 1 : 0);
-            break;
-        }
-
-        // black moves
-        int b_move = quick_search(&search, &board, args->depth, args->player2);
-        make_move(&board, b_move, all_moves);
-        b_nodes += search.neg_nodes;
-
-        if (!has_legal_moves(&board)) {
-            winner = (square_attacked(&board, ls1b(board.bitboards[K]), black) ? -1 : 0);
-            break;
-        }
-    }
-    print_board(&board);
-    float result = winner + ((w_nodes < b_nodes) ? node_bonus : -node_bonus);
-
+    match_params *args = (match_params *)params; 
+    float result = single_match(args->player1, args->player2, args->start_fen, args->depth, 1);
     printf("%d vs %d: %0.2f\n", args->player1_num, args->player2_num, result);
     adjust_elos(args->elo1, args->elo2, result);
 

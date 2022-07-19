@@ -85,7 +85,7 @@ int negamax(search_state *search, const int alpha, const int beta, int depth, co
     // initialize pv length
     search->pv_length[search->ply] = search->ply;
 
-    if (depth == 0)         // base case
+    if (depth <= 0)         // base case
         return quiescence(search, alpha, beta, weights);
     
     ++search->neg_nodes;
