@@ -20,6 +20,7 @@ void load_weights(float *weights, const int dim, const char *path)
         float w = atof(buf);
         weights[idx] = w;
     }
+    fclose(fp);
 }
 
 // initialize weight vectors
