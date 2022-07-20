@@ -34,8 +34,8 @@ void adjust_elos(int *elo1, int *elo2, int result);
 typedef struct {
     net_weights *player1, *player2;
     int player1_num, player2_num;
-    const char *start_fen;
-    const int depth;
+    char *start_fen;
+    int depth;
     int *elo1, *elo2;
 } match_params;
 

@@ -26,31 +26,11 @@ int main()
     init_all();
     srand(time(NULL));
 
-    // net_weights player1, player2;
-    // read_weights(&player1, "seed1");
-    // player2 = player1;
-    // mutate(&player2, 5, 0.2);
-    // single_match(&player1, &player2, start_position, 3, 1);
-
     clock_t start, end;
     start = clock();
 
-    // // create array of players
-    // int n_players = 4;
-    // net_weights **players = malloc(n_players * sizeof(net_weights *));
-    // int results[n_players];
-
-    // players[0] = malloc(sizeof(net_weights));
-    // read_weights(players[0], "seed1");
-
-    // for (int i = 1; i < n_players; ++i) {
-    //     players[i] = malloc(sizeof(net_weights));
-    //     copy_weights(players[i], players[0]);
-    //     mutate(players[i], 5, 0.2);
-    // }
-
     // create array of players
-    int n_players = 4;
+    int n_players = 8;
     net_weights *players[n_players];
 
     players[0] = calloc(1, sizeof(net_weights));
@@ -60,22 +40,9 @@ int main()
         mutate(players[i], 5, 0.2);
     }
 
-    // single_match(players[0], players[1], start_position, 3, 1);
-    // single_match(players[1], players[2], start_position, 3, 1);
-
-
-    // simulate match using thread_match
-    pthread_t tid;
-    int elo1 = 0;
-    int elo2 = 0;
-    match_params params = { .player1 = players[0], .player2 = players[1], .player1_num = 0, .player2_num = 1,
-	    		    .start_fen = start_position, .depth = 2, .elo1 = &elo1, .elo2 = &elo2 };
-    pthread_create(&tid, NULL, thread_match, (void *)&params);
-    pthread_join(tid, NULL);
-
     // have players face off
-//    int results[n_players];
-//    tournament(players, n_players/2, 3, results);
+   int results[n_players];
+   tournament(players, n_players/2, 3, results);
 
     // free player array
     for (int i = 0; i < n_players; ++i)

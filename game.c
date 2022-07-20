@@ -56,19 +56,26 @@ float single_match(const net_weights *player1, const net_weights *player2, const
             break;
         }
     }
-    print_board(&board);
+    // print_board(&board);
     return winner + ((w_nodes < b_nodes) ? node_bonus : -node_bonus);
 }
 
 // takes in match_params structure and simulates match between players, writing elo results to array
 void *thread_match(void *params)
 {
-    match_params *args = (match_params *)params; 
-    float result = single_match(args->player1, args->player2, args->start_fen, args->depth, 1);
+    match_params *args = (match_params *)params;
+    float result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
     printf("%d vs %d: %0.2f\n", args->player1_num, args->player2_num, result);
     adjust_elos(args->elo1, args->elo2, result);
 
-    pthread_exit(NULL);
+    return NULL;
+    // pthread_exit(NULL);
+}
+
+void *foo(void *params)
+{
+    printf("hello\n");
+    return NULL;
 }
 
 // writes array of elo results from round robin tournament
@@ -83,43 +90,51 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
         idxs2[i] = 2*n_pairings - i - 1;
     }
 
-    // pthread_t tid2;
-    // match_params params2 = (match_params){ .player1 = players[0], .player2 = players[1],
-    //                                     .player1_num = 0, .player2_num = 1,
-    //                                     .start_fen = start_position, .depth = depth,
-    //                                     .elo1 = &elos[0], .elo2 = &elos[1] };
-    // pthread_create(&tid2, NULL, thread_match, (void *)&params2);
-    // pthread_join(tid2, NULL);
-
-    // loop through rounds
+    // simulate matches
     printf("matchups:\n");
-    for (int round = 0; round < 2*n_pairings-1; ++round) {
-        // play matches
-        pthread_t tid[n_pairings];
-        for (int i = 0; i < n_pairings; ++i) {
-            // loop through starting positions
-            // for (int j = 0; j < n_starting_positions; ++j) {
-                match_params params = (match_params){ .player1 = players[idxs1[i]], .player2 = players[idxs2[i]],
-                                        .player1_num = idxs1[i], .player2_num = idxs2[i],
-                                        .start_fen = start_position, .depth = depth,
-                                        .elo1 = &elos[idxs1[i]], .elo2 = &elos[idxs2[i]] };
-                pthread_create(&tid[i], NULL, thread_match, (void *)&params);
-            // }
-        }
+    int n_rounds = 2*n_pairings-1;
+    int n_threads = 2*n_pairings*n_rounds;      // n_pairing * n_rounds different matchups, play both colors
+    pthread_t tid[n_threads];
+    match_params params[n_threads];
 
-        // join all threads
-        for (int i = 0; i < n_pairings; ++i)
-            pthread_join(tid[i], NULL);
-        
-        printf("--------------------\n");
+    for (int round = 0; round < n_rounds; ++round) {
+        for (int i = 0; i < n_pairings; ++i) {
+            // first match player1 as white
+            int w_idx = 2*n_pairings*round + i;
+            params[w_idx].player1 = players[idxs1[i]];
+            params[w_idx].player2 = players[idxs2[i]];
+            params[w_idx].player1_num = idxs1[i];
+            params[w_idx].player2_num = idxs2[i];
+            params[w_idx].start_fen = start_position;
+            params[w_idx].depth = depth;
+            params[w_idx].elo1 = &elos[idxs1[i]];
+            params[w_idx].elo2 = &elos[idxs2[i]];
+            pthread_create(&tid[w_idx], NULL, thread_match, (void *)&params[w_idx]);
+
+            // second match player1 as black
+            int b_idx = w_idx + n_pairings;
+            params[b_idx].player1 = players[idxs2[i]];
+            params[b_idx].player2 = players[idxs1[i]];
+            params[b_idx].player1_num = idxs2[i];
+            params[b_idx].player2_num = idxs1[i];
+            params[b_idx].start_fen = start_position;
+            params[b_idx].depth = depth;
+            params[b_idx].elo1 = &elos[idxs2[i]];
+            params[b_idx].elo2 = &elos[idxs1[i]];
+            pthread_create(&tid[b_idx], NULL, thread_match, (void *)&params[b_idx]);
+        }
 
         // cycle pairings
         for (int i = 1; i < n_pairings; ++i) idxs1[i] = (idxs1[i]>1) ? idxs1[i]-1 : 2*n_pairings-1;
         for (int i = 0; i < n_pairings; ++i) idxs2[i] = (idxs2[i]>1) ? idxs2[i]-1 : 2*n_pairings-1;
     }
 
+    // join all threads
+    for (int i = 0; i < n_threads; ++i)
+        pthread_join(tid[i], NULL);
+
     // print new elos
-    printf("new ratings:\n");
+    printf("-------------------\nnew ratings:\n");
     for (int i = 0; i < 2*n_pairings; ++i)
         printf("player %d: %d\n", i, elos[i]);
 }
