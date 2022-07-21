@@ -50,7 +50,7 @@ void read_weights(net_weights *weights, const char *path)
 int net_eval(const board_state *board, const net_weights *weights)
 {
     // pass through first layer
-    float *prods1 = malloc(sizeof(weights->biases1));
+    float prods1[nodes1];
     memcpy(prods1, weights->biases1, sizeof(weights->biases1));
 
     // loop through bitboards
@@ -66,7 +66,7 @@ int net_eval(const board_state *board, const net_weights *weights)
     }
 
     // pass through second layer
-    float *prods2 = malloc(sizeof(weights->biases2));
+    float prods2[nodes2];
     memcpy(prods2, weights->biases2, sizeof(weights->biases2));
 
     for (int i = 0; i < nodes1; ++i) {
@@ -74,10 +74,9 @@ int net_eval(const board_state *board, const net_weights *weights)
         for (int j = 0; j < nodes2; ++j)
             prods2[j] += prods1[i] * weights->weights2[i*nodes2 + j];
     }
-    free(prods1);
 
     // pass through third layer
-    float *prods3 = malloc(sizeof(weights->biases3));
+    float prods3[nodes3];
     memcpy(prods3, weights->biases3, sizeof(weights->biases3));
 
     for (int i = 0; i < nodes2; ++i) {
@@ -85,7 +84,6 @@ int net_eval(const board_state *board, const net_weights *weights)
         for (int j = 0; j < nodes2; ++j)
             prods3[j] += prods2[i] * weights->weights3[i*nodes2 + j];
     }
-    free(prods2);
 
     // pass through final layer
     float final = weights->biases4[0];
@@ -93,7 +91,6 @@ int net_eval(const board_state *board, const net_weights *weights)
         if (prods3[i] <= 0) continue;
         final += prods3[i] * weights->weights4[i];
     }
-    free(prods3);
     
     return (int)(final * 100);
 }
