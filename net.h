@@ -32,10 +32,16 @@ typedef struct {
 } net_weights;
 
 // load weights from text file into 1d array
-void load_weights(float *weights, const int dim, const char *path);
+void load_vector(float *weights, const int dim, const char *dir_path);
 
 // initialize weight vectors in weights given folder path
 void read_weights(net_weights *weights, const char *path);
+
+// save vector of weights to given file path
+void save_vector(const float *weights, const int dim, const char *dir_path);
+
+// save weights to files in given folder path
+void save_weights(const net_weights *weights, const char *path);
 
 // evaluate position using neural network
 int net_eval(const board_state *board, const net_weights *weights);
