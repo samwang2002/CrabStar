@@ -83,14 +83,14 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
 
     // simulate matches
     int n_rounds = 2*n_pairings-1;
-    int n_threads = 2*n_pairings*n_rounds;      // n_pairing * n_rounds different matchups, play both colors
+    int n_threads = 2*n_pairings;
     pthread_t tid[n_threads];
     match_params params[n_threads];
 
     for (int round = 0; round < n_rounds; ++round) {
         for (int i = 0; i < n_pairings; ++i) {
             // first match player1 as white
-            int w_idx = 2*n_pairings*round + i;
+            int w_idx = i;
             params[w_idx].player1 = players[idxs1[i]];
             params[w_idx].player2 = players[idxs2[i]];
             params[w_idx].player1_num = idxs1[i];
@@ -114,14 +114,14 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
             pthread_create(&tid[b_idx], NULL, thread_match, (void *)&params[b_idx]);
         }
 
+        // join all threads
+        for (int i = 0; i < n_threads; ++i)
+            pthread_join(tid[i], NULL);
+
         // cycle pairings
         for (int i = 1; i < n_pairings; ++i) idxs1[i] = (idxs1[i]>1) ? idxs1[i]-1 : 2*n_pairings-1;
         for (int i = 0; i < n_pairings; ++i) idxs2[i] = (idxs2[i]>1) ? idxs2[i]-1 : 2*n_pairings-1;
     }
-
-    // join all threads
-    for (int i = 0; i < n_threads; ++i)
-        pthread_join(tid[i], NULL);
 }
 
 // adjust elo ratings for two players based on result

@@ -31,18 +31,26 @@ int main()
     time(&start_s);
     start = clock();
 
-    // simulate_generations(30, 8, 3, "seed1", 5, 0.05);
+    simulate_generations(30, 16, 3, "seed1", 5, 0.03);
 
-    // net_weights player1, player2, player3, player4;
+    // net_weights player1, player2, player3, player4, player5, player6, player7, player8, player9, player10;
     // read_weights(&player1, "seed1");
     // read_weights(&player2, "gen10");
     // read_weights(&player3, "gen20");
     // read_weights(&player4, "gen30");
-    // net_weights *players[] = {&player1, &player2, &player3, &player4};
+    // read_weights(&player5, "gen40");
+    // read_weights(&player6, "gen50");
+    // read_weights(&player7, "gen60");
+    // read_weights(&player8, "gen70");
+    // read_weights(&player9, "gen80");
+    // read_weights(&player10, "gen90");
+    // net_weights *players[] = {&player1, &player2, &player3, &player4, &player5, &player6, &player7, &player8,
+    //                             &player9, &player10};
 
-    // int elos[4];
-    // tournament(players, 2, 3, elos);
-    // for (int i = 0; i < 4; ++i)
+    // int elos[10];
+    // memset(elos, 0, sizeof(elos));
+    // tournament(players, 5, 3, elos);
+    // for (int i = 0; i < 10; ++i)
     //     printf("%d: %d\n", i, elos[i]);
 
 
