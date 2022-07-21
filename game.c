@@ -72,7 +72,7 @@ void *thread_match(void *params)
 }
 
 // writes array of elo results from round robin tournament
-void tournament(const net_weights **players, const int n_pairings, const int depth, int *elos)
+void tournament(net_weights **players, const int n_pairings, const int depth, int *elos)
 {
     // in each round, idxs1[i] faces idxs2[i]
     int idxs1[n_pairings], idxs2[n_pairings];
@@ -140,7 +140,7 @@ void simulate_generations(const int generations, const int n_players, const int 
     net_weights *players[n_players];
 
     // create seed generation
-    players[0] = calloc(0, sizeof(net_weights));
+    players[0] = calloc(1, sizeof(net_weights));
     read_weights(players[0], seed_path);
     for (int i = 1; i < n_players; ++i) {
         players[i] = duplicate_weights(players[0]);
