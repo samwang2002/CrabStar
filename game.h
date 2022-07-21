@@ -30,12 +30,11 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
 // adjust elo ratings for two players based on result
 void adjust_elos(int *elo1, int *elo2, int result);
 
-// simulate multiple generations of evolution
+// simulate multiple generations of evolution, keeps 2 best performing nets each round to create next generation
 // n_players: total number of nets in each generation
-// keep_per_round: number of top nets that are immediately fed to next generation
 // seed_path: file path to seed net
 // inv_rate, std_dev: describe mutation rate (see net.h)
-void simulate_generations(const int generations, const int n_players, const int keep_per_round, const int depth,
+void simulate_generations(const int generations, const int n_players, const int depth,
                           const char *seed_path, const int inv_rate, const float std_dev);
 
 // struct to pass parameters to match function

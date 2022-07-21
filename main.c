@@ -26,13 +26,30 @@ int main()
     init_all();
     srand(time(NULL));
 
+    time_t start_s, end_s;
     clock_t start, end;
+    time(&start_s);
     start = clock();
 
-    simulate_generations(1, 8, 3, 2, "seed1", 5, 0.05);
+    // simulate_generations(30, 8, 3, "seed1", 5, 0.05);
 
+    // net_weights player1, player2, player3, player4;
+    // read_weights(&player1, "seed1");
+    // read_weights(&player2, "gen10");
+    // read_weights(&player3, "gen20");
+    // read_weights(&player4, "gen30");
+    // net_weights *players[] = {&player1, &player2, &player3, &player4};
+
+    // int elos[4];
+    // tournament(players, 2, 3, elos);
+    // for (int i = 0; i < 4; ++i)
+    //     printf("%d: %d\n", i, elos[i]);
+
+
+    time(&end_s);
     end = clock();
-    printf("-------------------\ntime taken: %0.2fs\n", (double)(end-start)/CLOCKS_PER_SEC);
+    printf("%s\ntime elapsed: %lds\n", horizontal_line, end_s-start_s);
+    printf("CPU time: %lus\n", (int)(end-start)/CLOCKS_PER_SEC);
 
     return 0;
 }

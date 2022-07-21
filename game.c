@@ -134,7 +134,7 @@ void adjust_elos(int *elo1, int *elo2, int result)
 }
 
 // simulate multiple generations of evolution
-void simulate_generations(const int generations, const int n_players, const int keep_per_round, const int depth,
+void simulate_generations(const int generations, const int n_players, const int depth,
                           const char *seed_path, const int inv_rate, const float std_dev)
 {
     net_weights *players[n_players];
@@ -144,23 +144,38 @@ void simulate_generations(const int generations, const int n_players, const int 
     read_weights(players[0], seed_path);
     for (int i = 1; i < n_players; ++i) {
         players[i] = duplicate_weights(players[0]);
-        mutate(players[i], inv_rate, std_dev);
+        mutate(players[i], inv_rate/2, 2*std_dev);        // a bit more variety in seed generation
     }
 
     int elos[n_players];
 
     // loop through generations
     for (int gen = 0; gen <= generations; ++gen) {
+        printf("generation %d\n", gen);
+
         // simulate tournament
         memset(elos, 0, sizeof(elos));
         tournament(players, n_players/2, depth, elos);
         for (int i = 0; i < n_players; ++i)
             printf("%d: %d\n", i, elos[i]);
 
-        if (gen == generations) continue;       // already done
+        // if all generations are complete, skip to saving
+        if (gen == generations) {
+            // find best performing net
+            int best_idx = 0;
+            for (int i = 1; i < n_players; ++i) if (elos[i] > elos[best_idx]) best_idx = i;
 
-        // keep top performing nets
-        for (int i = 0; i < keep_per_round; ++i) {
+            // save weights
+            char dir_path[100];
+            sprintf(dir_path, "gen%d", gen);
+            printf("%s\nsaving to %s\n", horizontal_line, dir_path);
+            save_weights(players[best_idx], dir_path);
+
+            continue;
+        }
+
+        // keep 2 top performing nets
+        for (int i = 0; i < 2; ++i) {
             int best_idx = i;
             for (int j = i+1; j < n_players; ++j)
                 if (elos[j] > elos[best_idx]) best_idx = j;
@@ -174,13 +189,21 @@ void simulate_generations(const int generations, const int n_players, const int 
             players[best_idx] = weights_temp;
         }
 
-        printf("\n");
-        for (int i = 0; i < n_players; ++i)
-            printf("%d\n", elos[i]);
-
         // discard low performing nets
+        for (int i = 2; i < n_players; ++i) {
+            free(players[i]);
+            players[i] = crossover(players[0], players[1], inv_rate, std_dev);
+        }
 
-        printf("-----------------------------\n");
+        // save best performing net every 10 generations
+        if (gen && gen%10 == 0) {
+            char dir_path[100];
+            sprintf(dir_path, "gen%d", gen);
+            printf("%s\nsaving to %s\n", horizontal_line, dir_path);
+            save_weights(players[0], dir_path);
+        }
+
+        printf("%s\n", horizontal_line);
     }
 
     // free all mallocs
