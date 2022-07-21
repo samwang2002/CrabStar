@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 // returns result of match between player1 (white) and player2 (black)
 // small bonus for using fewer nodes
@@ -65,24 +66,14 @@ void *thread_match(void *params)
 {
     match_params *args = (match_params *)params;
     float result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
-    printf("%d vs %d: %0.2f\n", args->player1_num, args->player2_num, result);
     adjust_elos(args->elo1, args->elo2, result);
 
-    return NULL;
-    // pthread_exit(NULL);
-}
-
-void *foo(void *params)
-{
-    printf("hello\n");
     return NULL;
 }
 
 // writes array of elo results from round robin tournament
-void tournament(net_weights **players, const int n_pairings, const int depth, int *elos)
+void tournament(const net_weights **players, const int n_pairings, const int depth, int *elos)
 {
-    memset(elos, 0, 2*n_pairings * sizeof(int));
-
     // in each round, idxs1[i] faces idxs2[i]
     int idxs1[n_pairings], idxs2[n_pairings];
     for (int i = 0; i < n_pairings; ++i) {
@@ -91,7 +82,6 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
     }
 
     // simulate matches
-    printf("matchups:\n");
     int n_rounds = 2*n_pairings-1;
     int n_threads = 2*n_pairings*n_rounds;      // n_pairing * n_rounds different matchups, play both colors
     pthread_t tid[n_threads];
@@ -132,11 +122,6 @@ void tournament(net_weights **players, const int n_pairings, const int depth, in
     // join all threads
     for (int i = 0; i < n_threads; ++i)
         pthread_join(tid[i], NULL);
-
-    // print new elos
-    printf("-------------------\nnew ratings:\n");
-    for (int i = 0; i < 2*n_pairings; ++i)
-        printf("player %d: %d\n", i, elos[i]);
 }
 
 // adjust elo ratings for two players based on result
@@ -146,4 +131,59 @@ void adjust_elos(int *elo1, int *elo2, int result)
     float actual = result*0.5 + 0.5;
     *elo1 += (int)(elo_k*(actual-expected));
     *elo2 -= (int)(elo_k*(actual-expected));
+}
+
+// simulate multiple generations of evolution
+void simulate_generations(const int generations, const int n_players, const int keep_per_round, const int depth,
+                          const char *seed_path, const int inv_rate, const float std_dev)
+{
+    net_weights *players[n_players];
+
+    // create seed generation
+    players[0] = calloc(0, sizeof(net_weights));
+    read_weights(players[0], seed_path);
+    for (int i = 1; i < n_players; ++i) {
+        players[i] = duplicate_weights(players[0]);
+        mutate(players[i], inv_rate, std_dev);
+    }
+
+    int elos[n_players];
+
+    // loop through generations
+    for (int gen = 0; gen <= generations; ++gen) {
+        // simulate tournament
+        memset(elos, 0, sizeof(elos));
+        tournament(players, n_players/2, depth, elos);
+        for (int i = 0; i < n_players; ++i)
+            printf("%d: %d\n", i, elos[i]);
+
+        if (gen == generations) continue;       // already done
+
+        // keep top performing nets
+        for (int i = 0; i < keep_per_round; ++i) {
+            int best_idx = i;
+            for (int j = i+1; j < n_players; ++j)
+                if (elos[j] > elos[best_idx]) best_idx = j;
+            
+            int num_temp = elos[i];
+            elos[i] = elos[best_idx];
+            elos[best_idx] = num_temp;
+
+            net_weights *weights_temp = players[i];
+            players[i] = players[best_idx];
+            players[best_idx] = weights_temp;
+        }
+
+        printf("\n");
+        for (int i = 0; i < n_players; ++i)
+            printf("%d\n", elos[i]);
+
+        // discard low performing nets
+
+        printf("-----------------------------\n");
+    }
+
+    // free all mallocs
+    for (int i = 0; i < n_players; ++i)
+        free(players[i]);
 }

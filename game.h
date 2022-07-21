@@ -25,10 +25,18 @@ float single_match(const net_weights *player1, const net_weights *player2, const
 void *thread_match(void *params);
 
 // writes array of elo results from round robin tournament
-void tournament(net_weights **players, const int n_pairings, const int depth, int *elo_results);
+void tournament(const net_weights **players, const int n_pairings, const int depth, int *elo_results);
 
 // adjust elo ratings for two players based on result
 void adjust_elos(int *elo1, int *elo2, int result);
+
+// simulate multiple generations of evolution
+// n_players: total number of nets in each generation
+// keep_per_round: number of top nets that are immediately fed to next generation
+// seed_path: file path to seed net
+// inv_rate, std_dev: describe mutation rate (see net.h)
+void simulate_generations(const int generations, const int n_players, const int keep_per_round, const int depth,
+                          const char *seed_path, const int inv_rate, const float std_dev);
 
 // struct to pass parameters to match function
 typedef struct {
