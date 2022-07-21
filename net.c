@@ -131,3 +131,40 @@ void mutate(net_weights *weights, const int inv_rate, const float std_dev)
     for (float *w = weights->biases4; w < weights->biases1 + nodes4; ++w)
         if (rand() % inv_rate == 0) *w += gaussian_rand() * std_dev;
 }
+
+// mix weights from two input weights 50/50 and mutate weights
+net_weights *crossover(const net_weights *weights1, const net_weights *weights2,
+                       const int inv_rate, const float std_dev)
+{
+    net_weights *new_weights = malloc(sizeof(net_weights));
+
+    // cross over weights
+    for (int i = 0; i < nodes0*nodes1; ++i)
+        new_weights->weights1[i] = ((rand()%2==0) ? weights1->weights1[i] : weights2->weights1[i])
+                                    + ((rand()%inv_rate==0) ? (gaussian_rand()*std_dev) : 0);
+    for (int i = 0; i < nodes1*nodes2; ++i)
+        new_weights->weights2[i] = ((rand()%2==0) ? weights1->weights2[i] : weights2->weights2[i])
+                                    + ((rand()%inv_rate==0) ? (gaussian_rand()*std_dev) : 0);
+    for (int i = 0; i < nodes2*nodes3; ++i)
+        new_weights->weights3[i] = ((rand()%2==0) ? weights1->weights3[i] : weights2->weights3[i])
+                                    + ((rand()%inv_rate==0) ? (gaussian_rand()*std_dev) : 0);
+    for (int i = 0; i < nodes3*nodes4; ++i)
+        new_weights->weights4[i] = ((rand()%2==0) ? weights1->weights4[i] : weights2->weights4[i])
+                                    + ((rand()%inv_rate==0) ? (gaussian_rand()*std_dev) : 0);
+    
+    // cross over biases
+    for (int i = 0; i < nodes1; ++i)
+        new_weights->biases1[i] = ((rand()%2==0) ? weights1->biases1[i] : weights2->biases1[i])
+                                    + ((rand()%inv_rate==0) ? (gaussian_rand()*std_dev) : 0);
+    for (int i = 0; i < nodes2; ++i)
+        new_weights->biases2[i] = ((rand()%2==0) ? weights1->biases2[i] : weights2->biases2[i])
+                                    + ((rand()%inv_rate==0) ? (gaussian_rand()*std_dev) : 0);
+    for (int i = 0; i < nodes3; ++i)
+        new_weights->biases3[i] = ((rand()%2==0) ? weights1->biases3[i] : weights2->biases3[i])
+                                    + ((rand()%inv_rate==0) ? (gaussian_rand()*std_dev) : 0);
+    for (int i = 0; i < nodes4; ++i)
+        new_weights->biases4[i] = ((rand()%2==0) ? weights1->biases4[i] : weights2->biases4[i])
+                                    + ((rand()%inv_rate==0) ? (gaussian_rand()*std_dev) : 0);
+
+    return new_weights;
+}

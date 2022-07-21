@@ -35,14 +35,20 @@ int main()
 
     players[0] = calloc(1, sizeof(net_weights));
     read_weights(players[0], "seed1");
-    for (int i = 1; i < n_players; ++i) {
-        players[i] = duplicate_weights(players[0]);
-        mutate(players[i], 5, 0.2);
-    }
+    // for (int i = 1; i < n_players; ++i) {
+    //     players[i] = duplicate_weights(players[0]);
+    //     mutate(players[i], 5, 0.2);
+    // }
 
     // have players face off
-   int results[n_players];
-   tournament(players, n_players/2, 3, results);
+//    int results[n_players];
+//    tournament(players, n_players/2, 3, results);
+
+    players[1] = calloc(1, sizeof(net_weights));
+    read_weights(players[1], "seed2");
+    net_weights *crossed_player = crossover(players[0], players[1], 5, 0.2);
+    for (int i = 0; i < nodes3; ++i)
+        printf("%f %f -> %f\n", players[0]->biases3[i], players[1]->biases3[i], crossed_player->biases3[i]);
 
     // free player array
     for (int i = 0; i < n_players; ++i)

@@ -47,4 +47,8 @@ net_weights *duplicate_weights(const net_weights *weights);
 // add normal(0, std_dev^2) noise randomly to one in inv_rate weight parameters
 void mutate(net_weights *weights, const int inv_rate, const float std_dev);
 
+// mix weights from two input weights 50/50 and mutate weights
+net_weights *crossover(const net_weights *weights1, const net_weights *weights2,
+                       const int inv_rate, const float std_dev);
+
 #endif
