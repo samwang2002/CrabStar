@@ -31,8 +31,16 @@ int main()
     time(&start_s);
     start = clock();
 
-    int ranks = encode_winners(12, 5);
-    printf("ranks: %d, first: %d, second: %d\n", ranks, get_first_place(ranks), get_second_place(ranks));
+    int n_players = 16;
+    net_weights *players[n_players];
+    players[0] = calloc(0, sizeof(net_weights));
+    read_weights(players[0], "seed1");
+    for (int i = 1; i < n_players; ++i) {
+        players[i] = duplicate_weights(players[0]);
+        mutate(players[i], 5, 0.05);
+    }
+
+    single_elimination(players, n_players, 3);
 
     // simulate_generations(30, 16, 3, "seed1", 5, 0.03);
 

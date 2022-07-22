@@ -61,13 +61,20 @@ float single_match(const net_weights *player1, const net_weights *player2, const
     return winner + ((w_nodes < b_nodes) ? node_bonus : -node_bonus);
 }
 
-// takes in match_params structure and simulates match between players, writing elo results to array
-void *thread_match(void *params)
+// simulates match in round robin format between players, writing elo results to array
+void *threaded_rr(void *params)
 {
-    match_params *args = (match_params *)params;
+    rr_params *args = (rr_params *)params;
     float result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
     adjust_elos(args->elo1, args->elo2, result);
+    return NULL;
+}
 
+// simulaters match in single elimination format between players, saves pointer to winner's net_weights
+void *threaded_se(void *params)
+{
+    se_params *args = (se_params *)params;
+    args->result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
     return NULL;
 }
 
@@ -87,7 +94,7 @@ void round_robin(net_weights **players, const int n_players, const int depth, in
     int n_rounds = 2*n_pairings-1;
     int n_threads = 2*n_pairings;
     pthread_t tid[n_threads];
-    match_params params[n_threads];
+    rr_params params[n_threads];
 
     for (int round = 0; round < n_rounds; ++round) {
         for (int i = 0; i < n_pairings; ++i) {
@@ -101,7 +108,7 @@ void round_robin(net_weights **players, const int n_players, const int depth, in
             params[w_idx].depth = depth;
             params[w_idx].elo1 = &elos[idxs1[i]];
             params[w_idx].elo2 = &elos[idxs2[i]];
-            pthread_create(&tid[w_idx], NULL, thread_match, (void *)&params[w_idx]);
+            pthread_create(&tid[w_idx], NULL, threaded_rr, (void *)&params[w_idx]);
 
             // second match player1 as black
             int b_idx = w_idx + n_pairings;
@@ -113,7 +120,7 @@ void round_robin(net_weights **players, const int n_players, const int depth, in
             params[b_idx].depth = depth;
             params[b_idx].elo1 = &elos[idxs2[i]];
             params[b_idx].elo2 = &elos[idxs1[i]];
-            pthread_create(&tid[b_idx], NULL, thread_match, (void *)&params[b_idx]);
+            pthread_create(&tid[b_idx], NULL, threaded_rr, (void *)&params[b_idx]);
         }
 
         // join all threads
@@ -124,6 +131,61 @@ void round_robin(net_weights **players, const int n_players, const int depth, in
         for (int i = 1; i < n_pairings; ++i) idxs1[i] = (idxs1[i]>1) ? idxs1[i]-1 : 2*n_pairings-1;
         for (int i = 0; i < n_pairings; ++i) idxs2[i] = (idxs2[i]>1) ? idxs2[i]-1 : 2*n_pairings-1;
     }
+}
+
+// simulates single elimination tournament, returns int containing indices of 1st and 2nd place
+int single_elimination(net_weights **players, const int n_players, const int depth)
+{
+    int n_remaining = n_players;
+    int players_remaining[n_players*2];         // complete binary tree stored in flat array
+    memset(players_remaining, -1, sizeof(players_remaining));       // REMOVE
+    for (int i = 0; i < n_players; ++i) players_remaining[i+n_players] = i;
+
+    // loop through rounds
+    while (n_remaining > 1) {
+        printf("%d remaining\n", n_remaining);
+        pthread_t tid[n_remaining];
+        se_params params[n_remaining];
+        
+        // loop through pairings and create matches
+        for (int i = 0; i < n_remaining; i += 2) {
+            int p1 = players_remaining[n_remaining+i], p2 = players_remaining[n_remaining+i+1];
+            printf("%d vs %d\n", p1, p2);
+            params[i].player1 = players[p1];
+            params[i].player2 = players[p2];
+            params[i].depth = depth;
+            params[i].start_fen = start_position;
+            params[i].result = -100;            // REMOVE
+            pthread_create(&tid[i], NULL, threaded_se, (void *)&params[i]);
+
+            params[i+1].player1 = players[p2];
+            params[i+1].player2 = players[p1];
+            params[i+1].depth = depth;
+            params[i+1].start_fen = start_position;
+            params[i+1].result = -100;          // REMOVE
+            pthread_create(&tid[i+1], NULL, threaded_se, (void *)&params[i+1]);
+        }
+
+        // wait for results and record winners
+        for (int i = 0; i < n_remaining; i += 2) {
+            pthread_join(tid[i], NULL);
+            pthread_join(tid[i+1], NULL);
+
+            int p1 = players_remaining[n_remaining+i], p2 = players_remaining[n_remaining+i+1];
+            printf("results for %d vs %d\n", p1, p2);
+            float result = params[i].result + params[i+1].result;
+            printf("%d vs %d: %0.2f\n", p1, p2, result);
+            if (n_remaining > 2)
+                players_remaining[(n_remaining+i)/2] = (result >= 0) ? p1 : p2;
+            else
+                return encode_winners((result >= 0) ? p1 : p2, (result >= 0) ? p1 : p2);
+        }
+
+        n_remaining >>= 1;
+        printf("%s\n", horizontal_line);
+    }
+
+    return 0;
 }
 
 // adjust elo ratings for two players based on result

@@ -17,9 +17,9 @@
 static const char *starting_positions[4] = {open_game, open_sicilian, closed_game, indian_defense};
 
 // macros for encoding and retrieving 1st/2nd place in single elimination tournament
-#define encode_winners(num1, num2) ((num1 << 16) | num2)
-#define get_first_place(ranks) (ranks >> 16)
-#define get_second_place(ranks) (ranks & 0xffff)
+#define encode_winners(num1, num2) (((num1) << 16) | (num2))
+#define get_first_place(ranks) ((ranks) >> 16)
+#define get_second_place(ranks) ((ranks) & 0xffff)
 
 // simulate game between two neural networks, return 1 for player 1 win, -1 for loss, 0 for draw,
 // with small bonus for using fewer nodes
@@ -33,6 +33,7 @@ void *thread_match(void *params);
 void round_robin(net_weights **players, const int n_players, const int depth, int *elo_results);
 
 // simulates single elimination tournament, returns int containing indices of 1st and 2nd place
+// assumes n_players is power of 2
 int single_elimination(net_weights **players, const int n_players, const int depth);
 
 // adjust elo ratings for two players based on result
@@ -45,13 +46,21 @@ void adjust_elos(int *elo1, int *elo2, int result);
 void simulate_generations(const int generations, const int n_players, const int depth,
                           const char *seed_path, const int inv_rate, const float std_dev);
 
-// struct to pass parameters to match function
+// struct to pass parameters to threaded_rr
 typedef struct {
     net_weights *player1, *player2;
     int player1_num, player2_num;
     char *start_fen;
     int depth;
     int *elo1, *elo2;
-} match_params;
+} rr_params;
+
+// struct to pass parameters to threaded_se
+typedef struct {
+    net_weights *player1, *player2;
+    char *start_fen;
+    int depth;
+    float result;
+} se_params;
 
 #endif
