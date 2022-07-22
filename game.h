@@ -30,11 +30,11 @@ float single_match(const net_weights *player1, const net_weights *player2, const
 void *thread_match(void *params);
 
 // writes array of elo results from round robin tournament
-void round_robin(net_weights **players, const int n_players, const int depth, int *elo_results);
+void round_robin(net_weights **players, const int n_players, const int depth, int *elo_results, int verbose);
 
 // simulates single elimination tournament, returns int containing indices of 1st and 2nd place
 // assumes n_players is power of 2
-int single_elimination(net_weights **players, const int n_players, const int depth);
+int single_elimination(net_weights **players, const int n_players, const int depth, int verbose);
 
 // adjust elo ratings for two players based on result
 void adjust_elos(int *elo1, int *elo2, int result);
@@ -53,6 +53,7 @@ typedef struct {
     char *start_fen;
     int depth;
     int *elo1, *elo2;
+    float result;
 } rr_params;
 
 // struct to pass parameters to threaded_se

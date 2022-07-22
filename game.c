@@ -65,8 +65,8 @@ float single_match(const net_weights *player1, const net_weights *player2, const
 void *threaded_rr(void *params)
 {
     rr_params *args = (rr_params *)params;
-    float result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
-    adjust_elos(args->elo1, args->elo2, result);
+    args->result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
+    adjust_elos(args->elo1, args->elo2, args->result);
     return NULL;
 }
 
@@ -79,9 +79,10 @@ void *threaded_se(void *params)
 }
 
 // writes array of elo results from round robin tournament
-void round_robin(net_weights **players, const int n_players, const int depth, int *elos)
+void round_robin(net_weights **players, const int n_players, const int depth, int *elos, int verbose)
 {
     int n_pairings = n_players/2;
+    memset(elos, 0, n_players * sizeof(int));
 
     // in each round, idxs1[i] faces idxs2[i]
     int idxs1[n_pairings], idxs2[n_pairings];
@@ -124,17 +125,27 @@ void round_robin(net_weights **players, const int n_players, const int depth, in
         }
 
         // join all threads
-        for (int i = 0; i < n_threads; ++i)
+        for (int i = 0; i < n_pairings; ++i) {
             pthread_join(tid[i], NULL);
+            pthread_join(tid[i+n_pairings], NULL);
+            if (verbose) printf("%d vs %d: %0.2f\n", idxs1[i], idxs2[i],
+                                params[i].result-params[i+n_pairings].result);
+        }
 
         // cycle pairings
         for (int i = 1; i < n_pairings; ++i) idxs1[i] = (idxs1[i]>1) ? idxs1[i]-1 : 2*n_pairings-1;
         for (int i = 0; i < n_pairings; ++i) idxs2[i] = (idxs2[i]>1) ? idxs2[i]-1 : 2*n_pairings-1;
+
+        if (verbose) printf("%s\n", horizontal_line);
+    }
+    if (verbose) {
+        printf("ratings:\n");
+        for (int i = 0; i < n_players; ++i) printf("player %d: %d\n", i, elos[i]);
     }
 }
 
 // simulates single elimination tournament, returns int containing indices of 1st and 2nd place
-int single_elimination(net_weights **players, const int n_players, const int depth)
+int single_elimination(net_weights **players, const int n_players, const int depth, int verbose)
 {
     int n_remaining = n_players;
     int players_remaining[n_players*2];         // complete binary tree stored in flat array
@@ -142,7 +153,7 @@ int single_elimination(net_weights **players, const int n_players, const int dep
 
     // loop through rounds
     while (n_remaining > 1) {
-        printf("%d remaining\n", n_remaining);
+        if (verbose) printf("%d remaining\n", n_remaining);
         pthread_t tid[n_remaining];
         se_params params[n_remaining];
         
@@ -168,8 +179,8 @@ int single_elimination(net_weights **players, const int n_players, const int dep
             pthread_join(tid[i+1], NULL);
 
             int p1 = players_remaining[n_remaining+i], p2 = players_remaining[n_remaining+i+1];
-            float result = params[i].result + params[i+1].result;
-            printf("%d vs %d: %0.2f\n", p1, p2, result);
+            float result = params[i].result - params[i+1].result;
+            if (verbose) printf("%d vs %d: %0.2f\n", p1, p2, result);
             if (n_remaining > 2)
                 players_remaining[(n_remaining+i)/2] = (result >= 0) ? p1 : p2;
             else
@@ -177,7 +188,7 @@ int single_elimination(net_weights **players, const int n_players, const int dep
         }
 
         n_remaining >>= 1;
-        printf("%s\n", horizontal_line);
+        if (verbose) printf("%s\n", horizontal_line);
     }
 
     return 0;
@@ -214,7 +225,7 @@ void simulate_generations(const int generations, const int n_players, const int 
 
         // simulate tournament
         memset(elos, 0, sizeof(elos));
-        round_robin(players, n_players/2, depth, elos);
+        round_robin(players, n_players/2, depth, elos, 0);
         for (int i = 0; i < n_players; ++i)
             printf("%d: %d\n", i, elos[i]);
 

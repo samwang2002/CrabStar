@@ -40,7 +40,10 @@ int main()
         mutate(players[i], 5, 0.05);
     }
 
-    single_elimination(players, n_players, 3);
+    single_elimination(players, n_players, 3, 1);
+    printf("\n\n");
+    int results[n_players];
+    round_robin(players, n_players, 3, results, 1);
 
     // simulate_generations(30, 16, 3, "seed1", 5, 0.03);
 
