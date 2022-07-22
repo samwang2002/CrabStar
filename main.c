@@ -33,7 +33,7 @@ int main()
 
     int n_players = 16;
     net_weights *players[n_players];
-    players[0] = calloc(0, sizeof(net_weights));
+    players[0] = calloc(1, sizeof(net_weights));
     read_weights(players[0], "seed1");
     for (int i = 1; i < n_players; ++i) {
         players[i] = duplicate_weights(players[0]);

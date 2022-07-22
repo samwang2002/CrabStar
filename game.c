@@ -138,7 +138,6 @@ int single_elimination(net_weights **players, const int n_players, const int dep
 {
     int n_remaining = n_players;
     int players_remaining[n_players*2];         // complete binary tree stored in flat array
-    memset(players_remaining, -1, sizeof(players_remaining));       // REMOVE
     for (int i = 0; i < n_players; ++i) players_remaining[i+n_players] = i;
 
     // loop through rounds
@@ -150,19 +149,16 @@ int single_elimination(net_weights **players, const int n_players, const int dep
         // loop through pairings and create matches
         for (int i = 0; i < n_remaining; i += 2) {
             int p1 = players_remaining[n_remaining+i], p2 = players_remaining[n_remaining+i+1];
-            printf("%d vs %d\n", p1, p2);
             params[i].player1 = players[p1];
             params[i].player2 = players[p2];
             params[i].depth = depth;
             params[i].start_fen = start_position;
-            params[i].result = -100;            // REMOVE
             pthread_create(&tid[i], NULL, threaded_se, (void *)&params[i]);
 
             params[i+1].player1 = players[p2];
             params[i+1].player2 = players[p1];
             params[i+1].depth = depth;
             params[i+1].start_fen = start_position;
-            params[i+1].result = -100;          // REMOVE
             pthread_create(&tid[i+1], NULL, threaded_se, (void *)&params[i+1]);
         }
 
@@ -172,7 +168,6 @@ int single_elimination(net_weights **players, const int n_players, const int dep
             pthread_join(tid[i+1], NULL);
 
             int p1 = players_remaining[n_remaining+i], p2 = players_remaining[n_remaining+i+1];
-            printf("results for %d vs %d\n", p1, p2);
             float result = params[i].result + params[i+1].result;
             printf("%d vs %d: %0.2f\n", p1, p2, result);
             if (n_remaining > 2)
