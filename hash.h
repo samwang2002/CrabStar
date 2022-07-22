@@ -24,6 +24,12 @@ typedef struct {
     int score; // score (alpha/beta/PV)
 } tt;
 
+typedef struct {
+    U64 hash_key;
+    U64 data;
+    int depth;
+} lockless_ht;
+
 extern tt hash_table[hash_size];
 
 //----------------key tables ------------------
@@ -56,5 +62,9 @@ void clear_hash_table();
 int read_hash_entry(int alpha, int beta, int depth);
 
 void write_hash_entry(int score, int depth, int hash_flag);
+
+int read_shared_entry(int alpha, int beta, int depth);
+
+void write_shared_entry(int score, int depth, int hash_flag);
 
 #endif

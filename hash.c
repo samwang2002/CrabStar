@@ -4,6 +4,7 @@
 #include "board.h"
 
 tt hash_table[hash_size];
+lockless_ht shared_ht[hash_size];
 
 U64 piece_keys[12][64];
 U64 enpassant_keys[64];
@@ -125,4 +126,53 @@ void write_hash_entry(int score, int depth, int hash_flag)
     hash_entry->score = score;
     hash_entry->flag = hash_flag;
     hash_entry->depth = depth;
+}
+
+int read_shared_entry(int alpha, int beta, int depth)
+{
+    lockless_ht *hash_entry = &shared_ht[hash_key % hash_size];
+
+    if ((hash_entry->hash_key ^ hash_entry->data) == hash_key)
+    {
+        if (hash_entry->depth >= depth){
+
+            U64 temp;
+            temp = hash_entry->data & 0xFFFF0000;
+            int score = temp >> 32;
+
+            if (score < -mate_score) score += ply;
+            if (score > mate_score) score -= ply;
+
+            int flag = hash_entry->data & 0x0000FFFF;
+            
+            if (flag == hash_flag_exact)
+                return score;
+            
+            if (flag == hash_flag_alpha && score <= alpha)
+                return alpha;
+
+            if (flag == hash_flag_beta && score >= beta)
+                return beta;
+        }
+    }
+
+    return no_hash_entry;
+}
+
+void write_shared_entry(int score, int depth, int hash_flag)
+{
+    lockless_ht *hash_entry = &shared_ht[hash_key % hash_size];
+
+    if (score < -mate_score) score -= ply;
+    if (score > mate_score) score += ply;
+
+    hash_entry->hash_key = hash_key;
+    
+    U64 data;
+    data ^= (score << 32);
+    data ^= hash_flag;
+
+    hash_entry->data = data;
+    hash_entry->depth = depth;
+
 }
