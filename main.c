@@ -31,7 +31,10 @@ int main()
     time(&start_s);
     start = clock();
 
-    simulate_generations(30, 16, 3, "seed1", 5, 0.03);
+    int ranks = encode_winners(12, 5);
+    printf("ranks: %d, first: %d, second: %d\n", ranks, get_first_place(ranks), get_second_place(ranks));
+
+    // simulate_generations(30, 16, 3, "seed1", 5, 0.03);
 
     // net_weights player1, player2, player3, player4, player5, player6, player7, player8, player9, player10;
     // read_weights(&player1, "seed1");

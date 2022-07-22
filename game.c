@@ -72,8 +72,10 @@ void *thread_match(void *params)
 }
 
 // writes array of elo results from round robin tournament
-void tournament(net_weights **players, const int n_pairings, const int depth, int *elos)
+void round_robin(net_weights **players, const int n_players, const int depth, int *elos)
 {
+    int n_pairings = n_players/2;
+
     // in each round, idxs1[i] faces idxs2[i]
     int idxs1[n_pairings], idxs2[n_pairings];
     for (int i = 0; i < n_pairings; ++i) {
@@ -155,7 +157,7 @@ void simulate_generations(const int generations, const int n_players, const int 
 
         // simulate tournament
         memset(elos, 0, sizeof(elos));
-        tournament(players, n_players/2, depth, elos);
+        round_robin(players, n_players/2, depth, elos);
         for (int i = 0; i < n_players; ++i)
             printf("%d: %d\n", i, elos[i]);
 
