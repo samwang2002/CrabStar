@@ -13,6 +13,7 @@
 #define closed_game "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1"
 #define indian_defense "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1"
 #define n_starting_positions 4
+#define all_positions NULL
 
 static const char *starting_positions[4] = {open_game, open_sicilian, closed_game, indian_defense};
 

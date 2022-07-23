@@ -31,24 +31,24 @@ int main()
     time(&start_s);
     start = clock();
 
-    // simulate_generations(30, 32, 3, "seed1", 5, 0.03);
+    simulate_generations(4, 32, 3, "seed1", 5, 0.03);
 
-    int n_players = 4;
-    net_weights *players[n_players];
-    for (int i = 0; i < n_players; ++i) players[i] = calloc(1, sizeof(net_weights));
-    read_weights(players[0], "seed1");
-    for (int i = 1; i < n_players; ++i) {
-        char dir_path[100];
-        sprintf(dir_path, "gen%d", i*10);
-        read_weights(players[i], dir_path);
-    }
-    round_robin(players, n_players, 3, 1);
+    // int n_players = 10;
+    // net_weights *players[n_players];
+    // for (int i = 0; i < n_players; ++i) players[i] = calloc(1, sizeof(net_weights));
+    // read_weights(players[0], "seed1");
+    // for (int i = 1; i < n_players; ++i) {
+    //     char dir_path[100];
+    //     sprintf(dir_path, "gen%d", i*10);
+    //     read_weights(players[i], dir_path);
+    // }
+    // round_robin(players, n_players, 3, 1);
 
 
     time(&end_s);
     end = clock();
     printf("%s\ntime elapsed: %lds\n", horizontal_line, end_s-start_s);
-    printf("CPU time: %ds\n", (int)(end-start)/CLOCKS_PER_SEC);
+    printf("CPU time: %lus\n", (int)(end-start)/CLOCKS_PER_SEC);
 
     return 0;
 }

@@ -65,7 +65,13 @@ float single_match(const net_weights *player1, const net_weights *player2, const
 void *threaded_rr(void *params)
 {
     rr_params *args = (rr_params *)params;
-    args->result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
+    if (args->start_fen != all_positions)
+        args->result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
+    else {
+        args->result = 0;
+        for (int i = 0; i < n_starting_positions; ++i)
+            args->result += single_match(args->player1, args->player2, starting_positions[i], args->depth, 0);
+    }
     adjust_elos(args->elo1, args->elo2, args->result);
     return NULL;
 }
@@ -74,7 +80,13 @@ void *threaded_rr(void *params)
 void *threaded_se(void *params)
 {
     se_params *args = (se_params *)params;
-    args->result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
+    if (args->start_fen != all_positions)
+        args->result = single_match(args->player1, args->player2, args->start_fen, args->depth, 0);
+    else {
+        args->result = 0;
+        for (int i = 0; i < n_starting_positions; ++i)
+            args->result += single_match(args->player1, args->player2, starting_positions[i], args->depth, 0);
+    }
     return NULL;
 }
 
@@ -106,7 +118,7 @@ void round_robin(net_weights **players, const int n_players, const int depth, in
             params[w_idx].player2 = players[idxs2[i]];
             params[w_idx].player1_num = idxs1[i];
             params[w_idx].player2_num = idxs2[i];
-            params[w_idx].start_fen = start_position;
+            params[w_idx].start_fen = all_positions;
             params[w_idx].depth = depth;
             params[w_idx].elo1 = &elos[idxs1[i]];
             params[w_idx].elo2 = &elos[idxs2[i]];
@@ -118,7 +130,7 @@ void round_robin(net_weights **players, const int n_players, const int depth, in
             params[b_idx].player2 = players[idxs1[i]];
             params[b_idx].player1_num = idxs2[i];
             params[b_idx].player2_num = idxs1[i];
-            params[b_idx].start_fen = start_position;
+            params[b_idx].start_fen = all_positions;
             params[b_idx].depth = depth;
             params[b_idx].elo1 = &elos[idxs2[i]];
             params[b_idx].elo2 = &elos[idxs1[i]];
@@ -163,13 +175,13 @@ int single_elimination(net_weights **players, const int n_players, const int dep
             params[i].player1 = players[p1];
             params[i].player2 = players[p2];
             params[i].depth = depth;
-            params[i].start_fen = start_position;
+            params[i].start_fen = all_positions;
             pthread_create(&tid[i], NULL, threaded_se, (void *)&params[i]);
 
             params[i+1].player1 = players[p2];
             params[i+1].player2 = players[p1];
             params[i+1].depth = depth;
-            params[i+1].start_fen = start_position;
+            params[i+1].start_fen = all_positions;
             pthread_create(&tid[i+1], NULL, threaded_se, (void *)&params[i+1]);
         }
 
