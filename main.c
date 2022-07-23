@@ -31,21 +31,21 @@ int main()
     time(&start_s);
     start = clock();
 
-    int n_players = 16;
-    net_weights *players[n_players];
-    players[0] = calloc(1, sizeof(net_weights));
-    read_weights(players[0], "seed1");
-    for (int i = 1; i < n_players; ++i) {
-        players[i] = duplicate_weights(players[0]);
-        mutate(players[i], 5, 0.05);
-    }
+    // int n_players = 16;
+    // net_weights *players[n_players];
+    // players[0] = calloc(1, sizeof(net_weights));
+    // read_weights(players[0], "seed1");
+    // for (int i = 1; i < n_players; ++i) {
+    //     players[i] = duplicate_weights(players[0]);
+    //     mutate(players[i], 5, 0.05);
+    // }
 
-    single_elimination(players, n_players, 3, 1);
-    printf("\n\n");
-    int results[n_players];
-    round_robin(players, n_players, 3, results, 1);
+    // single_elimination(players, n_players, 3, 1);
+    // printf("\n\n");
+    // int results[n_players];
+    // round_robin(players, n_players, 3, results, 1);
 
-    // simulate_generations(30, 16, 3, "seed1", 5, 0.03);
+    simulate_generations(2, 8, 3, "seed1", 5, 0.03);
 
     // net_weights player1, player2, player3, player4, player5, player6, player7, player8, player9, player10;
     // read_weights(&player1, "seed1");

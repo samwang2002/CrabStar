@@ -153,7 +153,6 @@ int single_elimination(net_weights **players, const int n_players, const int dep
 
     // loop through rounds
     while (n_remaining > 1) {
-        if (verbose) printf("%d remaining\n", n_remaining);
         pthread_t tid[n_remaining];
         se_params params[n_remaining];
         
@@ -184,11 +183,11 @@ int single_elimination(net_weights **players, const int n_players, const int dep
             if (n_remaining > 2)
                 players_remaining[(n_remaining+i)/2] = (result >= 0) ? p1 : p2;
             else
-                return encode_winners((result >= 0) ? p1 : p2, (result >= 0) ? p1 : p2);
+                return encode_winners(((result >= 0) ? p1 : p2), ((result >= 0) ? p2 : p1));
         }
 
         n_remaining >>= 1;
-        if (verbose) printf("%s\n", horizontal_line);
+        if (verbose) printf("%s\n", short_line);
     }
 
     return 0;
@@ -207,6 +206,7 @@ void adjust_elos(int *elo1, int *elo2, int result)
 void simulate_generations(const int generations, const int n_players, const int depth,
                           const char *seed_path, const int inv_rate, const float std_dev)
 {
+    printf("%s\n", horizontal_line);
     net_weights *players[n_players];
 
     // create seed generation
@@ -214,69 +214,47 @@ void simulate_generations(const int generations, const int n_players, const int 
     read_weights(players[0], seed_path);
     for (int i = 1; i < n_players; ++i) {
         players[i] = duplicate_weights(players[0]);
-        mutate(players[i], inv_rate/2, 2*std_dev);        // a bit more variety in seed generation
+        mutate(players[i], inv_rate/4, 4*std_dev);        // a bit more variety in seed generation
     }
-
-    int elos[n_players];
 
     // loop through generations
     for (int gen = 0; gen <= generations; ++gen) {
         printf("generation %d\n", gen);
 
         // simulate tournament
-        memset(elos, 0, sizeof(elos));
-        round_robin(players, n_players/2, depth, elos, 0);
-        for (int i = 0; i < n_players; ++i)
-            printf("%d: %d\n", i, elos[i]);
+        int winners = single_elimination(players, n_players, depth, 1);
+        int first = get_first_place(winners);
+        int second = get_second_place(winners);
+        net_weights *first_net = players[first];
+        net_weights *second_net = players[second];
+        printf("first: %d, second: %d\n", first, second);
 
-        // if all generations are complete, skip to saving
-        if (gen == generations) {
-            // find best performing net
-            int best_idx = 0;
-            for (int i = 1; i < n_players; ++i) if (elos[i] > elos[best_idx]) best_idx = i;
-
+        // save best performing net every 10 generations and at completion
+        if (gen == generations || (gen && gen % 10 == 0)) {
             // save weights
             char dir_path[100];
             sprintf(dir_path, "gen%d", gen);
             printf("%s\nsaving to %s\n", horizontal_line, dir_path);
-            save_weights(players[best_idx], dir_path);
+            save_weights(first_net, dir_path);
 
-            continue;
+            // if training completed, free all mallocs
+            if (gen == generations) {
+                for (int i = 0; i < n_players; ++i)
+                    free(players[i]);
+                return;
+            }
         }
 
-        // keep 2 top performing nets
-        for (int i = 0; i < 2; ++i) {
-            int best_idx = i;
-            for (int j = i+1; j < n_players; ++j)
-                if (elos[j] > elos[best_idx]) best_idx = j;
-            
-            int num_temp = elos[i];
-            elos[i] = elos[best_idx];
-            elos[best_idx] = num_temp;
-
-            net_weights *weights_temp = players[i];
-            players[i] = players[best_idx];
-            players[best_idx] = weights_temp;
-        }
-
-        // discard low performing nets
-        for (int i = 2; i < n_players; ++i) {
-            free(players[i]);
-            players[i] = crossover(players[0], players[1], inv_rate, std_dev);
-        }
-
-        // save best performing net every 10 generations
-        if (gen && gen%10 == 0) {
-            char dir_path[100];
-            sprintf(dir_path, "gen%d", gen);
-            printf("%s\nsaving to %s\n", horizontal_line, dir_path);
-            save_weights(players[0], dir_path);
+        // keep top 2 performing nets and replace rest
+        for (int i = 0; i < n_players; ++i)         // free discarded nets
+            if (i != first && i != second) free(players[i]);
+        players[0] = first_net;
+        players[n_players/2] = second_net;              // opposite bracket of tournament
+        for (int i = 1; i < n_players/2; ++i) {
+            players[i] = crossover(first_net, second_net, inv_rate, std_dev);
+            players[i+n_players/2] = crossover(first_net, second_net, inv_rate, std_dev);
         }
 
         printf("%s\n", horizontal_line);
     }
-
-    // free all mallocs
-    for (int i = 0; i < n_players; ++i)
-        free(players[i]);
 }
