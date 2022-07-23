@@ -26,31 +26,31 @@ int main()
     init_all();
     init_weights();
 
-    parse_fen(tricky_position);
-    print_board();
-    // printf("%d\n", net_eval());
+    // parse_fen(cmk_position);
+    // print_board();
+    // // printf("%d\n", net_eval());
 
-    // side = black;
-    // printf("%d\n", net_eval());
+    // // side = black;
+    // // printf("%d\n", net_eval());
+
+    // // clock_t start, end;
+    // // start = clock();
+    // // for (int i = 0; i < 100000; ++i) evaluate();
+    // // end = clock();
+    // // printf("regular eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
+
+    // // start = clock();
+    // // for (int i = 0; i < 100000; ++i) net_eval();
+    // // end = clock();
+    // // printf("network eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
 
     // clock_t start, end;
     // start = clock();
-    // for (int i = 0; i < 100000; ++i) evaluate();
+    // search_position(10);
     // end = clock();
-    // printf("regular eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
+    // printf("time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
 
-    // start = clock();
-    // for (int i = 0; i < 100000; ++i) net_eval();
-    // end = clock();
-    // printf("network eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
-
-    clock_t start, end;
-    start = clock();
-    search_position(8);
-    end = clock();
-    printf("time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
-
-    int debug = 1;
+    int debug = 0;
     if (debug) {
 
     } else

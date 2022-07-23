@@ -78,6 +78,13 @@ void clear_hash_table()
         hash_table[i].flag = 0;
         hash_table[i].score = 0;
     }
+    // loop over shared HT elements
+    for (int i = 0; i < hash_size; ++i)
+    {
+        shared_ht[i].hash_key = 0;
+        shared_ht[i].depth = 0;
+        shared_ht[i].data = 0;
+    }
 }
 
 int read_hash_entry(int alpha, int beta, int depth)
@@ -134,26 +141,22 @@ int read_shared_entry(int alpha, int beta, int depth)
 
     if ((hash_entry->hash_key ^ hash_entry->data) == hash_key)
     {
-        if (hash_entry->depth >= depth){
 
-            U64 temp;
-            temp = hash_entry->data & 0xFFFF0000;
-            int score = temp >> 32;
+        int score = ((hash_entry->data & 0xFFFFFFFF00000000) >> 32);
 
-            if (score < -mate_score) score += ply;
-            if (score > mate_score) score -= ply;
+        if (score < -mate_score) score += ply;
+        if (score > mate_score) score -= ply;
 
-            int flag = hash_entry->data & 0x0000FFFF;
-            
-            if (flag == hash_flag_exact)
-                return score;
-            
-            if (flag == hash_flag_alpha && score <= alpha)
-                return alpha;
+        int flag = hash_entry->data & 0x00000000FFFFFFFF;
+        
+        if (flag == hash_flag_exact)
+            return score;
+        
+        if (flag == hash_flag_alpha && score <= alpha)
+            return alpha;
 
-            if (flag == hash_flag_beta && score >= beta)
-                return beta;
-        }
+        if (flag == hash_flag_beta && score >= beta)
+            return beta;
     }
 
     return no_hash_entry;
@@ -165,14 +168,15 @@ void write_shared_entry(int score, int depth, int hash_flag)
 
     if (score < -mate_score) score -= ply;
     if (score > mate_score) score += ply;
-
-    hash_entry->hash_key = hash_key;
     
-    U64 data;
-    data ^= (score << 32);
+    U64 data = 0;
+    U64 data_score = score;
+    data_score >>= 32;
+    data ^= data_score;
     data ^= hash_flag;
 
     hash_entry->data = data;
     hash_entry->depth = depth;
+    hash_entry->hash_key = (hash_key ^ data);
 
 }

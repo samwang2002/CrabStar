@@ -11,6 +11,8 @@
 // no hash entry found constant
 #define no_hash_entry 100000
 
+#define wrong_hash_entry -100000
+
 // tranposition table hash flags
 #define hash_flag_exact 0
 #define hash_flag_alpha 1

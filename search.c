@@ -89,7 +89,7 @@ int negamax(const int alpha, const int beta, int depth)
     int pv_node = (beta - alpha > 1);
 
     //read hash entry if we're not in a root ply and hash entry is available and current node is not a PV node
-    if (ply && (score = read_hash_entry(alpha, beta, depth)) != no_hash_entry && !pv_node){
+    if (ply && (score = read_shared_entry(alpha, beta, depth)) != no_hash_entry && !pv_node){
         // if the move has already been searched return the score for this move without searching it
         return score;
     }
@@ -215,7 +215,7 @@ int negamax(const int alpha, const int beta, int depth)
                     // move failed hard beta cutoff
             if (score >= beta) {
                 // store hash entry with score equal to beta
-                write_hash_entry(beta, depth, hash_flag_beta);
+                write_shared_entry(beta, depth, hash_flag_beta);
                 // if move is quiet, store in killer moves cache so it has higher priority in analysis
                 if (!get_move_capture(move)) {
                     killer_moves[1][ply] = killer_moves[0][ply];
@@ -231,7 +231,7 @@ int negamax(const int alpha, const int beta, int depth)
     if (legal_count == 0) return in_check ? -mate_value + ply : 0;
 
     // store hash entry with the score equal to alpha
-    write_hash_entry(new_alpha, depth, hash_flag);
+    write_shared_entry(new_alpha, depth, hash_flag);
 
     if (new_alpha > alpha)      // improvement was found
         best_move = best_sofar;
