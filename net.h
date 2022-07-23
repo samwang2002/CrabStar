@@ -19,8 +19,8 @@
 // load weights from text file into 1d array
 void load_weights(float *weights, const int dim, const char *path);
 
-// initialize weight vectors
-void init_weights();
+// initialize weight vectors from directory
+void init_weights(const char *dir_path);
 
 // evaluate position using neural network
 int net_eval();

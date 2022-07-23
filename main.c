@@ -24,35 +24,19 @@
 int main()
 {
     init_all();
-    init_weights();
+    init_weights("gen150");
 
-    parse_fen(tricky_position);
-    print_board();
-    // printf("%d\n", net_eval());
-
-    // side = black;
-    // printf("%d\n", net_eval());
-
-    // clock_t start, end;
-    // start = clock();
-    // for (int i = 0; i < 100000; ++i) evaluate();
-    // end = clock();
-    // printf("regular eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
-
-    // start = clock();
-    // for (int i = 0; i < 100000; ++i) net_eval();
-    // end = clock();
-    // printf("network eval time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
-
-    clock_t start, end;
-    start = clock();
-    search_position(8);
-    end = clock();
-    printf("time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
-
-    int debug = 1;
+    int debug = 0;
     if (debug) {
+        parse_fen(start_position);
+        // parse_fen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
+        print_board();
 
+        clock_t start, end;
+        start = clock();
+        search_position(8);
+        end = clock();
+        printf("time: %lfs\n", ((double)(end-start)) / CLOCKS_PER_SEC);
     } else
          uci_loop();
     return 0;
