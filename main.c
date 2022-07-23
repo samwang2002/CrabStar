@@ -48,7 +48,7 @@ int main()
     time(&end_s);
     end = clock();
     printf("%s\ntime elapsed: %lds\n", horizontal_line, end_s-start_s);
-    printf("CPU time: %lus\n", (int)(end-start)/CLOCKS_PER_SEC);
+    printf("CPU time: %ds\n", (int)(end-start)/CLOCKS_PER_SEC);
 
     return 0;
 }
