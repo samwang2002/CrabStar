@@ -52,7 +52,6 @@ int net_eval()
             pop_bit(bitboard, loc);
         }
     }
-    // printf("prods1[0] = %f\n", prods1[0]);
 
     // pass through second layer
     float *prods2 = malloc(sizeof(biases2));
@@ -64,7 +63,6 @@ int net_eval()
             prods2[j] += prods1[i] * weights2[i*nodes2 + j];
     }
     free(prods1);
-    // printf("prods2[0] = %f\n", prods2[0]);
 
     // pass through third layer
     float *prods3 = malloc(sizeof(biases3));
@@ -76,7 +74,6 @@ int net_eval()
             prods3[j] += prods2[i] * weights3[i*nodes2 + j];
     }
     free(prods2);
-    // printf("prods3[0] = %f\n", prods3[0]);
 
     // pass through final layer
     float final = biases4[0];
@@ -85,8 +82,6 @@ int net_eval()
         final += prods3[i] * weights4[i];
     }
     free(prods3);
-
-    // printf("%f\n", final);
     
     return (int)(final * 100);
 }
