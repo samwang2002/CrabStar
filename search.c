@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
 
 #include "search.h"
 #include "board.h"
 #include "move.h"
 #include "constants.h"
 #include "net.h"
+#include "hash.h"
 
 // declaring global variables
 // int best_move = 0;
@@ -81,6 +83,14 @@ int negamax(search_state *search, const int alpha, const int beta, int depth, co
 {
     int score;
     board_state *board = search->board;
+    int hash_flag = hash_flag_alpha;
+    
+    int pv_node = (beta - alpha > 1);
+
+    if (search->ply && (score = read_shared_entry(board, alpha, beta, depth, search->ply)) != no_hash_entry && !pv_node)
+    {
+        return score;
+    }
 
     // initialize pv length
     search->pv_length[search->ply] = search->ply;
@@ -110,10 +120,12 @@ int negamax(search_state *search, const int alpha, const int beta, int depth, co
         memcpy(&board_copy, board, sizeof(board_state));
         // increment ply
         ++search->ply;
+        if (board->enpassant != no_sq) board->hash_key ^= enpassant_keys[board->enpassant];
         // reset enpassant capture square
         board->enpassant = no_sq;
         // switch the side and give an opponent an extra move to make
         board->side ^= 1;
+        board->hash_key ^= side_key;
         // search moves with reduced depth to find beta cutoffs
         int score = -negamax(search, -beta, -beta + 1, depth - 1, weights);
         //decrement ply
@@ -177,6 +189,8 @@ int negamax(search_state *search, const int alpha, const int beta, int depth, co
 
         // variation is better than current best
         if (score > new_alpha) {
+            // switch hash flag to one for storing PV node score
+            hash_flag = hash_flag_exact;
             // if move is quiet, add move to history heuristic
             // nodes higher in the tree are valued more
             if (!get_move_capture(move))
@@ -193,6 +207,8 @@ int negamax(search_state *search, const int alpha, const int beta, int depth, co
             search->pv_length[search->ply] = search->pv_length[search->ply+1];
                     // move failed hard beta cutoff
             if (score >= beta) {
+                // store hash entry with score equal to beta
+                write_shared_entry(board, beta, depth, hash_flag_beta, search->ply);
                 // if move is quiet, store in killer moves cache so it has higher priority in analysis
                 if (!get_move_capture(move)) {
                     search->killer_moves[1][search->ply] = search->killer_moves[0][search->ply];
@@ -205,6 +221,8 @@ int negamax(search_state *search, const int alpha, const int beta, int depth, co
 
     // if no legal moves are possible, position is either checkmate or stalemate
     if (legal_count == 0) return in_check ? -mate_value + search->ply : 0;
+
+    write_shared_entry(board, new_alpha, depth, hash_flag, search->ply);
 
     if (new_alpha > alpha)      // improvement was found
         search->best_move = best_sofar;
@@ -321,4 +339,9 @@ int quick_search(search_state *search, board_state *board, const int depth, cons
     // find move
     negamax(search, -infinity, infinity, depth, weights);
     return search->pv_table[0][0];
+}
+
+void smp_search(search_state *search, board_state *board, const int max_depth, const net_weights *weights)
+{
+    
 }

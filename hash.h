@@ -2,6 +2,7 @@
 #define HASH_H
 
 #include "bitboard.h"
+#include "board.h"
 
 //---------------transposition table------------
 
@@ -57,16 +58,12 @@ extern U64 hash_key;
 void init_random_keys();
 
 // generate unique position identifier from scratch
-U64 generate_hash_key();
+U64 generate_hash_key(board_state *search);
 
 void clear_hash_table();
 
-int read_hash_entry(int alpha, int beta, int depth);
+int read_shared_entry(board_state *search, int alpha, int beta, int depth, int ply);
 
-void write_hash_entry(int score, int depth, int hash_flag);
-
-int read_shared_entry(int alpha, int beta, int depth);
-
-void write_shared_entry(int score, int depth, int hash_flag);
+void write_shared_entry(board_state *search, int score, int depth, int hash_flag, int ply);
 
 #endif

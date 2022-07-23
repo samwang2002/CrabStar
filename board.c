@@ -5,6 +5,7 @@
 #include "move.h"
 #include "bitboard.h"
 #include "constants.h"
+#include "hash.h"
 
 #include "pawn.h"
 #include "knight.h"
@@ -77,6 +78,7 @@ void print_board(const board_state *board)
     printf("     Enpass:      %s\n", (board->enpassant != no_sq) ? square_to_coordinates[board->enpassant] : "no");
     printf("     Castling:  %c%c%c%c\n\n", (board->castle & wk) ? 'K' : '-', (board->castle & wq) ? 'Q' : '-',
            (board->castle & bk) ? 'k' : '-', (board->castle & bq) ? 'q' : '-');
+    printf("     Hash key:  %llx\n", board->hash_key);
 }
 
 // initialize all attacks
@@ -87,6 +89,8 @@ void init_all()
     init_king_attacks();
     init_bishop_attacks();
     init_rook_attacks();
+    init_random_keys();
+    clear_hash_table();
 }
 
 // parse fen from string
@@ -143,6 +147,8 @@ void parse_fen(board_state *board, const char *fen)
     for (int piece = P; piece <= K; ++piece) board->occupancies[white] |= board->bitboards[piece];
     for (int piece = p; piece <= k; ++piece) board->occupancies[black] |= board->bitboards[piece];
     board->occupancies[both] |= board->occupancies[white] | board->occupancies[black];
+
+    board->hash_key = generate_hash_key(board);
 }
 
 // get whether square is currently attacked by given side
@@ -222,6 +228,7 @@ int make_move(board_state *board, const int move, const int move_flag)
         pop_bit(board->bitboards[piece], source);
         pop_bit(board->occupancies[board->side], source);
         pop_bit(board->occupancies[both], source);
+        board->hash_key ^= piece_keys[piece][source];
 
         // clear target square
         if (capture) {
@@ -229,6 +236,7 @@ int make_move(board_state *board, const int move, const int move_flag)
                 for (int i = p; i <= k; ++i){
                     if (get_bit(board->bitboards[i], target)){
                         pop_bit(board->bitboards[i], target);
+                        board->hash_key ^= piece_keys[i][target];
                         break;
                     }
                 }
@@ -237,6 +245,7 @@ int make_move(board_state *board, const int move, const int move_flag)
                 for (int i = P; i <= K; ++i){
                     if (get_bit(board->bitboards[i], target)) {
                         pop_bit(board->bitboards[i], target);
+                        board->hash_key ^= piece_keys[i][target];
                     }
                 }
                 pop_bit(board->occupancies[white], target);
@@ -245,8 +254,14 @@ int make_move(board_state *board, const int move, const int move_flag)
         }
 
         // place piece on target square
-        if (promoted_piece) set_bit(board->bitboards[promoted_piece], target);
-        else set_bit(board->bitboards[piece], target);
+        if (promoted_piece) {
+            set_bit(board->bitboards[promoted_piece], target);
+            board->hash_key ^= piece_keys[promoted_piece][target];
+        }
+        else {
+            set_bit(board->bitboards[piece], target);
+            board->hash_key ^= piece_keys[piece][target];
+        }
         set_bit(board->occupancies[board->side], target);
         set_bit(board->occupancies[both], target);
 
@@ -256,10 +271,12 @@ int make_move(board_state *board, const int move, const int move_flag)
                 pop_bit(board->bitboards[p], target+8);
                 pop_bit(board->occupancies[black], target+8);
                 pop_bit(board->occupancies[both], target+8);
+                board->hash_key ^= piece_keys[p][target+8];
             } else {
                 pop_bit(board->bitboards[P], target-8);
                 pop_bit(board->occupancies[white], target-8);
                 pop_bit(board->occupancies[both], target-8);
+                board->hash_key ^= piece_keys[P][target-8];
             }
         }
         board->enpassant = no_sq;
@@ -273,9 +290,10 @@ int make_move(board_state *board, const int move, const int move_flag)
 
         // -- update state variables --
         // handle double pawn pushes
-        if (double_push)
+        if (double_push) {
             board->enpassant = target + ((board->side==white) ? 8 : -8);
-
+            board->hash_key ^= enpassant_keys[target + ((board->side == white) ? 8 : -8)];
+        }
         // handle castling
         if (castling) {
             switch (target) {
@@ -286,6 +304,8 @@ int make_move(board_state *board, const int move, const int move_flag)
                     set_bit(board->bitboards[R], f1);
                     set_bit(board->occupancies[white], f1);
                     set_bit(board->occupancies[both], f1);
+                    board->hash_key ^= piece_keys[R][h1];
+                    board->hash_key ^= piece_keys[R][f1];
                     break;
                 case c1:
                     pop_bit(board->bitboards[R], a1);
@@ -294,6 +314,8 @@ int make_move(board_state *board, const int move, const int move_flag)
                     set_bit(board->bitboards[R], d1);
                     set_bit(board->occupancies[white], d1);
                     set_bit(board->occupancies[both], d1);
+                    board->hash_key ^= piece_keys[R][a1];
+                    board->hash_key ^= piece_keys[R][d1];
                     break;
                 case g8:
                     pop_bit(board->bitboards[r], h8);
@@ -302,6 +324,8 @@ int make_move(board_state *board, const int move, const int move_flag)
                     set_bit(board->bitboards[r], f8);
                     set_bit(board->occupancies[black], f8);
                     set_bit(board->occupancies[both], f8);
+                    board->hash_key ^= piece_keys[r][h8];
+                    board->hash_key ^= piece_keys[r][f8];
                     break;
                 case c8:
                     pop_bit(board->bitboards[r], a8);
@@ -310,15 +334,19 @@ int make_move(board_state *board, const int move, const int move_flag)
                     set_bit(board->bitboards[r], d8);
                     set_bit(board->occupancies[black], d8);
                     set_bit(board->occupancies[both], d8);
+                    board->hash_key ^= piece_keys[r][a8];
+                    board->hash_key ^= piece_keys[r][d8];
                     break;
             }
         }
-
+        board->hash_key ^= castle_keys[board->castle];
         // update castling rights
         board->castle &= castling_rights[source] & castling_rights[target];
+        board->hash_key ^= castle_keys[board->castle];
 
         // flip side
         board->side ^= 1;
+        board->hash_key ^= side_key;
 
         return 1;
     } else          // quiet move, ignore because flag asks only for captures

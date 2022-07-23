@@ -46,6 +46,8 @@ int quick_search(search_state *search, board_state *board, const int depth, cons
 // enable PV mopve scoring
 void enable_pv_scoring(search_state *search, move_list *moves);
 
+void smp_search(search_state *search, board_state *board, const int max_depth, const net_weights *weights)
+
 /* ------------------------------- variables ------------------------------- */
 // // best move
 // extern int best_move;

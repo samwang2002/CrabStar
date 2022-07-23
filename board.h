@@ -11,6 +11,7 @@ typedef struct {
     // positional data
     U64 bitboards[12];
     U64 occupancies[3];
+    U64 hash_key;
     int side;
     int enpassant;
     int castle;
