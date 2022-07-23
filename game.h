@@ -9,13 +9,15 @@
 
 // start positions for games
 #define open_game "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
-#define open_sicilian "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
 #define closed_game "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1"
-#define indian_defense "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1"
-#define n_starting_positions 4
+#define sicilian "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
+#define indian "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1"
+#define french "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
+#define caro "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
+#define n_starting_positions 6
 #define all_positions NULL
 
-static const char *starting_positions[4] = {open_game, open_sicilian, closed_game, indian_defense};
+static const char *starting_positions[] = {open_game, closed_game, sicilian, indian, french, caro};
 
 // macros for encoding and retrieving 1st/2nd place in single elimination tournament
 #define encode_winners(num1, num2) (((num1) << 16) | (num2))
