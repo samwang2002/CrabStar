@@ -31,41 +31,18 @@ int main()
     time(&start_s);
     start = clock();
 
-    // int n_players = 16;
-    // net_weights *players[n_players];
-    // players[0] = calloc(1, sizeof(net_weights));
-    // read_weights(players[0], "seed1");
-    // for (int i = 1; i < n_players; ++i) {
-    //     players[i] = duplicate_weights(players[0]);
-    //     mutate(players[i], 5, 0.05);
-    // }
+    // simulate_generations(30, 32, 3, "seed1", 5, 0.03);
 
-    // single_elimination(players, n_players, 3, 1);
-    // printf("\n\n");
-    // int results[n_players];
-    // round_robin(players, n_players, 3, results, 1);
-
-    simulate_generations(2, 8, 3, "seed1", 5, 0.03);
-
-    // net_weights player1, player2, player3, player4, player5, player6, player7, player8, player9, player10;
-    // read_weights(&player1, "seed1");
-    // read_weights(&player2, "gen10");
-    // read_weights(&player3, "gen20");
-    // read_weights(&player4, "gen30");
-    // read_weights(&player5, "gen40");
-    // read_weights(&player6, "gen50");
-    // read_weights(&player7, "gen60");
-    // read_weights(&player8, "gen70");
-    // read_weights(&player9, "gen80");
-    // read_weights(&player10, "gen90");
-    // net_weights *players[] = {&player1, &player2, &player3, &player4, &player5, &player6, &player7, &player8,
-    //                             &player9, &player10};
-
-    // int elos[10];
-    // memset(elos, 0, sizeof(elos));
-    // tournament(players, 5, 3, elos);
-    // for (int i = 0; i < 10; ++i)
-    //     printf("%d: %d\n", i, elos[i]);
+    int n_players = 4;
+    net_weights *players[n_players];
+    for (int i = 0; i < n_players; ++i) players[i] = calloc(1, sizeof(net_weights));
+    read_weights(players[0], "seed1");
+    for (int i = 1; i < n_players; ++i) {
+        char dir_path[100];
+        sprintf(dir_path, "gen%d", i*10);
+        read_weights(players[i], dir_path);
+    }
+    round_robin(players, n_players, 3, 1);
 
 
     time(&end_s);

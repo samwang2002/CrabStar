@@ -79,9 +79,10 @@ void *threaded_se(void *params)
 }
 
 // writes array of elo results from round robin tournament
-void round_robin(net_weights **players, const int n_players, const int depth, int *elos, int verbose)
+void round_robin(net_weights **players, const int n_players, const int depth, int verbose)
 {
     int n_pairings = n_players/2;
+    int elos[n_players];
     memset(elos, 0, n_players * sizeof(int));
 
     // in each round, idxs1[i] faces idxs2[i]

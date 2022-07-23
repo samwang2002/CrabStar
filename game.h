@@ -30,7 +30,7 @@ float single_match(const net_weights *player1, const net_weights *player2, const
 void *thread_match(void *params);
 
 // writes array of elo results from round robin tournament
-void round_robin(net_weights **players, const int n_players, const int depth, int *elo_results, int verbose);
+void round_robin(net_weights **players, const int n_players, const int depth, int verbose);
 
 // simulates single elimination tournament, returns int containing indices of 1st and 2nd place
 // assumes n_players is power of 2
