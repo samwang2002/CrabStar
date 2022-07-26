@@ -5,6 +5,7 @@
 #include "move.h"
 #include "constants.h"
 #include <string.h>
+// #include "boardstate.h"
 
 // board state structure
 typedef struct {
