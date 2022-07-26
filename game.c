@@ -288,7 +288,7 @@ void simulate_challengers(const int generations, const int win_by, const int dep
     int takeovers = 0;
     // simulate generation of challengers
     for (int gen = 1; gen <= generations; ++gen) {
-        printf("generation %d: ", gen);
+        printf("generation %d ", gen);
         net_weights *challenger = crossover(champion, runner_up, inv_rate, std_dev);
         pthread_t tid[4*n_starting_positions];      // 2 sides * 2 matchups * # of starting positions
         se_params params[4*n_starting_positions];
@@ -357,7 +357,7 @@ void simulate_challengers(const int generations, const int win_by, const int dep
             pthread_join(tid[i], NULL);
             result2 += params[i].result * ((i < 3*n_starting_positions) ? -1 : 1);
             if (result2 + (4*n_starting_positions-i) < win_by || result2 - (4*n_starting_positions-i) >= win_by) {
-                if (result2 < win_by) printf("lost to runner-up: %d\n", result2);
+                if (result2 < win_by) printf("lost to runner-up: %d, %d\n", result1, result2);
                 for (int j = i+1; j < 4*n_starting_positions; ++j)
                     pthread_cancel(tid[j]);
                 goto THREADS_COMPLETED;
@@ -368,11 +368,16 @@ void simulate_challengers(const int generations, const int win_by, const int dep
         // if challenger is successful, update champions
         THREADS_COMPLETED:
         if (result1 >= win_by && result2 >= win_by) {
-            printf("challenger wins: %d, %d\n", result1, result2);
+            printf("challenger wins: %d, %d\t┏(-_-)┛┗(-_-﻿ )┓┗(-_-)┛┏(-_-)┓\n", result1, result2);
             free(runner_up);
             runner_up = champion;
             champion = challenger;
             ++takeovers;
+
+            // save weights
+            char dir_path[100];
+            sprintf(dir_path, "%d", takeovers);
+            save_weights(challenger, dir_path);
         } else
             free(challenger);
     }
