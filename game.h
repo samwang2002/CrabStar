@@ -4,7 +4,6 @@
 #include "net.h"
 
 #define max_moves 100
-#define node_bonus 0.05             // bonus in result for using fewer nodes
 #define elo_k 16                    // multiplier to calculate elo scores
 
 // start positions for games
@@ -17,7 +16,7 @@
 #define n_starting_positions 6
 #define all_positions NULL
 
-static const char *starting_positions[] = {open_game, closed_game, sicilian, indian, french, caro};
+static char *starting_positions[] = {open_game, closed_game, sicilian, indian, french, caro};
 
 // macros for encoding and retrieving 1st/2nd place in single elimination tournament
 #define encode_winners(num1, num2) (((num1) << 16) | (num2))
@@ -26,7 +25,7 @@ static const char *starting_positions[] = {open_game, closed_game, sicilian, ind
 
 // simulate game between two neural networks, return 1 for player 1 win, -1 for loss, 0 for draw,
 // with small bonus for using fewer nodes
-float single_match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
+int single_match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
             const int verbose);
 
 // takes in match_params structure and simulates multi-round match between players, writing elo results to array
@@ -49,6 +48,11 @@ void adjust_elos(int *elo1, int *elo2, int result);
 void simulate_generations(const int generations, const int n_players, const int depth,
                           const char *seed_path, const int inv_rate, const float std_dev);
 
+// simulate matches between candidate and reigning champions
+// candidate only replaces current champion if it defeats both reigning 1st and 2nd place by win_by points
+void simulate_challengers(const int generations, const int win_by, const int depth, const char *seed_path,
+                          const int inv_rate, const float std_dev);
+
 // struct to pass parameters to threaded_rr
 typedef struct {
     net_weights *player1, *player2;
@@ -56,7 +60,7 @@ typedef struct {
     char *start_fen;
     int depth;
     int *elo1, *elo2;
-    float result;
+    int result;
 } rr_params;
 
 // struct to pass parameters to threaded_se
@@ -64,7 +68,7 @@ typedef struct {
     net_weights *player1, *player2;
     char *start_fen;
     int depth;
-    float result;
+    int result;
 } se_params;
 
 #endif

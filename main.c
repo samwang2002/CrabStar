@@ -31,7 +31,9 @@ int main()
     time(&start_s);
     start = clock();
 
-    simulate_generations(4, 32, 3, "seed1", 5, 0.03);
+    // simulate_generations(4, 32, 3, "seed1", 5, 0.03);
+
+    simulate_challengers(100, 2, 3, "seed1", 3, 0.05);
 
     // int n_players = 10;
     // net_weights *players[n_players];
@@ -42,6 +44,8 @@ int main()
     //     sprintf(dir_path, "gen%d", i*10);
     //     read_weights(players[i], dir_path);
     // }
+
+    // single_match(players[0], players[1], start_position, 5, 0);
     // round_robin(players, n_players, 3, 1);
 
 

@@ -552,7 +552,7 @@ static const int mvv_lva[12][12] = {
 #define mate_value 49000
 #define mate_score 48000
 
-#define horizontal_line "----------------------------------------"
-#define short_line "----------------------------"
+#define horizontal_line "-------------------------------------------------------------------"
+#define short_line "---------------------------------------------------"
 
 #endif

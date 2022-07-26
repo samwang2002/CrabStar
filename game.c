@@ -10,7 +10,7 @@
 
 // returns result of match between player1 (white) and player2 (black)
 // small bonus for using fewer nodes
-float single_match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
+int single_match(const net_weights *player1, const net_weights *player2, const char *start_fen, const int depth,
             const int verbose)
 {
     int move_count = 0;
@@ -58,7 +58,7 @@ float single_match(const net_weights *player1, const net_weights *player2, const
         }
     }
     // print_board(&board);
-    return winner + ((w_nodes < b_nodes) ? node_bonus : -node_bonus);
+    return winner;
 }
 
 // simulates match in round robin format between players, writing elo results to array
@@ -141,7 +141,7 @@ void round_robin(net_weights **players, const int n_players, const int depth, in
         for (int i = 0; i < n_pairings; ++i) {
             pthread_join(tid[i], NULL);
             pthread_join(tid[i+n_pairings], NULL);
-            if (verbose) printf("%d vs %d: %0.2f\n", idxs1[i], idxs2[i],
+            if (verbose) printf("%d vs %d: %d\n", idxs1[i], idxs2[i],
                                 params[i].result-params[i+n_pairings].result);
         }
 
@@ -191,8 +191,8 @@ int single_elimination(net_weights **players, const int n_players, const int dep
             pthread_join(tid[i+1], NULL);
 
             int p1 = players_remaining[n_remaining+i], p2 = players_remaining[n_remaining+i+1];
-            float result = params[i].result - params[i+1].result;
-            if (verbose) printf("%d vs %d: %0.2f\n", p1, p2, result);
+            int result = params[i].result - params[i+1].result;
+            if (verbose) printf("%d vs %d: %d\n", p1, p2, result);
             if (n_remaining > 2)
                 players_remaining[(n_remaining+i)/2] = (result >= 0) ? p1 : p2;
             else
@@ -270,4 +270,110 @@ void simulate_generations(const int generations, const int n_players, const int 
 
         printf("%s\n", horizontal_line);
     }
+}
+
+// simulate matches between candidate and reigning champions
+void simulate_challengers(const int generations, const int win_by, const int depth, const char *seed_path,
+                          const int inv_rate, const float std_dev)
+{
+    printf("%s\n", horizontal_line);
+    net_weights *champion, *runner_up;
+
+    // create seed champions
+    champion = calloc(1, sizeof(net_weights));
+    runner_up = duplicate_weights(champion);
+    mutate(runner_up, inv_rate, std_dev);
+
+    int takeovers = 0;
+    // simulate generation of challengers
+    for (int gen = 1; gen <= generations; ++gen) {
+        printf("generation %d: ", gen);
+        net_weights *challenger = crossover(champion, runner_up, inv_rate, std_dev);
+        pthread_t tid[4*n_starting_positions];      // 2 sides * 2 matchups * # of starting positions
+        se_params params[4*n_starting_positions];
+
+        // create matches
+        for (int i = 0; i < n_starting_positions; ++i) {
+            int idx1 = i;
+            int idx2 = n_starting_positions + i;
+            int idx3 = 2*n_starting_positions + i;
+            int idx4 = 3*n_starting_positions + i;
+
+            // challenger vs champion (black)
+            params[idx1].player1 = champion;
+            params[idx1].player2 = challenger;
+            params[idx1].start_fen = starting_positions[i];
+            params[idx1].depth = depth;
+            pthread_create(&tid[idx1], NULL, threaded_se, (void *)&params[idx1]);
+
+            // challenger vs champion (white)
+            params[idx2].player1 = challenger;
+            params[idx2].player2 = champion;
+            params[idx2].start_fen = starting_positions[i];
+            params[idx2].depth = depth;
+            pthread_create(&tid[idx2], NULL, threaded_se, (void *)&params[idx2]);
+
+            // challenger vs champion (black)
+            params[idx3].player1 = runner_up;
+            params[idx3].player2 = challenger;
+            params[idx3].start_fen = starting_positions[i];
+            params[idx3].depth = depth;
+            pthread_create(&tid[idx3], NULL, threaded_se, (void *)&params[idx3]);
+
+            // challenger vs champion (white)
+            params[idx4].player1 = challenger;
+            params[idx4].player2 = runner_up;
+            params[idx4].start_fen = starting_positions[i];
+            params[idx4].depth = depth;
+            pthread_create(&tid[idx4], NULL, threaded_se, (void *)&params[idx4]);
+        }
+
+        // wait for threads to finish, terminate early if impossible for challenger to win
+        int result1 = 0, result2 = 0;               // from challengers point of view
+        // against champion
+        for (int i = 0; i < 2*n_starting_positions; ++i) {
+            pthread_join(tid[i], NULL);
+            result1 += params[i].result * ((i < n_starting_positions) ? -1 : 1);
+            if (result1 + (2*n_starting_positions-i) < win_by) {    // can't win, skip to end
+                printf("lost to champion: %d\n", result1);
+                for (int j = i+1; j < 4*n_starting_positions; ++j)
+                    pthread_cancel(tid[j]);
+                goto THREADS_COMPLETED;
+            }
+            if (result1 - (2*n_starting_positions-i) >= win_by) {   // can't lose, skip to runner-up
+                for (int j = i+1; j < 2*n_starting_positions; ++j)
+                    pthread_cancel(tid[j]);
+                break;
+            }
+        }
+        if (result1 < win_by) {
+            printf("lost to champion: %d\n", result1);
+            goto THREADS_COMPLETED;
+        }
+
+        // against runner-up
+        for (int i = 2*n_starting_positions; i < 4*n_starting_positions; ++i) {
+            pthread_join(tid[i], NULL);
+            result2 += params[i].result * ((i < 3*n_starting_positions) ? -1 : 1);
+            if (result2 + (4*n_starting_positions-i) < win_by || result2 - (4*n_starting_positions-i) >= win_by) {
+                if (result2 < win_by) printf("lost to runner-up: %d\n", result2);
+                for (int j = i+1; j < 4*n_starting_positions; ++j)
+                    pthread_cancel(tid[j]);
+                goto THREADS_COMPLETED;
+            }
+        }
+        if (result2 < win_by) printf("lost to runner-up: %d, %d\n", result1, result2);
+
+        // if challenger is successful, update champions
+        THREADS_COMPLETED:
+        if (result1 >= win_by && result2 >= win_by) {
+            printf("challenger wins: %d, %d\n", result1, result2);
+            free(runner_up);
+            runner_up = champion;
+            champion = challenger;
+            ++takeovers;
+        } else
+            free(challenger);
+    }
+    printf("%d generations, %d takeovers\n", generations, takeovers);
 }
