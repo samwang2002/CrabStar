@@ -1,6 +1,8 @@
 #ifndef NET_H
 #define NET_H
 
+#include "weights.h"
+
 /*
     neural net structure:
     768 input nodes: 12 piece bitboards, all from perspective of player to move
@@ -26,15 +28,15 @@ void init_weights(const char *dir_path);
 int net_eval();
 
 // weight vectors
-static float weights1[nodes0 * nodes1];
-static float weights2[nodes1 * nodes2];
-static float weights3[nodes2 * nodes3];
-static float weights4[nodes3 * nodes4];
+// static float weights1[nodes0 * nodes1];
+// static float weights2[nodes1 * nodes2];
+// static float weights3[nodes2 * nodes3];
+// static float weights4[nodes3 * nodes4];
 
-// bias vectors
-static float biases1[nodes1];
-static float biases2[nodes2];
-static float biases3[nodes3];
-static float biases4[nodes4];
+// // bias vectors
+// static float biases1[nodes1];
+// static float biases2[nodes2];
+// static float biases3[nodes3];
+// static float biases4[nodes4];
 
 #endif

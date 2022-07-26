@@ -5,7 +5,7 @@
 #include "move.h"
 
 #define max_ply 64
-#define net_weight 0.5
+#define net_weight 1
 
 /* ------------------------------- functions ------------------------------- */
 // score move - determines priority of move

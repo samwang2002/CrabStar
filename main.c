@@ -24,7 +24,7 @@
 int main()
 {
     init_all();
-    init_weights("gen150");
+    // init_weights("120");
 
     int debug = 0;
     if (debug) {

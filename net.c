@@ -10,13 +10,17 @@
 void load_weights(float *weights, const int dim, const char *path)
 {
     FILE *fp;
-    if ((fp = fopen(path, "r")) == NULL) return;
+    if ((fp = fopen(path, "r")) == NULL) {
+        printf("failed to open file %s\n", path);
+        return;
+    }
 
     // read in lines
     char buf[128];
     for (int idx = 0; idx < dim; ++idx) {
         fgets(buf, sizeof(buf), fp);
         float w = atof(buf);
+        printf("%f,\n", w);
         weights[idx] = w;
     }
 }
@@ -25,20 +29,20 @@ void load_weights(float *weights, const int dim, const char *path)
 void init_weights(const char *dir_path)
 {
     char file_path[100];
-    sprintf(file_path, "%s/layer1-weights.txt", dir_path);
-    load_weights(weights1, nodes0*nodes1, file_path);
-    sprintf(file_path, "%s/layer2-weights.txt", dir_path);
-    load_weights(weights2, nodes1*nodes2, file_path);
-    sprintf(file_path, "%s/layer3-weights.txt", dir_path);
-    load_weights(weights3, nodes2*nodes3, file_path);
-    sprintf(file_path, "%s/layer4-weights.txt", dir_path);
-    load_weights(weights4, nodes3*nodes4, file_path);
-    sprintf(file_path, "%s/layer1-biases.txt", dir_path);
-    load_weights(biases1, nodes1, file_path);
-    sprintf(file_path, "%s/layer2-biases.txt", dir_path);
-    load_weights(biases2, nodes2, file_path);
-    sprintf(file_path, "%s/layer3-biases.txt", dir_path);
-    load_weights(biases3, nodes3, file_path);
+    // sprintf(file_path, "%s/layer1-weights.txt", dir_path);
+    // load_weights(weights1, nodes0*nodes1, file_path);
+    // sprintf(file_path, "%s/layer2-weights.txt", dir_path);
+    // load_weights(weights2, nodes1*nodes2, file_path);
+    // sprintf(file_path, "%s/layer3-weights.txt", dir_path);
+    // load_weights(weights3, nodes2*nodes3, file_path);
+    // sprintf(file_path, "%s/layer4-weights.txt", dir_path);
+    // load_weights(weights4, nodes3*nodes4, file_path);
+    // sprintf(file_path, "%s/layer1-biases.txt", dir_path);
+    // load_weights(biases1, nodes1, file_path);
+    // sprintf(file_path, "%s/layer2-biases.txt", dir_path);
+    // load_weights(biases2, nodes2, file_path);
+    // sprintf(file_path, "%s/layer3-biases.txt", dir_path);
+    // load_weights(biases3, nodes3, file_path);
     sprintf(file_path, "%s/layer4-biases.txt", dir_path);
     load_weights(biases4, nodes4, file_path);
 }
