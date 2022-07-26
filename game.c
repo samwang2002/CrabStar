@@ -281,6 +281,7 @@ void simulate_challengers(const int generations, const int win_by, const int dep
 
     // create seed champions
     champion = calloc(1, sizeof(net_weights));
+    read_weights(champion, seed_path);
     runner_up = duplicate_weights(champion);
     mutate(runner_up, inv_rate, std_dev);
 
