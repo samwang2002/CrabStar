@@ -176,7 +176,7 @@ void mutate(net_weights *weights, const int inv_rate, const float std_dev)
 net_weights *crossover(const net_weights *weights1, const net_weights *weights2,
                        const int inv_rate, const float std_dev)
 {
-    net_weights *new_weights = malloc(sizeof(net_weights));
+    net_weights *new_weights = calloc(1, sizeof(net_weights));
 
     // cross over weights
     for (int i = 0; i < nodes0*nodes1; ++i)

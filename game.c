@@ -288,7 +288,7 @@ void simulate_challengers(const int generations, const int win_by, const int dep
     int takeovers = 0;
     // simulate generation of challengers
     for (int gen = 1; gen <= generations; ++gen) {
-        printf("generation %d ", gen);
+        printf("%d ", gen);
         net_weights *challenger = crossover(champion, runner_up, inv_rate, std_dev);
         pthread_t tid[4*n_starting_positions];      // 2 sides * 2 matchups * # of starting positions
         se_params params[4*n_starting_positions];
