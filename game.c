@@ -408,8 +408,6 @@ void simulate_challengers(const int generations, const int win_by, const int dep
             }
         }
 
-
-        
         // if challenger is successful, update champions
         THREADS_COMPLETED:
         if (result1 >= win_by && result2 >= win_by && (takeovers < 2 || result3 >= win_by_seed)) {
@@ -421,7 +419,7 @@ void simulate_challengers(const int generations, const int win_by, const int dep
             ++takeovers;
 
             int root = (int)round(sqrt(takeovers/seed_divisor));
-            if (root*root == takeovers/seed_divisor)
+            if (root*root*seed_divisor == takeovers)
                 printf("%s new challengers need to defeat seed by at least %d %s\n",
                         short_line, win_by+root, short_line);
 
