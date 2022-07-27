@@ -33,19 +33,19 @@ int main()
 
     // simulate_generations(4, 32, 3, "seed1", 5, 0.03);
 
-    // simulate_challengers(100, 2, 3, "noisy_seed", 3, 0.05);
+    simulate_challengers(50, 2, 3, "trained_seed", 3, 0.05);
 
-    int n_players = 4;
-    net_weights *players[n_players];
-    for (int i = 0; i < n_players; ++i) players[i] = calloc(1, sizeof(net_weights));
-    read_weights(players[0], "noisy_seed");
-    for (int i = 1; i < n_players; ++i) {
-        char dir_path[100];
-        sprintf(dir_path, "%d", i);
-        read_weights(players[i], dir_path);
-    }
+    // int n_players = 16;
+    // net_weights *players[n_players];
+    // for (int i = 0; i < n_players; ++i) players[i] = calloc(1, sizeof(net_weights));
+    // read_weights(players[0], "trained_seed");
+    // for (int i = 1; i < n_players; ++i) {
+    //     char dir_path[100];
+    //     sprintf(dir_path, "%d", i*10);
+    //     read_weights(players[i], dir_path);
+    // }
 
-    round_robin(players, n_players, 3, 1);
+    // round_robin(players, n_players, 3, 1);
 
 
     time(&end_s);

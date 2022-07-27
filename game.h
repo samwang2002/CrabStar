@@ -6,6 +6,8 @@
 #define max_moves 100
 #define elo_k 16                    // multiplier to calculate elo scores
 
+#define party "┏(-_-)┛┗(-_-﻿ )┓┗(-_-)┛┏(-_-)┓"
+
 // start positions for games
 #define open_game "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
 #define closed_game "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1"
@@ -15,7 +17,7 @@
 #define caro "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
 #define dutch "rnbqkbnr/ppppp1pp/8/5p2/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1"
 #define english "rnbqkbnr/pppp1ppp/8/4p3/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 1"
-#define n_starting_positions 8
+#define n_starting_positions 3
 #define all_positions NULL
 
 static char *starting_positions[] = {open_game, closed_game, sicilian, indian, french, caro, dutch, english};
@@ -52,6 +54,7 @@ void simulate_generations(const int generations, const int n_players, const int 
 
 // simulate matches between candidate and reigning champions
 // candidate only replaces current champion if it defeats both reigning 1st and 2nd place by win_by points
+// and defeats the seed by even more points
 void simulate_challengers(const int generations, const int win_by, const int depth, const char *seed_path,
                           const int inv_rate, const float std_dev);
 
