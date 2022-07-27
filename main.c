@@ -33,7 +33,7 @@ int main()
 
     // simulate_generations(4, 32, 3, "seed1", 5, 0.03);
 
-    simulate_challengers(50, 2, 3, "trained_seed", 3, 0.05);
+    simulate_challengers(1000, 2, 3, "trained_seed", 3, 0.05);
 
     // int n_players = 16;
     // net_weights *players[n_players];
