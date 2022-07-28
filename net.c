@@ -33,7 +33,7 @@ void read_weights(net_weights *weights, const char *dir_path)
     load_vector(weights->weights1, nodes0*nodes1, file_path);
     sprintf(file_path, "%s%s", dir_path, "/layer2-weights.txt");
     load_vector(weights->weights2, nodes1*nodes2, file_path);
-    sprintf(file_path, "%s%s", dir_path, "/layer3-weights.txt");
+    sprintf(file_path, "%s%s", dir_path, "/layr3-weights.txt");
     load_vector(weights->weights3, nodes2*nodes3, file_path);
     sprintf(file_path, "%s%s", dir_path, "/layer4-weights.txt");
     load_vector(weights->weights4, nodes3*nodes4, file_path);

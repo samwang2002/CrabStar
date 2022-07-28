@@ -26,29 +26,25 @@ int main()
     init_all();
     srand(time(NULL));
 
+    board_state *board;
+    search_state *search;
+    parse_fen(board, start_position);
+    search->board = board;
+    search->neg_nodes = 0;
+    search->follow_pv = 0;
+    search->score_pv = 0;
+    memset(search->killer_moves, 0, sizeof(search->killer_moves));
+    memset(search->history_moves, 0, sizeof(search->history_moves));
+    memset(search->pv_table, 0, sizeof(search->pv_table));
+    memset(search->pv_length, 0, sizeof(search->pv_length));
+
+    net_weights *weights;
+    read_weights(weights, "seed1");
+
+    search_position(search, board, 8, weights);
+
     time_t start_s, end_s;
     clock_t start, end;
     time(&start_s);
     start = clock();
-
-    // simulate_generations(30, 32, 3, "seed1", 5, 0.03);
-
-    int n_players = 4;
-    net_weights *players[n_players];
-    for (int i = 0; i < n_players; ++i) players[i] = calloc(1, sizeof(net_weights));
-    read_weights(players[0], "seed1");
-    for (int i = 1; i < n_players; ++i) {
-        char dir_path[100];
-        sprintf(dir_path, "gen%d", i*10);
-        read_weights(players[i], dir_path);
-    }
-    round_robin(players, n_players, 3, 1);
-
-
-    time(&end_s);
-    end = clock();
-    printf("%s\ntime elapsed: %lds\n", horizontal_line, end_s-start_s);
-    printf("CPU time: %ds\n", (int)(end-start)/CLOCKS_PER_SEC);
-
-    return 0;
 }

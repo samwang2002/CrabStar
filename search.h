@@ -24,6 +24,14 @@ typedef struct {
     int reduction_limit;
 } search_state;
 
+typedef struct {
+    search_state *search;
+    int alpha;
+    int beta;
+    int depth;
+    const net_weights *weights;
+} negamax_params;
+
 /* ------------------------------- functions ------------------------------- */
 // score move - determines priority of move
 int score_move(search_state *search, const int move);
@@ -46,7 +54,9 @@ int quick_search(search_state *search, board_state *board, const int depth, cons
 // enable PV mopve scoring
 void enable_pv_scoring(search_state *search, move_list *moves);
 
-void smp_search(search_state *search, board_state *board, const int max_depth, const net_weights *weights);
+void smp_search(search_state *search, const int max_depth, const net_weights *weights);
+
+void *lazy_negamax(void *params);
 
 /* ------------------------------- variables ------------------------------- */
 // // best move
