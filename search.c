@@ -344,24 +344,25 @@ int quick_search(search_state *search, board_state *board, const int depth, cons
 void smp_search(search_state *search, const int max_depth, const net_weights *weights)
 {
     pthread_t threads[max_depth];
-    negamax_params *searches[max_depth];
+    negamax_params searches[max_depth];
 
     for (int i = 0; i < max_depth; i++)
     {
-        searches[i]->search = search;
-        searches[i]->alpha = -infinity;
-        searches[i]->beta = infinity;
-        searches[i]->depth = i;
-        searches[i]->weights = weights;
+        searches[i].search = search;
+        searches[i].alpha = -infinity;
+        searches[i].beta = infinity;
+        searches[i].depth = i;
+        searches[i].weights = weights;
 
         pthread_create(&threads[i], NULL, lazy_negamax, searches);
+        printf("created pthread\n");
     }
 
     for (int i = 0; i < max_depth; i++)
         pthread_join(threads[i], NULL);
     
     printf("bestmove ");
-    print_move(searches[max_depth]->search->pv_table[0][0]);
+    print_move(searches[max_depth].search->pv_table[0][0]);
     printf("\n");
 
 }
@@ -376,4 +377,5 @@ void *lazy_negamax(void *params)
     const net_weights *weights = nparams->weights;
 
     int score = negamax(search, alpha, beta, depth, weights);
+    printf("finished search\n");
 }
