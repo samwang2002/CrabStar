@@ -13,7 +13,7 @@
     </head>
 
     <body>
-        <div id="myBoard" style="width: 400px"></div>
+        <div id="myBoard" style="width: 80%"></div>
     </body>
 </html>
 
@@ -45,6 +45,12 @@
 
     // illegal move
     if (move === null) return 'snapback'
+
+    // make HTTP POST request to make move
+    $.post('/make_move', {'fen': game.fen()}, function(data) {
+        game.load(data.fen);
+        board.position(game.fen());
+    });
 
     updateStatus()
     }
