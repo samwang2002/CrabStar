@@ -5,14 +5,8 @@ import chess
 import chess.engine
 
 engine = chess.engine.SimpleEngine.popen_uci('./engine/crabstar2')
-# engine = chess.uci.popen_engine("./engine/crabstar")
 
 board = chess.Board()
-# while not board.is_game_over():
-#     result = engine.play(board, chess.engine.Limit(time=0.1))
-#     board.push(result.move)
-
-# engine.quit()
 
 app = Flask(__name__)
 
@@ -30,10 +24,11 @@ def make_move():
     # find best move
     board = chess.Board(fen)
     result = engine.play(board, chess.engine.Limit(depth=6))
-    print('\n', result.move, '\n')
     board.push(result.move)
+    best_move = str(result.move)
+    print('\n', best_move, '\n')
 
-    return {'fen': board.fen()}
+    return {'fen': board.fen(), 'best_move': best_move}
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True, host='localhost', port=4000)

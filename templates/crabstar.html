@@ -10,10 +10,32 @@
         <script src="/static/js/chess.js"></script>
         <link rel="stylesheet" href="/static/css/chessboard-1.0.0.min.css">
         <script src="/static/js/chessboard-1.0.0.min.js"></script>
+
+        <style>
+            body {
+                margin: 30px;
+            }
+
+            #boardGui {
+                width: 40%;
+                margin-bottom: 10px;
+            }
+
+            #status, #fen, #pgn {
+                margin-top: -5px;
+                padding-bottom: 10px;
+            }
+        </style>
     </head>
 
     <body>
-        <div id="myBoard" style="width: 80%"></div>
+        <div id="boardGui"></div>
+        <label><b>Status:</b></label>
+        <div id="status"></div>
+        <label><b>FEN:</b></label>
+        <div id="fen"></div>
+        <label><b>PGN:</b></label>
+        <div id="pgn"></div>
     </body>
 </html>
 
@@ -25,58 +47,60 @@
     var $pgn = $('#pgn')
 
     function onDragStart (source, piece, position, orientation) {
-    // do not pick up pieces if the game is over
-    if (game.game_over()) return false
+        // do not pick up pieces if the game is over
+        if (game.game_over()) return false
 
-    // only pick up pieces for the side to move
-    if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-        (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-        return false
-    }
+        // only pick up pieces for the side to move
+        if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+            (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+            return false
+        }
     }
 
     function onDrop (source, target) {
-    // see if the move is legal
-    var move = game.move({
-        from: source,
-        to: target,
-        promotion: 'q' // NOTE: always promote to a queen for example simplicity
-    })
+        // see if the move is legal
+        var move = game.move({
+            from: source,
+            to: target,
+            promotion: 'q' // NOTE: always promote to a queen for example simplicity
+        })
 
-    // illegal move
-    if (move === null) return 'snapback'
+        // illegal move
+        if (move === null) return 'snapback'
 
-    // make HTTP POST request to make move
-    $.post('/make_move', {'fen': game.fen()}, function(data) {
-        game.load(data.fen);
-        board.position(game.fen());
-    });
+        // make HTTP POST request to make move
+        $.post('/make_move', {'fen': game.fen()}, function(data) {
+            console.log(data.best_move);
+            game.move(data.best_move, { sloppy: true });
+            board.position(game.fen());
+            updateStatus();
+        });
 
-    updateStatus()
+        updateStatus()
     }
 
     // update the board position after the piece snap
     // for castling, en passant, pawn promotion
     function onSnapEnd () {
-    board.position(game.fen())
+        board.position(game.fen())
     }
 
     function updateStatus () {
     var status = ''
 
-    var moveColor = 'White'
+    var moveColor = 'white'
     if (game.turn() === 'b') {
-        moveColor = 'Black'
+        moveColor = 'black'
     }
 
     // checkmate?
     if (game.in_checkmate()) {
-        status = 'Game over, ' + moveColor + ' is in checkmate.'
+        status = 'game over, ' + moveColor + ' is in checkmate.'
     }
 
     // draw?
     else if (game.in_draw()) {
-        status = 'Game over, drawn position'
+        status = 'game over, drawn position'
     }
 
     // game still on
@@ -101,7 +125,7 @@
     onDrop: onDrop,
     onSnapEnd: onSnapEnd
     }
-    board = Chessboard('myBoard', config)
+    board = Chessboard('boardGui', config)
 
     updateStatus()
 </script>
