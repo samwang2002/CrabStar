@@ -149,9 +149,9 @@ void uci_loop()
     char input[2000];
 
     // print engine info
-    printf("id name Crab Star\n");
-    printf("id author Sam and Justin\n");
-    printf("uciok\n");
+    //printf("id name Crab Star\n");
+    //printf("id author Sam and Justin\n");
+    //printf("uciok\n");
 
     // main loop
     while (1) {
