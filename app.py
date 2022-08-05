@@ -4,7 +4,7 @@ from flask import request
 import chess
 import chess.engine
 
-engine = chess.engine.SimpleEngine.popen_uci('./engine/crabstar-ubuntu')
+# engine = chess.engine.SimpleEngine.popen_uci('./engine/crabstar-ubuntu')
 
 board = chess.Board()
 
@@ -18,17 +18,18 @@ def root():
 # make move api
 @app.route('/make_move', methods=['POST'])
 def make_move():
-    fen = request.form.get('fen')
-    print('fen:', fen)
+    print("hello")
+    # fen = request.form.get('fen')
+    # print('fen:', fen)
 
-    # find best move
-    board = chess.Board(fen)
-    result = engine.play(board, chess.engine.Limit(depth=6))
-    board.push(result.move)
-    best_move = str(result.move)
-    print('\n', best_move, '\n')
+    # # find best move
+    # board = chess.Board(fen)
+    # result = engine.play(board, chess.engine.Limit(depth=6))
+    # board.push(result.move)
+    # best_move = str(result.move)
+    # print('\n', best_move, '\n')
 
-    return {'fen': board.fen(), 'best_move': best_move}
+    return {'fen': board.fen(), 'best_move': 'a8a8'}
 
 # if __name__ == '__main__':
 #     app.run(debug=True, threaded=True)
