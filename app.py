@@ -31,4 +31,4 @@ def make_move():
     return {'fen': board.fen(), 'best_move': best_move}
 
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True, host='localhost', port=4000)
+    app.run(debug=True, threaded=True)
