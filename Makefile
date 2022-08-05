@@ -22,6 +22,7 @@ search.o: search.c search.h
 uci.o: uci.c uci.h
 timecontrol.o: timecontrol.c timecontrol.h
 
+
 .phony: clean
 clean:
 	rm -f *.o main
