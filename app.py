@@ -4,7 +4,7 @@ from flask import request
 import chess
 import chess.engine
 
-engine = chess.engine.SimpleEngine.popen_uci('./engine/crabstar2')
+engine = chess.engine.SimpleEngine.popen_uci('./engine/crabstar-ubuntu')
 
 board = chess.Board()
 
