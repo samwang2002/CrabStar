@@ -76,12 +76,12 @@
     // piece dragged
     function onDragStart (source, piece, position, orientation) {
         // do not pick up pieces if the game is over or computer is thinking
-        if (game.game_over() || game.turn() === 'b') return false
+        if (game.game_over() || game.turn() === 'b') return false;
 
         // only pick up pieces for the side to move
         if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
             (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-            return false
+            return false;
         }
     }
 
@@ -91,60 +91,61 @@
         var move = game.move({
             from: source,
             to: target,
-            promotion: 'q' // NOTE: always promote to a queen for example simplicity
-        })
+            promotion: 'q' // NOTE: always promote to a queen for simplicity
+        });
 
         // illegal move
-        if (move === null) return 'snapback'
+        if (move === null) return 'snapback';
 
         // make HTTP POST request to make move
+        if (game.game_over()) return false;
         $.post('/make_move', {'fen': game.fen()}, function(data) {
             game.move(data.best_move, { sloppy: true });
             board.position(game.fen());
             updateStatus();
         });
 
-        updateStatus()
+        updateStatus();
     }
 
     // update the board position after the piece snap
     // for castling, en passant, pawn promotion
     function onSnapEnd () {
-        board.position(game.fen())
+        board.position(game.fen());
     }
 
     // update game status variables
     function updateStatus () {
-        var status = ''
+        var status = '';
 
-        var moveColor = 'white'
+        var moveColor = 'white';
         if (game.turn() === 'b') {
-            moveColor = 'black'
+            moveColor = 'black';
         }
 
         // checkmate?
         if (game.in_checkmate()) {
-            status = 'game over, ' + moveColor + ' is in checkmate.'
+            status = 'game over, ' + moveColor + ' is in checkmate.';
         }
 
         // draw?
         else if (game.in_draw()) {
-            status = 'game over, drawn position'
+            status = 'game over, drawn position';
         }
 
         // game still on
         else {
-            status = moveColor + ' to move'
+            status = moveColor + ' to move';
 
             // check?
             if (game.in_check()) {
-            status += ', ' + moveColor + ' is in check'
+                status += ', ' + moveColor + ' is in check';
             }
         }
 
-        $status.html(status)
-        $fen.html(game.fen())
-        $pgn.html(game.pgn())
+        $status.html(status);
+        $fen.html(game.fen());
+        $pgn.html(game.pgn());
     }
 
     var config = {
@@ -153,7 +154,7 @@
         onDragStart: onDragStart,
         onDrop: onDrop,
         onSnapEnd: onSnapEnd
-    }
-    board = Chessboard('boardGui', config)
-    updateStatus()
+    };
+    board = Chessboard('boardGui', config);
+    updateStatus();
 </script>
