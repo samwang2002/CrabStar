@@ -19,11 +19,11 @@ def root():
 @app.route('/make_move', methods=['POST'])
 def make_move():
     fen = request.form.get('fen')
-    print('fen:', fen)
+    net_weight = float(request.form.get('weight'))  # communicate weight to engine using uci time control option
 
     # find best move
     board = chess.Board(fen)
-    result = engine.play(board, chess.engine.Limit(depth=6))
+    result = engine.play(board, chess.engine.Limit(depth=6, time=net_weight))
     board.push(result.move)
     best_move = str(result.move)
 

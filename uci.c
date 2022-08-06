@@ -81,6 +81,7 @@ void parse_position(const char *command)
 // parse "go" command
 void parse_go(const char *command)
 {
+    printf("command: %s\n", command);
     int depth = -1;
     const char *argument = NULL;
     if ((argument = strstr(command, "depth"))) // depth command
@@ -121,22 +122,20 @@ void parse_go(const char *command)
     // init start time
     starttime = get_time_ms();
 
-    // if time control is available
-    if(mseconds != -1)
-    {
-        // flag we're playing with time control
-        timeset = 1;
-        // set up timing
-        mseconds /= movestogo;
-        mseconds -= 50;
-        stoptime = starttime + mseconds + inc;
-    }
-    // print debug info
-    printf("time:%d start:%d stop:%d depth:%d timeset:%d\n",
-    mseconds, starttime, stoptime, depth, timeset);
-
-    if(depth == -1) depth = 10; // depth is not available
-    search_position(depth);
+    // // if time control is available
+    // if(mseconds != -1)
+    // {
+    //     // flag we're playing with time control
+    //     timeset = 1;
+    //     // set up timing
+    //     mseconds /= movestogo;
+    //     mseconds -= 50;
+    //     stoptime = starttime + mseconds + inc;
+    // }
+    if (mseconds == -1) mseconds = 500;     // use time option to encode net weights
+    if (depth == -1) depth = 10;            // depth is not available
+    printf("net weight: %f\n", mseconds * 0.001);
+    search_position(depth, mseconds * 0.001);
 }
 
 // main UCI loop

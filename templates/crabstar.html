@@ -46,6 +46,8 @@
 </html>
 
 <script>
+    var net_weight = 0.9;
+
     var board = null
     var game = new Chess()
     var $status = $('#status')
@@ -99,7 +101,7 @@
 
         // make HTTP POST request to make move
         if (game.game_over()) return false;
-        $.post('/make_move', {'fen': game.fen()}, function(data) {
+        $.post('/make_move', {'fen': game.fen(), 'weight': net_weight}, function(data) {
             game.move(data.best_move, { sloppy: true });
             board.position(game.fen());
             updateStatus();

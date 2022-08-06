@@ -78,9 +78,8 @@ void sort_moves(move_list *moves)
 // beta: maximum score the minimizing player is assured of
 // goal is to get alpha as high as possible
 // if beta <= alpha, then the minimizing player had a better option, so we can prune
-int negamax(const int alpha, const int beta, int depth)
+int negamax(const int alpha, const int beta, int depth, const float net_weight)
 {
-
     int score;
     // define hash flag
     int hash_flag = hash_flag_alpha;
@@ -100,7 +99,7 @@ int negamax(const int alpha, const int beta, int depth)
     pv_length[ply] = ply;
 
     if (depth == 0)         // base case
-        return quiescence(alpha, beta);
+        return quiescence(alpha, beta, net_weight);
     
     ++neg_nodes;
 
@@ -132,7 +131,7 @@ int negamax(const int alpha, const int beta, int depth)
         // hash side
         hash_key ^= side_key;
         // search moves with reduced depth to find beta cutoffs
-        int score = -negamax(-beta, -beta + 1, depth -1 -2);
+        int score = -negamax(-beta, -beta + 1, depth - 2, net_weight);
         //decrement ply
         --ply;
         //restore board state
@@ -168,22 +167,23 @@ int negamax(const int alpha, const int beta, int depth)
         }
         ++legal_count;
 
-        if (!moves_searched) score = -negamax(-beta, -new_alpha, depth - 1); // normal alpha beta search
+        if (!moves_searched) score = -negamax(-beta, -new_alpha, depth-1, net_weight); // normal alpha beta search
 
         else { // late move reduction (LMR)
             //condition to consider LMR
             if (moves_searched >= full_depth_moves && depth >= reduction_limit && !in_check 
             && !get_move_capture(moves.moves[i]) && !get_move_promoted(moves.moves[i]))
                 //search current move with reduced depth
-                score = -negamax(-new_alpha - 1, -new_alpha, depth -2);
+                score = -negamax(-new_alpha - 1, -new_alpha, depth - 2, net_weight);
             else // hack to ensure that full-depth search is done
                 score = new_alpha + 1;
             // principle variation search PVS
             if (score > new_alpha) {
-                score = -negamax(-new_alpha -1, -new_alpha, depth-1); //search the remaining moves to prove they are all bad
+                //search the remaining moves to prove they are all bad
+                score = -negamax(-new_alpha -1, -new_alpha, depth-1, net_weight);
                 // if a better move is found in the search, search again with normal alpha beta score bounds
                 if ((score > new_alpha) && (score < beta))
-                    score = -negamax(-beta, -new_alpha, depth-1);
+                    score = -negamax(-beta, -new_alpha, depth-1, net_weight);
             }
         }
 
@@ -238,7 +238,7 @@ int negamax(const int alpha, const int beta, int depth)
 }
 
 // quiescence search, see negamax code for better documentation
-int quiescence(const int alpha, const int beta)
+int quiescence(const int alpha, const int beta, const float net_weight)
 {
     // every 2047 nodes
     if (!(neg_nodes & 2047))
@@ -268,7 +268,7 @@ int quiescence(const int alpha, const int beta)
             --ply;
             continue;
         }
-        int score = -quiescence(-beta, -new_alpha);     // now from opposite perspective
+        int score = -quiescence(-beta, -new_alpha, net_weight);     // now from opposite perspective
 
         --ply;
         take_back();
@@ -281,7 +281,7 @@ int quiescence(const int alpha, const int beta)
 }
 
 // search for best move and print it
-void search_position(const int max_depth)
+void search_position(const int max_depth, const float net_weight)
 {
     printf("searching at depth %d\n", max_depth);
     // reset variables
@@ -304,7 +304,7 @@ void search_position(const int max_depth)
         if (stopped) break; //time is up
         follow_pv = 1;
         // find best move within a given position
-        score = negamax(alpha, beta, depth);
+        score = negamax(alpha, beta, depth, net_weight);
         // we fell outide the window, so try again with a full-wdth window
         if ((score <= alpha) || (score >= beta)) {
             alpha = -infinity;
