@@ -23,7 +23,7 @@ def make_move():
 
     # find best move
     board = chess.Board(fen)
-    result = engine.play(board, chess.engine.Limit(depth=8))
+    result = engine.play(board, chess.engine.Limit(depth=6))
     board.push(result.move)
     best_move = str(result.move)
 
