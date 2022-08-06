@@ -100,14 +100,12 @@ int negamax(const int alpha, const int beta, int depth)
     pv_length[ply] = ply;
 
     if (depth == 0)         // base case
-        // return (int)(net_eval()*net_weight + evaluate()*(1-net_weight));
         return quiescence(alpha, beta);
     
     ++neg_nodes;
 
     if (ply >= max_ply)     // too deep, danger of exceeding arrays
-        return (int)(net_eval()*net_weight + evaluate()*(1-net_weight));
-        // return evaluate();
+        return (int)(net_weight*net_eval() + (1-net_weight)*evaluate());
 
     // if in check, increase search depth
     int in_check = square_attacked((side==white) ? ls1b(bitboards[K]) : ls1b(bitboards[k]), side^1);
@@ -249,7 +247,7 @@ int quiescence(const int alpha, const int beta)
 
     ++neg_nodes;
     // int evaluation = evaluate();
-    int evaluation = (int)(net_eval()*net_weight + evaluate()*(1-net_weight));
+    int evaluation = (int)(net_weight*net_eval() + (1-net_weight)*evaluate());
 
     if (evaluation >= beta) return beta;                // failed hard beta cutoff
     int new_alpha = alpha;
