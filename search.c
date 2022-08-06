@@ -283,6 +283,7 @@ int quiescence(const int alpha, const int beta)
 // search for best move and print it
 void search_position(const int max_depth)
 {
+    printf("searching at depth %d\n", max_depth);
     // reset variables
     neg_nodes = 0;
     follow_pv = 0;
