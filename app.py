@@ -18,13 +18,12 @@ def root():
 # make move api
 @app.route('/make_move', methods=['POST'])
 def make_move():
-    print("hello")
     fen = request.form.get('fen')
     print('fen:', fen)
 
     # find best move
     board = chess.Board(fen)
-    result = engine.play(board, chess.engine.Limit(depth=6))
+    result = engine.play(board, chess.engine.Limit(depth=8))
     board.push(result.move)
     best_move = str(result.move)
 
