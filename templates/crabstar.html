@@ -1,5 +1,7 @@
 <html>
     <head>
+        <meta charset="utf-8" />
+
         <title>CrabStar Chess</title>
 
         <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -9,7 +11,7 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
         <script src="/static/js/chess.js"></script>
         <link rel="stylesheet" href="/static/css/chessboard-1.0.0.css">
-        <script src="/static/js/chessboard-1.0.0.min.js"></script>
+        <script src="/static/js/chessboard-1.0.0.js"></script>
 
         <style>
             body {
@@ -46,13 +48,13 @@
 </html>
 
 <script>
+    // define game variables
     var net_weight = 0.9;
-
-    var board = null
-    var game = new Chess()
-    var $status = $('#status')
-    var $fen = $('#fen')
-    var $pgn = $('#pgn')
+    // var board = null
+    var game = new Chess();
+    var $status = $('#status');
+    var $fen = $('#fen');
+    var $pgn = $('#pgn');
 
     // new game button
     $('#new_game').on('click', function() {
@@ -158,5 +160,7 @@
         onSnapEnd: onSnapEnd
     };
     board = Chessboard('boardGui', config);
+    $(window).resize(board.resize);         // dynamically resize chess board
+
     updateStatus();
 </script>
