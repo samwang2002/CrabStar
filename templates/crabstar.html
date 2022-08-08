@@ -15,37 +15,36 @@
 
         <style>
             body {
-                margin: 0px;
+                margin: 0px 30px;
                 padding: 0px;
                 background-color: #0d151c;
                 color: white;
-                font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
 
-            .container {
+            #container {
                 width: 100%;
-                max-width: 1200px;
+                max-width: 1300px;
                 margin: auto;
                 display: flex;
                 flex-flow: row nonwrap;
-                background-color: yellow;
+                /* background-color: yellow; */
                 justify-content: center;
             }
 
-            .left {
-                width: 150px;
+            #left {
+                width: 200px;
                 padding: 15px;
                 flex-shrink: 0;
-                background-color: red;
+                /* background-color: red; */
                 box-sizing: border-box;
             }
 
-            .right {
-                padding: 20px;
-                width: 250px;
+            #right {
+                padding: 30px 20px;
+                width: 300px;
                 flex-shrink: 0;
-                margin: 30px 0px 0px 0px;
-                background-color: pink;
+                /* background-color: pink; */
                 box-sizing: border-box;
             }
 
@@ -64,11 +63,33 @@
                 background-color: #1b2f4f;
                 width: 100%;
                 height: 500px;
+                border: 1px solid white;
+                /* text-align: center;
+                border-collapse: collapse; */
+            }
+
+            #move-list table {
+                width: 100%;
+                text-align: center;
+                border-collapse: collapse;
+            }
+
+            #move-list tr {
+                border: 1px solid white;
             }
 
             #move-list td {
-                width: 100%;
-                text-align: center;
+                /* border: 1px solid white; */
+                overflow: hidden;
+            }
+            
+            .move-count {
+                border: 1px solid white;
+                width: 16%;
+            }
+
+            .move-label {
+                width: 42%;
             }
 
             #status, #fen, #pgn {
@@ -79,8 +100,8 @@
     </head>
 
     <body>
-        <div class="container">
-        <div class="left">
+        <div id="container">
+        <div id="left">
             <img src="/static/img/cs-text-nobg.png" id="logo">
         </div>
 
@@ -90,17 +111,19 @@
             Hi
         </div> -->
 
-        <div class="right">
+        <div id="right">
             <div id="move-list">
-                <table>
-                    <tr>
-                        <td>e4</td>
-                        <td>e5</td>
+                <table id="move-table">
+                    <!-- <tr>
+                        <td class="move-count">1</td>
+                        <td class="move-label">e4</td>
+                        <td class="move-label">e5</td>
                     </tr>
                     <tr>
-                        <td>e4</td>
-                        <td>e5</td>
-                    </tr>
+                        <td class="move-count">2</td>
+                        <td class="move-label">Nf3</td>
+                        <td class="move-label">Nc6</td>
+                    </tr> -->
                 </table>
             </div>
         </div>
@@ -123,11 +146,12 @@
 <script>
     // define game variables
     var net_weight = 0.9;
-    // var board = null
     var game = new Chess();
     var $status = $('#status');
     var $fen = $('#fen');
     var $pgn = $('#pgn');
+
+    var ply = 0;
 
     // new game button
     $('#new_game').on('click', function() {
@@ -174,12 +198,15 @@
         // illegal move
         if (move === null) return 'snapback';
 
-        // make HTTP POST request to make move
+        ply++;
+
+        // make HTTP POST request to make computer move
         if (game.game_over()) return false;
         $.post('/make_move', {'fen': game.fen(), 'weight': net_weight}, function(data) {
             game.move(data.best_move, { sloppy: true });
             board.position(game.fen());
             updateStatus();
+            ply++;
         });
 
         updateStatus();
@@ -220,15 +247,20 @@
             }
         }
 
-        $status.html(status);
-        $fen.html(game.fen());
-        $pgn.html(game.pgn());
+        // add move to table
+        if (ply > 0 && ply % 2 == 0) {
+            cell1 = row.insertCell(0);
+        }
+
+        // $status.html(status);
+        // $fen.html(game.fen());
+        // $pgn.html(game.pgn());
     }
 
     // resize board element and then call resize function
     function resizeBoard() {
-        let containerWidth = Math.min(1200, window.innerWidth);
-        let newWidth = Math.min(containerWidth - 400, 700);
+        let containerWidth = document.getElementById('container').offsetWidth;
+        let newWidth = Math.min(containerWidth - 500, 700);
         document.getElementById('boardGui').setAttribute("style", "width: " + newWidth + "px;");
         board.resize();
     }
@@ -240,8 +272,17 @@
         onDrop: onDrop,
         onSnapEnd: onSnapEnd
     };
+
     board = Chessboard('boardGui', config);
     $(window).resize(resizeBoard);         // dynamically resize chess board
+    let table = document.getElementById("move-table");
+
+    var currentRow = document.createElement('tr');
+    let firstNum = document.createElement('td');
+    firstNum.classList.add('move-count');
+    firstNum.innerHTML = 1;
+    currentRow.appendChild(firstNum);
+    table.appendChild(currentRow);
 
     updateStatus();
 </script>
