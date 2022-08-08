@@ -15,11 +15,15 @@
 
         <style>
             body {
-                margin: 0px 30px;
+                margin: 0px 15px;
                 padding: 0px;
                 background-color: #0d151c;
                 color: white;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            }
+
+            p {
+                font-size: 15px;
             }
 
             #container {
@@ -28,23 +32,20 @@
                 margin: auto;
                 display: flex;
                 flex-flow: row nonwrap;
-                /* background-color: yellow; */
                 justify-content: center;
             }
 
             #left {
-                width: 200px;
+                width: 250px;
                 padding: 15px;
                 flex-shrink: 0;
-                /* background-color: red; */
                 box-sizing: border-box;
             }
 
             #right {
                 padding: 30px 20px;
-                width: 300px;
+                width: 250px;
                 flex-shrink: 0;
-                /* background-color: pink; */
                 box-sizing: border-box;
             }
 
@@ -55,7 +56,7 @@
             }
 
             #logo {
-                width: 100%;
+                width: 80%;
                 margin: auto;
             }
 
@@ -91,37 +92,41 @@
                 margin-top: -5px;
                 padding-bottom: 10px;
             }
+
+            /* chess board highlights */
+            .highlight-white-light {
+                background-color: #ef4182;
+            }
+
+            .highlight-white-dark {
+                background-color: #e31261;
+            }
+
+            .highlight-black-light {
+                background-color: #ef4182;
+            }
+
+            .highlight-black-dark {
+                background-color: #e31261;
+            }
         </style>
     </head>
 
     <body>
         <div id="container">
-        <div id="left">
-            <img src="/static/img/cs-text-nobg.png" id="logo">
-        </div>
-
-        <div id="boardGui"></div>
-<!-- 
-        <div class="center">
-            Hi
-        </div> -->
-
-        <div id="right">
-            <div id="move-list">
-                <table id="move-table">
-                    <!-- <tr>
-                        <td class="move-count">1</td>
-                        <td class="move-label">e4</td>
-                        <td class="move-label">e5</td>
-                    </tr>
-                    <tr>
-                        <td class="move-count">2</td>
-                        <td class="move-label">Nf3</td>
-                        <td class="move-label">Nc6</td>
-                    </tr> -->
-                </table>
+            <div id="left">
+                <img src="/static/img/cs-text-nobg.png" id="logo">
+                <p>
+                    Crab Star is a chess engine written by Sam Wang and Justin Peng.
+                    It uses a combination of hardcoded factors and a neural network to evaluate positions.
+                </p>
             </div>
-        </div>
+
+            <div id="boardGui"></div>
+
+            <div id="right">
+                <div id="move-list"><table id="move-table"></table></div>
+            </div>
         </div>
 
         <!-- <button id="new_game">New game</button>
@@ -142,9 +147,9 @@
     // define game variables
     var net_weight = 0.9;
     var game = new Chess();
-    var $status = $('#status');
-    var $fen = $('#fen');
-    var $pgn = $('#pgn');
+    // var $status = $('#status');
+    // var $fen = $('#fen');
+    // var $pgn = $('#pgn');
 
     var ply = 0;
 
@@ -157,8 +162,16 @@
         onSnapEnd: onSnapEnd
     };
 
+    console.log(isDark('a1'));
+    console.log(isDark('a8'));
+    console.log(isDark('h8'));
+
     board = Chessboard('boardGui', config);
+    var $boardGui = $('#boardGui');
     $(window).resize(resizeBoard);         // dynamically resize chess board
+
+    // define other useful constants
+    let squareClass = '.square-55d63';
 
     // new game button
     $('#new_game').on('click', function() {
@@ -205,19 +218,33 @@
         // illegal move
         if (move === null) return 'snapback';
 
+        // update visuals
         ply++;
         addMoveToTable(game.history()[game.history().length-1]);
+        removeHighlights('black');
+        // $boardGui.find('.square-' + source).addClass('highlight-white');
+        // $boardGui.find('.square-' + target).addClass('highlight-white');
+        highlightSquare(source, 'white');
+        highlightSquare(target, 'white');
 
         // make HTTP POST request to make computer move
         if (game.game_over()) return false;
         $.post('/make_move', {'fen': game.fen(), 'weight': net_weight}, function(data) {
+            // make move
             game.move(data.best_move, { sloppy: true });
             board.position(game.fen());
-            updateStatus();
+
             ply++;
             addMoveToTable(game.history()[game.history().length-1]);
+            removeHighlights('white');
+            let compSource = data.best_move.slice(0, 2);
+            let compTarget = data.best_move.slice(2, 4);
+            console.log(compSource + ' ' + compTarget);
+            // $boardGui.find('.square-' + compSource).addClass('highlight-black');
+            // $boardGui.find('.square-' + compTarget).addClass('highlight-black');
+            highlightSquare(compSource, 'black');
+            highlightSquare(compTarget, 'black');
         });
-
         updateStatus();
     }
 
@@ -260,6 +287,28 @@
         if (ply > 0 && ply % 2 == 0) {
             cell1 = row.insertCell(0);
         }
+    }
+
+    // return whether square is dark
+    function isDark(square) {
+        let file = square.charCodeAt(0) - 97;
+        let rank = square.charCodeAt(1) - 48;
+        if ((file + rank) % 2 === 1) return true;
+        return false;
+    }
+
+    // highlight square
+    function highlightSquare(square, color) {
+        if (isDark(square))
+            $boardGui.find('.square-' + square).addClass('highlight-' + color + '-dark');
+        else
+            $boardGui.find('.square-' + square).addClass('highlight-' + color + '-light');
+    }
+
+    // remove highlighted squares of color
+    function removeHighlights(color) {
+        $boardGui.find(squareClass).removeClass('highlight-' + color + '-dark');
+        $boardGui.find(squareClass).removeClass('highlight-' + color + '-light');
     }
 
     // add move to table
