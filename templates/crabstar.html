@@ -115,7 +115,7 @@
     <body>
         <div id="container">
             <div id="left">
-                <img src="/static/img/cs-text-nobg.png" id="logo">
+                <div style="text-align: center;"><img src="/static/img/cs-text-nobg.png" id="logo"></div>
                 <p>
                     Crab Star is a chess engine written by Sam Wang and Justin Peng.
                     It uses a combination of hardcoded factors and a neural network to evaluate positions.
@@ -129,17 +129,6 @@
             </div>
         </div>
 
-        <!-- <button id="new_game">New game</button>
-        <button id="take_back">Take back</button>
-        <button id="flip_board">Flip board</button>
-        <br><br>
-
-        <label><b>Status:</b></label>
-        <div id="status"></div>
-        <label><b>FEN:</b></label>
-        <div id="fen"></div>
-        <label><b>PGN:</b></label>
-        <div id="pgn"></div> -->
     </body>
 </html>
 
@@ -162,16 +151,14 @@
         onSnapEnd: onSnapEnd
     };
 
-    console.log(isDark('a1'));
-    console.log(isDark('a8'));
-    console.log(isDark('h8'));
-
     board = Chessboard('boardGui', config);
     var $boardGui = $('#boardGui');
     $(window).resize(resizeBoard);         // dynamically resize chess board
 
-    // define other useful constants
+    // for square highlighting
     let squareClass = '.square-55d63';
+    var lastSource = null;
+    var lastTarget = null;
 
     // new game button
     $('#new_game').on('click', function() {
@@ -222,10 +209,10 @@
         ply++;
         addMoveToTable(game.history()[game.history().length-1]);
         removeHighlights('black');
-        // $boardGui.find('.square-' + source).addClass('highlight-white');
-        // $boardGui.find('.square-' + target).addClass('highlight-white');
-        highlightSquare(source, 'white');
-        highlightSquare(target, 'white');
+        lastSource = source;
+        lastTarget = target;
+        highlightSquare(lastSource, 'white');
+        highlightSquare(lastTarget, 'white');
 
         // make HTTP POST request to make computer move
         if (game.game_over()) return false;
@@ -237,13 +224,10 @@
             ply++;
             addMoveToTable(game.history()[game.history().length-1]);
             removeHighlights('white');
-            let compSource = data.best_move.slice(0, 2);
-            let compTarget = data.best_move.slice(2, 4);
-            console.log(compSource + ' ' + compTarget);
-            // $boardGui.find('.square-' + compSource).addClass('highlight-black');
-            // $boardGui.find('.square-' + compTarget).addClass('highlight-black');
-            highlightSquare(compSource, 'black');
-            highlightSquare(compTarget, 'black');
+            lastSource = data.best_move.slice(0, 2);
+            lastTarget = data.best_move.slice(2, 4);
+            highlightSquare(lastSource, 'black');
+            highlightSquare(lastTarget, 'black');
         });
         updateStatus();
     }
@@ -347,6 +331,11 @@
         let newWidth = Math.min(containerWidth - 500, 700);
         document.getElementById('boardGui').setAttribute("style", "width: " + newWidth + "px;");
         board.resize();
+        // make sure new board still displays highlights
+        if (lastSource != null) {
+            highlightSquare(lastSource, (ply % 2 == 0) ? "white" : "black");
+            highlightSquare(lastTarget, (ply % 2 == 0) ? "white" : "black");
+        }
     }
 
     updateStatus();
