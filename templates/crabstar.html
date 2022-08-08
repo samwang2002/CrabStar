@@ -64,27 +64,22 @@
                 width: 100%;
                 height: 500px;
                 border: 1px solid white;
-                /* text-align: center;
-                border-collapse: collapse; */
+                overflow: auto;
             }
 
             #move-list table {
                 width: 100%;
+                max-height: 100%;
                 text-align: center;
                 border-collapse: collapse;
             }
 
-            #move-list tr {
-                border: 1px solid white;
-            }
-
             #move-list td {
-                /* border: 1px solid white; */
+                border: 1px solid white;
                 overflow: hidden;
             }
             
             .move-count {
-                border: 1px solid white;
                 width: 16%;
             }
 
@@ -153,6 +148,18 @@
 
     var ply = 0;
 
+    // initialize board
+    var config = {
+        draggable: true,
+        position: 'start',
+        onDragStart: onDragStart,
+        onDrop: onDrop,
+        onSnapEnd: onSnapEnd
+    };
+
+    board = Chessboard('boardGui', config);
+    $(window).resize(resizeBoard);         // dynamically resize chess board
+
     // new game button
     $('#new_game').on('click', function() {
         game.reset();
@@ -199,6 +206,7 @@
         if (move === null) return 'snapback';
 
         ply++;
+        addMoveToTable(game.history()[game.history().length-1]);
 
         // make HTTP POST request to make computer move
         if (game.game_over()) return false;
@@ -207,6 +215,7 @@
             board.position(game.fen());
             updateStatus();
             ply++;
+            addMoveToTable(game.history()[game.history().length-1]);
         });
 
         updateStatus();
@@ -251,10 +260,36 @@
         if (ply > 0 && ply % 2 == 0) {
             cell1 = row.insertCell(0);
         }
+    }
 
-        // $status.html(status);
-        // $fen.html(game.fen());
-        // $pgn.html(game.pgn());
+    // add move to table
+    function addMoveToTable(move) {
+        let table = document.getElementById("move-table");
+        let wrapper = document.getElementById("move-list");
+
+        if (ply % 2 == 1) {     // white just moved, need to add new row
+            currentRow = document.createElement('tr');
+
+            let countLabel = document.createElement('td');
+            countLabel.classList.add('move-count');
+            countLabel.innerHTML = (ply+1) >> 1;
+            currentRow.appendChild(countLabel);
+
+            let wmove = document.createElement('td');
+            wmove.classList.add('move-label');
+            wmove.innerHTML = move;
+            currentRow.appendChild(wmove);
+
+            let bmove = document.createElement('td');
+            bmove.classList.add('move-label');
+            currentRow.appendChild(bmove);
+
+            table.appendChild(currentRow);
+            wrapper.scrollTop = wrapper.scrollHeight;
+        } else {            // black just moved, update black's move
+            let bmove = currentRow.children[2];
+            bmove.innerHTML = move;
+        }
     }
 
     // resize board element and then call resize function
@@ -264,25 +299,6 @@
         document.getElementById('boardGui').setAttribute("style", "width: " + newWidth + "px;");
         board.resize();
     }
-
-    var config = {
-        draggable: true,
-        position: 'start',
-        onDragStart: onDragStart,
-        onDrop: onDrop,
-        onSnapEnd: onSnapEnd
-    };
-
-    board = Chessboard('boardGui', config);
-    $(window).resize(resizeBoard);         // dynamically resize chess board
-    let table = document.getElementById("move-table");
-
-    var currentRow = document.createElement('tr');
-    let firstNum = document.createElement('td');
-    firstNum.classList.add('move-count');
-    firstNum.innerHTML = 1;
-    currentRow.appendChild(firstNum);
-    table.appendChild(currentRow);
 
     updateStatus();
 </script>
