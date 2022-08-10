@@ -20,10 +20,7 @@
                 background-color: #0d151c;
                 color: white;
                 font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-            }
-
-            p {
-                font-size: 15px;
+                font-size: 14px;
             }
 
             a {
@@ -35,6 +32,7 @@
                 cursor: pointer;
             }
 
+            /* big boxes formatting */
             #container {
                 width: 100%;
                 max-width: 1300px;
@@ -79,6 +77,7 @@
                 font-weight: bold;
             }
 
+            /* move list table */
             #move-list {
                 background-color: #1b2f4f;
                 width: 100%;
@@ -98,6 +97,7 @@
             #move-list td {
                 border: 1px solid white;
                 overflow: hidden;
+                font-size: 15px;
             }
 
             .cell-highlight {
@@ -112,16 +112,31 @@
                 width: 42%;
             }
 
+            #status-label {
+                font-size: 16px;
+            }
+
+            #move-buttons {
+                display: flex;
+            }
+
+            /* game control buttons */
             button {
-                font-size: 25px;
-                font-weight: bold;
                 background-color: #0b4c7a;
                 color: white;
                 border: 1px solid white;
                 box-shadow: none;
-                margin: 0px 10px;
-                padding: 0px 20px;
+                margin: 0px 4px;
+                height: 40px;
+                padding: 0px 15px;
                 border-radius: 5px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            #back-button, #forward-button {
+                font-size: 25px;
                 font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
             }
 
@@ -131,6 +146,52 @@
 
             button:disabled {
                 background-color: #808080;
+            }
+
+            /* new game drop down */
+            #new-button {
+                width: 110px;
+                position: relative;
+                z-index: 10;
+            }
+
+            #new-dropdown {
+                position: relative;
+                display: inline-block;
+            }
+
+            #new-dropdown-content {
+                display: none;
+                position: absolute;
+                width: 108px;
+                margin: 0px 4px;
+                background-color: #0b4c7a;
+                top: 35px;
+                border-radius: 0px 0px 5px 5px;
+                border: 1px solid white;
+            }
+
+            #new-dropdown-content a {
+                display: block;
+                color: white;
+                text-decoration: none;
+                font-size: 15px;
+                padding: 6px 0px;
+                z-index: -10;
+                text-align: center;
+            }
+
+            #new-dropdown-content a:hover {
+                background-color: #1b2f4f;
+            }
+
+            #new-dropdown-content a:first-of-type {
+                margin-top: 5px;
+                /* border-bottom: 1px solid white; */
+            }
+
+            .show-dropdown {
+                display: block !important;
             }
 
             /* chess board highlights */
@@ -181,6 +242,13 @@
                 <div id="move-buttons">
                     <button id="back-button" disabled onclick="goBack()">&#60;</button>
                     <button id="forward-button" disabled onclick="goForward()">&#62;</button>
+                    <div id="new-dropdown">
+                        <button id="new-button" onclick="newClicked()">new game</button>
+                        <div id="new-dropdown-content">
+                            <a href="#">play as white</a>
+                            <a href="#">play as black</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -501,6 +569,12 @@
         // disable if necessary
         if (ply == totalPly)
             forwardButton.disabled = true;
+    }
+
+    // new button clicked - toggle visibility of dropdown
+    function newClicked() {
+        console.log("hello");
+        document.getElementById('new-dropdown-content').classList.toggle('show-dropdown');
     }
 
     updateStatus();
