@@ -598,6 +598,9 @@
         let currColor = (ply%2 == 0) ? 'black' : 'white';
         highlightSquare(sources[ply-1], currColor);
         highlightSquare(targets[ply-1], currColor);
+
+        // scroll if necessary
+        moveCells[ply-1].scrollIntoView(true);
     }
 
     // go forward function
@@ -628,6 +631,9 @@
         // disable if necessary
         if (ply == totalPly)
             forwardButton.disabled = true;
+        
+        // scroll if necessary
+        moveCells[ply-1].scrollIntoView(false);
     }
 
     // new button clicked - toggle visibility of dropdown
