@@ -185,9 +185,13 @@
                 background-color: #1b2f4f;
             }
 
-            #new-dropdown-content a:first-of-type {
+            #white-button {
                 margin-top: 5px;
                 /* border-bottom: 1px solid white; */
+            }
+
+            #black-button {
+                border-radius: 0px 0px 5px 5px;
             }
 
             .show-dropdown {
@@ -245,8 +249,8 @@
                     <div id="new-dropdown">
                         <button id="new-button" onclick="newClicked()">new game</button>
                         <div id="new-dropdown-content">
-                            <a href="#">play as white</a>
-                            <a href="#">play as black</a>
+                            <a id="white-button">play as white</a>
+                            <a id="black-button">play as black</a>
                         </div>
                     </div>
                 </div>
@@ -580,11 +584,18 @@
     updateStatus();
     resizeBoard();
 
-    // add key events
+    // add key events for back/forward
     document.onkeydown = checkKey;
     function checkKey(e) {
         e = e || window.event;
         if (e.keyCode == '37') goBack();
         if (e.keyCode == '39') goForward();
+    }
+
+    // add window events for closing dropdown
+    window.onclick = function(event) {
+        if (!event.target.matches('#new-button')) {
+            document.getElementById('new-dropdown-content').classList.remove('show-dropdown');
+        }
     }
 </script>
