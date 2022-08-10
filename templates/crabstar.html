@@ -52,10 +52,15 @@
             }
 
             #right {
-                padding: 30px 0px 0px 20px;
+                padding: 0px 0px 0px 20px;
+                margin-top: 30px;
                 width: 250px;
                 flex-shrink: 0;
                 box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-flow: column nowrap;
             }
 
             #boardGui {
@@ -69,12 +74,17 @@
                 margin: auto;
             }
 
+            #status-label {
+                font-weight: bold;
+            }
+
             #move-list {
                 background-color: #1b2f4f;
                 width: 100%;
                 height: 500px;
                 border: 1px solid white;
                 overflow: auto;
+                margin: 10px 0px;
             }
 
             #move-list table {
@@ -97,9 +107,24 @@
                 width: 42%;
             }
 
-            #status, #fen, #pgn {
-                margin-top: -5px;
-                padding-bottom: 10px;
+            button {
+                font-size: 25px;
+                font-weight: bold;
+                background-color: #0b4c7a;
+                color: white;
+                border: 1px solid white;
+                box-shadow: none;
+                margin: 0px 10px;
+                padding: 0px 20px;
+                border-radius: 5px;
+            }
+
+            button:hover {
+                background-color: #1b2f4f;
+            }
+
+            button:disabled {
+                background-color: #808080;
             }
 
             /* chess board highlights */
@@ -126,7 +151,7 @@
             <div id="left">
                 <div style="text-align: center;"><img src="/static/img/cs-text-nobg.png" id="logo"></div>
                 <p>
-                    Crab Star is a chess engine written by Sam Wang and Justin Peng.
+                    Crab Star is a chess AI written by Sam Wang and Justin Peng.
                     It uses a combination of a neural network and hardcoded factors (e.g. material score)
                     to evaluate positions.
                     Its strength in blitz chess is around 2300 elo.
@@ -145,7 +170,12 @@
             <div id="boardGui"></div>
 
             <div id="right">
+                <div id="status-label">white to move</div>
                 <div id="move-list"><table id="move-table"></table></div>
+                <div id="move-buttons">
+                    <button id="back-button">&#60;</button>
+                    <button id="forward-button" disabled>&#62;</button>
+                </div>
             </div>
         </div>
 
@@ -156,9 +186,6 @@
     // define game variables
     var net_weight = 0.25;
     var game = new Chess();
-    // var $status = $('#status');
-    // var $fen = $('#fen');
-    // var $pgn = $('#pgn');
 
     var ply = 0;
 
@@ -174,6 +201,8 @@
     board = Chessboard('boardGui', config);
     var $boardGui = $('#boardGui');
     $(window).resize(resizeBoard);         // dynamically resize chess board
+
+    var $status = $('#status-label');
 
     // for square highlighting
     let squareClass = '.square-55d63';
@@ -248,6 +277,7 @@
             lastTarget = data.best_move.slice(2, 4);
             highlightSquare(lastSource, 'black');
             highlightSquare(lastTarget, 'black');
+            updateStatus();
         });
         updateStatus();
     }
@@ -269,23 +299,26 @@
 
         // checkmate?
         if (game.in_checkmate()) {
-            status = 'game over, ' + moveColor + ' is in checkmate.';
+            status = moveColor + ' is in checkmate';
         }
 
         // draw?
         else if (game.in_draw()) {
-            status = 'game over, drawn position';
+            status = 'game drawn';
         }
 
         // game still on
         else {
             status = moveColor + ' to move';
 
-            // check?
-            if (game.in_check()) {
-                status += ', ' + moveColor + ' is in check';
-            }
+            // // check?
+            // if (game.in_check()) {
+            //     status += ', ' + moveColor + ' is in check';
+            // }
         }
+
+        // update elements
+        $status.html(status);
 
         // add move to table
         if (ply > 0 && ply % 2 == 0) {
@@ -351,12 +384,18 @@
         let newWidth = Math.min(containerWidth - 500, 700);
         document.getElementById('boardGui').setAttribute("style", "width: " + newWidth + "px;");
         board.resize();
+
         // make sure new board still displays highlights
         if (lastSource != null) {
             highlightSquare(lastSource, (ply % 2 == 0) ? "white" : "black");
             highlightSquare(lastTarget, (ply % 2 == 0) ? "white" : "black");
         }
+
+        // set right toolbar height equal to board
+        let rightHeight = Math.max(newWidth, 550);
+        document.getElementById('right').setAttribute('style', 'height: ' + rightHeight + 'px;');
     }
 
     updateStatus();
+    resizeBoard();
 </script>
