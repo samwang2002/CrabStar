@@ -98,6 +98,10 @@
                 border: 1px solid white;
                 overflow: hidden;
             }
+
+            .cell-highlight {
+                background-color: #eb3a7c;
+            }
             
             .move-count {
                 width: 16%;
@@ -173,8 +177,8 @@
                 <div id="status-label">white to move</div>
                 <div id="move-list"><table id="move-table"></table></div>
                 <div id="move-buttons">
-                    <button id="back-button">&#60;</button>
-                    <button id="forward-button" disabled>&#62;</button>
+                    <button id="back-button" disabled onclick="goBack()">&#60;</button>
+                    <button id="forward-button" disabled onclick="goForward()">&#62;</button>
                 </div>
             </div>
         </div>
@@ -187,10 +191,14 @@
     var net_weight = 0.25;
     var game = new Chess();
 
+    var totalPly = 0;
     var ply = 0;
+    var sources = Array();
+    var targets = Array();
+    var moveCells = Array();
 
     // initialize board
-    var config = {
+    let config = {
         draggable: true,
         position: 'start',
         onDragStart: onDragStart,
@@ -199,10 +207,12 @@
     };
 
     board = Chessboard('boardGui', config);
-    var $boardGui = $('#boardGui');
+    let $boardGui = $('#boardGui');
     $(window).resize(resizeBoard);         // dynamically resize chess board
 
-    var $status = $('#status-label');
+    let $status = $('#status-label');
+    let backButton = document.getElementById('back-button');
+    let forwardButton = document.getElementById('forward-button');
 
     // for square highlighting
     let squareClass = '.square-55d63';
@@ -235,6 +245,9 @@
         // do not pick up pieces if the game is over or computer is thinking
         if (game.game_over() || game.turn() === 'b') return false;
 
+        // do not pick up pieces if game is in an older position
+        if (ply < totalPly) return false;
+
         // only pick up pieces for the side to move
         if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
             (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
@@ -254,29 +267,47 @@
         // illegal move
         if (move === null) return 'snapback';
 
+        totalPly++;
+        ply = totalPly;
+        backButton.disabled = false;
+
         // update visuals
-        ply++;
         addMoveToTable(game.history()[game.history().length-1]);
-        removeHighlights('black');
+        removeBoardHighlights();
         lastSource = source;
         lastTarget = target;
         highlightSquare(lastSource, 'white');
         highlightSquare(lastTarget, 'white');
+        sources.push(lastSource);
+        targets.push(lastTarget);
 
         // make HTTP POST request to make computer move
         if (game.game_over()) return false;
         $.post('/make_move', {'fen': game.fen(), 'weight': net_weight}, function(data) {
+            // make sure position is up to date
+            for (var i = ply; i <= totalPly; i++) {
+                game.move({
+                    from: sources[i],
+                    to: targets[i],
+                    promotion: 'q'
+                });
+            }
+            
             // make move
             game.move(data.best_move, { sloppy: true });
             board.position(game.fen());
 
-            ply++;
+            totalPly++;
+            ply = totalPly;
+
             addMoveToTable(game.history()[game.history().length-1]);
-            removeHighlights('white');
+            removeBoardHighlights();
             lastSource = data.best_move.slice(0, 2);
             lastTarget = data.best_move.slice(2, 4);
             highlightSquare(lastSource, 'black');
             highlightSquare(lastTarget, 'black');
+            sources.push(lastSource);
+            targets.push(lastTarget);
             updateStatus();
         });
         updateStatus();
@@ -319,11 +350,10 @@
 
         // update elements
         $status.html(status);
-
-        // add move to table
-        if (ply > 0 && ply % 2 == 0) {
-            cell1 = row.insertCell(0);
-        }
+        if (ply > 0) backButton.disabled = false;
+        else backButton.disabled = true;
+        if (ply < totalPly) forwardButton.disabled = false;
+        else forwardButton.disabled = true;
     }
 
     // return whether square is dark
@@ -343,9 +373,18 @@
     }
 
     // remove highlighted squares of color
-    function removeHighlights(color) {
-        $boardGui.find(squareClass).removeClass('highlight-' + color + '-dark');
-        $boardGui.find(squareClass).removeClass('highlight-' + color + '-light');
+    function removeBoardHighlights() {
+        $boardGui.find(squareClass).removeClass('highlight-white-dark');
+        $boardGui.find(squareClass).removeClass('highlight-white-light');
+        $boardGui.find(squareClass).removeClass('highlight-black-dark');
+        $boardGui.find(squareClass).removeClass('highlight-black-light');
+    }
+
+    // remove highlighted table squares
+    function removeTableHighlights() {
+        [].forEach.call(document.querySelectorAll('.cell-highlight'), function(el) {
+            el.classList.remove('cell-highlight');
+        });
     }
 
     // add move to table
@@ -353,18 +392,23 @@
         let table = document.getElementById("move-table");
         let wrapper = document.getElementById("move-list");
 
-        if (ply % 2 == 1) {     // white just moved, need to add new row
+        // remove existing highlights
+        if (ply > 1)
+            removeTableHighlights();
+
+        if (totalPly % 2 == 1) {     // white just moved, need to add new row
             currentRow = document.createElement('tr');
 
             let countLabel = document.createElement('td');
             countLabel.classList.add('move-count');
-            countLabel.innerHTML = (ply+1) >> 1;
+            countLabel.innerHTML = (totalPly+1) >> 1;
             currentRow.appendChild(countLabel);
 
             let wmove = document.createElement('td');
-            wmove.classList.add('move-label');
             wmove.innerHTML = move;
+            wmove.classList.add('move-label', 'cell-highlight');
             currentRow.appendChild(wmove);
+            moveCells.push(wmove);
 
             let bmove = document.createElement('td');
             bmove.classList.add('move-label');
@@ -375,6 +419,8 @@
         } else {            // black just moved, update black's move
             let bmove = currentRow.children[2];
             bmove.innerHTML = move;
+            bmove.classList.add('cell-highlight');
+            moveCells.push(bmove);
         }
     }
 
@@ -387,8 +433,8 @@
 
         // make sure new board still displays highlights
         if (lastSource != null) {
-            highlightSquare(lastSource, (ply % 2 == 0) ? "white" : "black");
-            highlightSquare(lastTarget, (ply % 2 == 0) ? "white" : "black");
+            highlightSquare(lastSource, (totalPly % 2 == 0) ? "white" : "black");
+            highlightSquare(lastTarget, (totalPly % 2 == 0) ? "white" : "black");
         }
 
         // set right toolbar height equal to board
@@ -396,6 +442,72 @@
         document.getElementById('right').setAttribute('style', 'height: ' + rightHeight + 'px;');
     }
 
+    // go back function
+    function goBack() {
+        if (ply <= 0) return;
+        ply--;
+        forwardButton.disabled = false;
+
+        // update position
+        game.undo();
+        board.position(game.fen());
+
+        // remove old highlights
+        removeTableHighlights();
+        let lastColor = (ply%2 == 0) ? 'white' : 'black';
+        removeBoardHighlights();
+
+        // disable if necessary
+        if (ply == 0) {
+            backButton.disabled = true;
+            return;
+        }
+
+        // add new highlights
+        moveCells[ply-1].classList.add('cell-highlight');
+        let currColor = (ply%2 == 0) ? 'black' : 'white';
+        highlightSquare(sources[ply-1], currColor);
+        highlightSquare(targets[ply-1], currColor);
+    }
+
+    // go forward function
+    function goForward() {
+        if (ply == totalPly) return;
+        ply++;
+        backButton.disabled = false;
+
+        // update position
+        var move = game.move({
+            from: sources[ply-1],
+            to: targets[ply-1],
+            promotion: 'q' // NOTE: always promote to a queen for simplicity
+        });
+        board.position(game.fen());
+
+        // remove old highlights
+        removeTableHighlights();
+        let lastColor = (ply%2 == 0) ? 'white' : 'black';
+        removeBoardHighlights();
+
+        // add new highlights
+        moveCells[ply-1].classList.add('cell-highlight');
+        let currColor = (ply%2 == 0) ? 'black' : 'white';
+        highlightSquare(sources[ply-1], currColor);
+        highlightSquare(targets[ply-1], currColor);
+
+        // disable if necessary
+        if (ply == totalPly)
+            forwardButton.disabled = true;
+    }
+
     updateStatus();
     resizeBoard();
+
+    // add key events
+    document.onkeydown = checkKey;
+    function checkKey(e) {
+        e = e || window.event;
+        if (e.keyCode == '37') goBack();
+        if (e.keyCode == '39') goForward();
+    }
 </script>
