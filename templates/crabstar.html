@@ -220,18 +220,10 @@
             <div id="left">
                 <div style="text-align: center;"><img src="/static/img/cs-text-nobg.png" id="logo"></div>
                 <p>
-                    Crab Star is a chess AI written by Sam Wang and Justin Peng.
-                    It uses a combination of a neural network and hardcoded factors (e.g. material score)
-                    to evaluate positions.
-                    Its strength in blitz chess is around 2300 elo.
+                    Crab Star is a chess AI written by Sam Wang and Justin Peng. It uses a combination of a neural network and hardcoded factors (e.g. material score) to evaluate positions. The neural network was first trained over a dataset of 500,000 positions along with their Stockfish evaluations, and then improved by playing against itself over 30,000 times.
                 </p>
                 <p>
-                    The neural network was first trained over a dataset of 500,000 positions along with
-                    their Stockfish evaluations, and then improved by playing against itself over 30,000 times.
-                </p>
-                <p>
-                    On this website, the engine is set to run at depth 6, meaning that it looks 6 half moves
-                    (3 moves) ahead.
+                    On this website, the engine is set to run at depth 6, meaning that it searches 6 half moves (3 moves) ahead. At this depth, its strength is around 2200 elo. To play against a stronger version of Crab Star, download and compile the source code from Github, and connect the program to a UCI-compatible interface like Arena.
                 </p>
                 <p>
                     Note: We did not implement an opening book so the engine always responds with the same move
