@@ -1,33 +1,60 @@
-from flask import Flask
-from flask import render_template
-from flask import request
+import os
+import threading
+from flask import Flask, render_template, request, jsonify
 import chess
 import chess.engine
 
-engine = chess.engine.SimpleEngine.popen_uci('./main')
-
-board = chess.Board()
-
 app = Flask(__name__)
 
-# root route
-@app.route('/')
+ENGINE_PATH = os.path.abspath("./main")
+_engine = None
+_engine_lock = threading.Lock()
+
+
+def get_engine():
+    global _engine
+
+    if _engine is None:
+        with _engine_lock:
+            if _engine is None:
+                if not os.path.exists(ENGINE_PATH):
+                    raise RuntimeError(f"Engine binary not found at {ENGINE_PATH}")
+
+                _engine = chess.engine.SimpleEngine.popen_uci(ENGINE_PATH)
+    return _engine
+
+
+@app.route("/")
 def root():
-    return render_template('crabstar.html')
+    return render_template("crabstar.html")
 
-# make move api
-@app.route('/make_move', methods=['POST'])
+
+@app.route("/make_move", methods=["POST"])
 def make_move():
-    fen = request.form.get('fen')
-    net_weight = float(request.form.get('weight'))  # communicate weight to engine using uci time control option
+    try:
+        engine = get_engine()
 
-    # find best move
-    board = chess.Board(fen)
-    result = engine.play(board, chess.engine.Limit(depth=6, time=net_weight))
-    board.push(result.move)
-    best_move = str(result.move)
+        fen = request.form.get("fen")
+        weight = float(request.form.get("weight", 0.1))
 
-    return {'fen': board.fen(), 'best_move': best_move}
+        board = chess.Board(fen)
 
-if __name__ == '__main__':
-    app.run(debug=True, threaded=True, port=4500)
+        # FORCE a cheap test first
+        result = engine.play(board, chess.engine.Limit(depth=2, time=min(weight, 0.2)))
+
+        board.push(result.move)
+
+        return jsonify({
+            "fen": board.fen(),
+            "best_move": str(result.move)
+        })
+
+    except chess.engine.EngineTerminatedError:
+        return jsonify({"error": "Engine process crashed."}), 500
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
