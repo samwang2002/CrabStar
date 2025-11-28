@@ -32,7 +32,7 @@ U64 mask_king_attacks(const int square)
 // initialize king attack table
 void init_king_attacks()
 {
-    for (int square = 0; square <= 64; ++square)
+    for (int square = 0; square < 64; ++square)
         king_attacks[square] = mask_king_attacks(square);
 }
 
