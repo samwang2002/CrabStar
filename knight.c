@@ -33,7 +33,7 @@ U64 mask_knight_attacks(const int square)
 // initialize knight attack table
 void init_knight_attacks()
 {
-    for (int square = 0; square <= 64; ++square)
+    for (int square = 0; square < 64; ++square)
         knight_attacks[square] = mask_knight_attacks(square);
 }
 
