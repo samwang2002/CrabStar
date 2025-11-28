@@ -40,7 +40,7 @@ def make_move():
         board = chess.Board(fen)
 
         # FORCE a cheap test first
-        result = engine.play(board, chess.engine.Limit(depth=2, time=min(weight, 0.2)))
+        result = engine.play(board, chess.engine.Limit(depth=6, time=weight))
 
         board.push(result.move)
 
