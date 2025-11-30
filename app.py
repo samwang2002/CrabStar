@@ -35,12 +35,10 @@ def make_move():
         engine = get_engine()
 
         fen = request.form.get("fen")
-        weight = float(request.form.get("weight", 0.1))
+        # weight = float(request.form.get("weight", 0.1))
 
         board = chess.Board(fen)
-
-        # FORCE a cheap test first
-        result = engine.play(board, chess.engine.Limit(depth=8, time=weight))
+        result = engine.play(board, chess.engine.Limit(depth=8, time=10.0))
 
         board.push(result.move)
 
